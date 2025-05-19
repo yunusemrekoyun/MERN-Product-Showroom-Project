@@ -1,17 +1,21 @@
 /*! header start */
 
 header {
-  position: sticky;
-  top: 0;
   width: 100%;
   background-color: #fff;
-  z-index: 10;
-  border-bottom: 1px solid #dee0ea;
   font-family: Arial, sans-serif;
 }
 
 .header-top {
   padding: 16px 0;
+  background-color: #fff;
+  border-bottom: 1px solid #dee0ea;
+  z-index: 1;
+}
+
+.site-logo {
+  height: 70px;
+  object-fit: contain;
 }
 
 .header-wrapper {
@@ -19,22 +23,6 @@ header {
   justify-content: space-between;
   align-items: center;
 }
-
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  text-decoration: none;
-  color: black;
-}
-
-/* .search-input {
-  width: 350px;
-  padding: 10px 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: #f9f9f9;
-} */
 
 .header-right {
   display: flex;
@@ -91,13 +79,14 @@ header {
   font-weight: 500;
 }
 
-/* Alt Menü */
+/* Sadece .header-bottom sticky olsun */
 .header-bottom {
+  position: sticky;
+  top: 0;
+  z-index: 99;
   background-color: #f5f5f5;
   border-top: 1px solid #dee0ea;
   border-bottom: 1px solid #dee0ea;
-  position: relative;
-  z-index: 5;
 }
 
 .header-menu {
@@ -105,8 +94,6 @@ header {
   align-items: center;
   gap: 32px;
   padding: 14px 0;
-  position: relative;
-  z-index: 5;
 }
 
 .menu-link {
@@ -143,7 +130,6 @@ header {
 
 .menu-item {
   position: relative;
-  z-index: 5;
 }
 
 .menu-item:hover .submenu,
@@ -160,9 +146,8 @@ header {
   background-color: white;
   border: 1px solid #ccc;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-  display: none;
   flex-direction: column;
-  z-index: 99;
+  z-index: 999;
   border-radius: 4px;
   animation: fadeIn 0.2s ease-in-out;
 }
@@ -177,9 +162,11 @@ header {
   border-bottom: 1px solid #f0f0f0;
   background-color: #fff;
 }
+
 .submenu.show {
   display: flex;
 }
+
 .submenu a:last-child {
   border-bottom: none;
 }
@@ -201,11 +188,6 @@ header {
 }
 
 @media (max-width: 768px) {
-  .search-input {
-    width: 100%;
-    margin: 8px 0;
-  }
-
   .header-wrapper {
     flex-direction: column;
     align-items: flex-start;
@@ -217,5 +199,3 @@ header {
     gap: 12px;
   }
 }
-
-/*! header end */
