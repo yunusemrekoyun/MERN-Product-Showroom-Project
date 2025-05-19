@@ -21,7 +21,9 @@ import CreateCouponPage from "./pages/Admin/Coupons/CreateCouponPage";
 import UpdateCouponPage from "./pages/Admin/Coupons/UpdateCouponPage";
 import Success from "./pages/Success";
 import OrderPage from "./pages/Admin/OrderPage";
-
+import CampaignPage from "./pages/Admin/Campaigns/CampaignPage";
+import CreateCampaignPage from "./pages/Admin/Campaigns/CreateCampaignPage";
+import UpdateCampaignPage from "./pages/Admin/Campaigns/UpdateCampaignPage";
 function App() {
   return (
     <Routes>
@@ -43,6 +45,9 @@ function App() {
         <Route path="products" element={<ProductPage />} />
         <Route path="products/create" element={<CreateProductPage />} />
         <Route path="products/update/:id" element={<UpdateProductPage />} />
+        <Route path="campaigns" element={<CampaignPage />} />
+        <Route path="campaigns/create" element={<CreateCampaignPage />} />
+        <Route path="campaigns/update/:id" element={<UpdateCampaignPage />} />
         <Route path="coupons" element={<CouponPage />} />
         <Route path="coupons/create" element={<CreateCouponPage />} />
         <Route path="coupons/update/:id" element={<UpdateCouponPage />} />

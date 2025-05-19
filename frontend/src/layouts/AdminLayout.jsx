@@ -36,7 +36,6 @@ const AdminLayout = ({ children }) => {
       key: "2",
       icon: <AppstoreOutlined />,
       label: "Kategoriler",
-      path: "/",
       children: [
         {
           key: "3",
@@ -60,7 +59,6 @@ const AdminLayout = ({ children }) => {
       key: "5",
       icon: <LaptopOutlined />,
       label: "Ürünler",
-      path: "/",
       children: [
         {
           key: "6",
@@ -84,7 +82,6 @@ const AdminLayout = ({ children }) => {
       key: "8",
       icon: <BarcodeOutlined />,
       label: "Kuponlar",
-      path: "/admin/coupons",
       children: [
         {
           key: "9",
@@ -100,6 +97,29 @@ const AdminLayout = ({ children }) => {
           path: "/admin/coupons/create",
           onClick: () => {
             navigate("/admin/coupons/create");
+          },
+        },
+      ],
+    },
+    {
+      key: "14",
+      icon: <AppstoreOutlined />,
+      label: "Kampanyalar",
+      children: [
+        {
+          key: "15",
+          label: "Kampanya Listesi",
+          path: "/admin/campaigns",
+          onClick: () => {
+            navigate("/admin/campaigns");
+          },
+        },
+        {
+          key: "16",
+          label: "Yeni Kampanya Oluştur",
+          path: "/admin/campaigns/create",
+          onClick: () => {
+            navigate("/admin/campaigns/create");
           },
         },
       ],

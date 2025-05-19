@@ -13,8 +13,6 @@ const HomePage = () => {
       <Categories />
       <Products />
       <Campaigns />
-      <Campaigns />
-      <Campaigns />
       <Products />
       <Blogs />
       <Brands />
