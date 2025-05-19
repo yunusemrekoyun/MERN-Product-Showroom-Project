@@ -35,7 +35,7 @@ p {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1700px;
   width: 100%;
   margin: 0 auto;
 }
@@ -120,31 +120,31 @@ input[type="number"]::-webkit-inner-spin-button {
 
 @media (max-width: 1200px) {
   .container {
-    max-width: 992px;
+    max-width: 1700px;
   }
 }
 
 @media (max-width: 992px) {
   .container {
-    max-width: 768px;
+    max-width: 1700px;
   }
 }
 
 @media (max-width: 768px) {
   .container {
-    max-width: 576px;
+    max-width: 1700px;
   }
 }
 
 @media (max-width: 576px) {
   .container {
-    max-width: 400px;
+    max-width: 1700px;
   }
 }
 
 @media (max-width: 420px) {
   .container {
-    max-width: 350px;
+    max-width: 1700px;
   }
 }
 
