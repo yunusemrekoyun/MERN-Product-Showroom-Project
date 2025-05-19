@@ -27,14 +27,14 @@ header {
   color: black;
 }
 
-.search-input {
+/* .search-input {
   width: 350px;
   padding: 10px 16px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
   background-color: #f9f9f9;
-}
+} */
 
 .header-right {
   display: flex;

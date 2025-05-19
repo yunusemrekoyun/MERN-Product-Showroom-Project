@@ -1,165 +1,102 @@
-/*! modal search start  */
-.modal-search {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    visibility: hidden;
-    z-index: 999;
-    opacity: 0;
-    transition: 0.3s ease all;
-  }
-  .modal-search.show{
-    visibility: visible;
-    opacity: 1;
-  }
-.modal-overlay {
-    content: "";
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    position: fixed;
-    top: 0;
-    left: 0;
-    opacity: 0.5;
-  }
-  
-  .modal-wrapper {
-    max-width: 800px;
-    width: 100%;
-    background-color: #fff;
-    position: fixed;
-    z-index: 10;
-    padding: 30px;
-  }
-  
-  .modal-search .modal-title {
-    font-size: 30px;
-    font-weight: 600;
-  }
-  
-  .modal-search .modal-text {
-    font-size: 14px;
-    color: #7a7a7a;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #dee0ea;
-  }
-  
-  .modal-search .search-form {
-    margin-top: 15px;
-    display: flex;
-    position: relative;
-  }
-  
-  .modal-search .search-form::after {
-    content: "";
-    width: 100%;
-    height: 1px;
-    background-color: #dee0ea;
-    position: absolute;
-    bottom: -15px;
-  }
-  
-  .modal-search .search-form input {
-    width: 100%;
-    max-height: 42px;
-    border-color: #dee0ea !important;
-  }
-  
-  .modal-search .search-form button {
-    position: absolute;
-    right: 0;
-    height: 100%;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #dee0ea;
-  }
-  
-  .modal-search .search-form button i {
-    font-size: 18px;
-    color: #7a7a7a;
-  }
-  
-  .modal-search .search-results {
-    margin-top: 30px;
-  }
-  
-  .modal-search .search-heading {
-    padding: 15px;
-    background-color: #f9f9f9;
-    border: 1px solid #dee0ea;
-  }
-  
-  .modal-search .search-heading h3 {
-    font-size: 16px;
-    font-weight: 600;
-  }
-  
-  .modal-search .results {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-left: 1px solid #dee0ea;
-  }
-  
-  .modal-search .result-item {
-    display: flex;
-    column-gap: 15px;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #dee0ea;
-    border-right: 1px solid #dee0ea;
-    transition: background-color 0.2s eae;
-  }
-  
-  .modal-search .result-item:hover {
-    background-color: #f9f9f9;
-  }
-  
-  .modal-search .search-thumb {
-    max-width: 65px;
+.search-inline-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-form-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+
+}
+
+.search-input {
+  width: 650px;
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+}
+
+.search-form-inline button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.search-form-inline button i {
+  font-size: 18px;
+  color: #555;
+}
+
+.search-results-inline {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  z-index: 99;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.result-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #eee;
+  text-decoration: none;
+  color: #333;
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.result-item:hover {
+  background-color: #f5f5f5;
+}
+
+.result-item.empty {
+  justify-content: center;
+  font-weight: 500;
+  grid-column: 1 / -1;
+}
+
+.search-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.search-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.search-price {
+  color: #dc3545;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .search-input {
     width: 100%;
   }
-  
-  .modal-search .search-info {
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
+
+  .search-results-inline {
+    grid-template-columns: 1fr;
   }
-  
-  .modal-search .search-sku {
-    color: #7a7a7a;
-    margin: 2px 0;
-  }
-  
-  .modal-search .search-price {
-    font-weight: 600;
-    color: #dc3545;
-  }
-  
-  .modal-search .bi-x-circle {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  /*! modal search end  */
-  
-  /* search responsive  */
-  
-  @media (max-width: 992px) {
-    .modal-search .modal-wrapper {
-      max-width: 370px;
-    }
-    .modal-search .results {
-      grid-template-columns: 1fr;
-    }
-  }
-  
+}

@@ -1,129 +1,92 @@
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { message } from "antd";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./Search.css";
 
-const Search = ({ isSearchShow, setIsSearchShow }) => {
+const Search = () => {
+  const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const wrapperRef = useRef(null);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
-  const handleCloseModal = () => {
-    setIsSearchShow(false);
-    setSearchResults(null);
-  };
-
+useEffect(() => {
+  console.log("Search rendered");
+}, []);
   const handleSearch = async (e) => {
     e.preventDefault();
-    const productName = e.target[0].value;
-
-    if (productName.trim().length === 0) {
-      message.warning("Boş karakter arayamazsınız!");
+    if (query.trim().length === 0) {
+      setSearchResults([]);
       return;
     }
 
     try {
-      const res = await fetch(
-        `${apiUrl}/api/products/search/${productName.trim()}`
-      );
-
-      if (!res.ok) {
-        message.error("Ürün getirme hatası!");
-        return;
-      }
-
+      const res = await fetch(`${apiUrl}/api/products/search/${query.trim()}`);
+      if (!res.ok) return;
       const data = await res.json();
       setSearchResults(data);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className={`modal-search ${isSearchShow ? "show" : ""} `}>
-      <div className="modal-wrapper">
-        <h3 className="modal-title">Search for products</h3>
-        <p className="modal-text">
-          Start typing to see products you are looking for.
-        </p>
-        <form className="search-form" onSubmit={handleSearch}>
-          <input type="text" placeholder="Search a product" />
-          <button>
-            <i className="bi bi-search"></i>
-          </button>
-        </form>
-        <div className="search-results">
-          <div className="search-heading">
-            <h3>RESULTS FROM PRODUCT</h3>
-          </div>
-          <div
-            className="results"
-            style={{
-              display: `${
-                searchResults?.length === 0 || !searchResults ? "flex" : "grid"
-              }`,
-            }}
-          >
-            {!searchResults && (
-              <b
+    <div className="search-inline-wrapper" ref={wrapperRef}>
+      <form className="search-form-inline" onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Ürün ara..."
+          className="search-input"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+        />
+        <button type="submit">
+          <i className="bi bi-search"></i>
+        </button>
+      </form>
+
+      {isFocused && (
+        <div className="search-results-inline">
+          {query.trim() === "" && searchResults === null ? (
+            <div className="result-item empty">Ürün ara...</div>
+          ) : searchResults?.length === 0 ? (
+            <div className="result-item empty">
+              😔 Aradığınız ürün bulunamadı
+            </div>
+          ) : (
+            searchResults?.map((item) => (
+              <Link
+                to={`/product/${item._id}`}
                 className="result-item"
-                style={{
-                  justifyContent: "center",
-                  width: "100%",
-                }}
+                key={item._id}
               >
-                Ürün Ara...
-              </b>
-            )}
-            {searchResults?.length === 0 && (
-              <a
-                href="#"
-                className="result-item"
-                style={{
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                😔Aradığınız Ürün Bulunamadı😔
-              </a>
-            )}
-            {searchResults?.length > 0 &&
-              searchResults?.map((resultItem) => (
-                <Link
-                  to={`product/${resultItem._id}`}
-                  className="result-item"
-                  key={resultItem._id}
-                >
-                  <img
-                    src={resultItem.img[0]}
-                    className="search-thumb"
-                    alt=""
-                  />
-                  <div className="search-info">
-                    <h4>{resultItem.name}</h4>
-                    <span className="search-sku">SKU: PD0016</span>
-                    <span className="search-price">
-                      ${resultItem.price.current.toFixed(2)}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-          </div>
+                <img
+                  src={item.img[0]}
+                  className="search-thumb"
+                  alt={item.name}
+                />
+                <div className="search-info">
+                  <h4>{item.name}</h4>
+                  <span className="search-price">
+                    ${item.price.current.toFixed(2)}
+                  </span>
+                </div>
+              </Link>
+            ))
+          )}
         </div>
-        <i
-          className="bi bi-x-circle"
-          id="close-search"
-          onClick={handleCloseModal}
-        ></i>
-      </div>
-      <div className="modal-overlay" onClick={handleCloseModal}></div>
+      )}
     </div>
   );
 };
 
 export default Search;
-
-Search.propTypes = {
-  isSearchShow: PropTypes.bool,
-  setIsSearchShow: PropTypes.func,
-};

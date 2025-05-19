@@ -1,12 +1,10 @@
-// Yeni yapıya göre güncellenmiş Header.jsx (JS destekli submenu açılma)
-
 import { useContext, useState, useRef } from "react";
-import PropTypes from "prop-types";
 import { Link, useLocation } from "react-router-dom";
 import { CartContext } from "../../../context/CartProvider";
 import "./Header.css";
+import Search from "../../Modals/Search/Search";
 
-const Header = ({ setIsSearchShow }) => {
+const Header = () => {
   const { cartItems } = useContext(CartContext);
   const user = localStorage.getItem("user");
   const { pathname } = useLocation();
@@ -35,12 +33,7 @@ const Header = ({ setIsSearchShow }) => {
             </Link>
           </div>
           <div className="header-center">
-            <input
-              type="text"
-              placeholder="Arama"
-              className="search-input"
-              onClick={() => setIsSearchShow(true)}
-            />
+            <Search />
           </div>
           <div className="header-right">
             <Link to="/auth" className="header-icon">
@@ -86,117 +79,87 @@ const Header = ({ setIsSearchShow }) => {
             </Link>
           </div>
 
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("3d")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/3d" className="menu-link">
-              3D TASARIMLAR
-            </Link>
-            <div className={`submenu ${activeMenu === "3d" ? "show" : ""}`}>
-              <Link to="/3d/masaustu">Masaüstü Objeler</Link>
-              <Link to="/3d/dekoratif">Dekoratif Tasarımlar</Link>
-            </div>
-          </div>
-
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("el")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/el-yapimi" className="menu-link">
-              EL YAPIMI
-            </Link>
-            <div className={`submenu ${activeMenu === "el" ? "show" : ""}`}>
-              <Link to="/el-yapimi/ahsap">Ahşap Ürünler</Link>
-              <Link to="/el-yapimi/kumas">Kumaş Ürünler</Link>
-            </div>
-          </div>
-
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("seramik")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/seramik" className="menu-link">
-              SERAMİK KOLEKSİYONU
-            </Link>
+          {/* Alt Menü Kategorileri */}
+          {[
+            {
+              key: "3d",
+              name: "3D TASARIMLAR",
+              links: [
+                ["/3d/masaustu", "Masaüstü Objeler"],
+                ["/3d/dekoratif", "Dekoratif Tasarımlar"],
+              ],
+            },
+            {
+              key: "el",
+              name: "EL YAPIMI",
+              links: [
+                ["/el-yapimi/ahsap", "Ahşap Ürünler"],
+                ["/el-yapimi/kumas", "Kumaş Ürünler"],
+              ],
+            },
+            {
+              key: "seramik",
+              name: "SERAMİK KOLEKSİYONU",
+              links: [
+                ["/seramik/tabak", "Tabaklar"],
+                ["/seramik/kupa", "Kupalar"],
+              ],
+            },
+            {
+              key: "cam",
+              name: "CAM KOLEKSİYONU",
+              links: [
+                ["/cam/vazo", "Vazolar"],
+                ["/cam/sus", "Süs Eşyaları"],
+              ],
+            },
+            {
+              key: "pet",
+              name: "PET ÜRÜNLERİ",
+              links: [
+                ["/pet/oyuncak", "Oyuncaklar"],
+                ["/pet/mama", "Mama Kapları"],
+              ],
+            },
+            {
+              key: "aksesuar",
+              name: "AKSESUAR & YAŞAM",
+              links: [
+                ["/aksesuar/taki", "Takı & Aksesuar"],
+                ["/aksesuar/ev", "Ev Dekoru"],
+              ],
+            },
+            {
+              key: "anneler",
+              name: "ANNELER GÜNÜ HEDİYESİ",
+              links: [
+                ["/anneler-gunu/kisiye-ozel", "Kişiye Özel"],
+                ["/anneler-gunu/hazir-set", "Hazır Setler"],
+              ],
+            },
+          ].map(({ key, name, links }) => (
             <div
-              className={`submenu ${activeMenu === "seramik" ? "show" : ""}`}
+              key={key}
+              className="menu-item"
+              onMouseEnter={() => handleMouseEnter(key)}
+              onMouseLeave={handleMouseLeave}
             >
-              <Link to="/seramik/tabak">Tabaklar</Link>
-              <Link to="/seramik/kupa">Kupalar</Link>
+              <Link to={`/${key}`} className="menu-link">
+                {name}
+              </Link>
+              <div className={`submenu ${activeMenu === key ? "show" : ""}`}>
+                {links.map(([url, label]) => (
+                  <Link to={url} key={url}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("cam")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/cam" className="menu-link">
-              CAM KOLEKSİYONU
-            </Link>
-            <div className={`submenu ${activeMenu === "cam" ? "show" : ""}`}>
-              <Link to="/cam/vazo">Vazolar</Link>
-              <Link to="/cam/sus">Süs Eşyaları</Link>
-            </div>
-          </div>
-
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("pet")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/pet" className="menu-link">
-              PET ÜRÜNLERİ
-            </Link>
-            <div className={`submenu ${activeMenu === "pet" ? "show" : ""}`}>
-              <Link to="/pet/oyuncak">Oyuncaklar</Link>
-              <Link to="/pet/mama">Mama Kapları</Link>
-            </div>
-          </div>
-
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("aksesuar")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/aksesuar" className="menu-link">
-              AKSESUAR & YAŞAM
-            </Link>
-            <div
-              className={`submenu ${activeMenu === "aksesuar" ? "show" : ""}`}
-            >
-              <Link to="/aksesuar/taki">Takı & Aksesuar</Link>
-              <Link to="/aksesuar/ev">Ev Dekoru</Link>
-            </div>
-          </div>
-
-          <div
-            className="menu-item"
-            onMouseEnter={() => handleMouseEnter("anneler")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/anneler-gunu" className="menu-link">
-              ANNELER GÜNÜ HEDİYESİ
-            </Link>
-            <div
-              className={`submenu ${activeMenu === "anneler" ? "show" : ""}`}
-            >
-              <Link to="/anneler-gunu/kisiye-ozel">Kişiye Özel</Link>
-              <Link to="/anneler-gunu/hazir-set">Hazır Setler</Link>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </header>
   );
-};
-
-Header.propTypes = {
-  setIsSearchShow: PropTypes.func,
 };
 
 export default Header;
