@@ -1,21 +1,21 @@
 // src/components/Products/ProductItem.jsx
 import PropTypes from "prop-types";
-import { useContext } from "react";
-import { CartContext } from "../../context/CartProvider";
+// import { useContext } from "react";
+// import { CartContext } from "../../context/CartProvider";
 import "./ProductItem.css";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 const ProductItem = ({ productItem }) => {
-  const { cartItems, addToCart } = useContext(CartContext);
+  // const { cartItems, addToCart } = useContext(CartContext);
 
-  const filteredCart = cartItems.find(
-    (cartItem) => cartItem._id === productItem._id
-  );
+  // const filteredCart = cartItems.find(
+  //   (cartItem) => cartItem._id === productItem._id
+  // );
 
-  const originalPrice = productItem.price.current;
-  const discountPercentage = productItem.price.discount;
-  const discountedPrice =
-    originalPrice - (originalPrice * discountPercentage) / 100;
+  // const originalPrice = productItem.price.current;
+  // const discountPercentage = productItem.price.discount;
+  // const discountedPrice =
+  //   originalPrice - (originalPrice * discountPercentage) / 100;
 
   return (
     <div className="product-item">
@@ -31,7 +31,7 @@ const ProductItem = ({ productItem }) => {
         <a href="#" className="product-title">
           {productItem.name}
         </a>
-        <ul className="product-star">
+        {/* <ul className="product-star">
           {[...Array(4)].map((_, i) => (
             <li key={i}>
               <i className="bi bi-star-fill"></i>
@@ -40,17 +40,17 @@ const ProductItem = ({ productItem }) => {
           <li>
             <i className="bi bi-star-half"></i>
           </li>
-        </ul>
+        </ul> */}
 
-        <div className="product-prices">
+        {/* <div className="product-prices">
           <strong className="new-price">${discountedPrice.toFixed(2)}</strong>
           <span className="old-price">${originalPrice.toFixed(2)}</span>
-        </div>
+        </div> */}
 
-        <span className="product-discount">-{discountPercentage}%</span>
+        {/* <span className="product-discount">-{discountPercentage}%</span> */}
 
         <div className="product-links">
-          <button
+          {/* <button
             className="add-to-cart"
             onClick={() =>
               addToCart({ ...productItem, price: discountedPrice })
@@ -58,13 +58,13 @@ const ProductItem = ({ productItem }) => {
             disabled={filteredCart}
           >
             <i className="bi bi-basket-fill"></i>
-          </button>
+          </button> */}
           <button>
             <i className="bi bi-heart-fill"></i>
           </button>
-          <Link to={`product/${productItem._id}`} className="product-link">
+          {/* <Link to={`product/${productItem._id}`} className="product-link">
             <i className="bi bi-eye-fill"></i>
-          </Link>
+          </Link> */}
           <a href="#">
             <i className="bi bi-share-fill"></i>
           </a>

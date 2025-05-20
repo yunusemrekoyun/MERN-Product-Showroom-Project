@@ -1,12 +1,12 @@
 import React from "react";
-import Policy from "../Policy/Policy";
+// import Policy from "../Policy/Policy";
 import "./Footer.css";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <React.Fragment>
-      <Policy />
+      {/* <Policy /> */}
       <footer className="footer">
         <div className="subscribe-row">
           <div className="container">
@@ -15,66 +15,60 @@ const Footer = () => {
                 <div className="footer-subscribe">
                   <div className="footer-subscribe-top">
                     <h3 className="subscribe-title">
-                      Get our emails for info on new items, sales and more.
+                      Yeni Gelişmeler İçin Bültenimize Kaydolun{" "}
                     </h3>
-                    <p className="subscribe-desc">
-                      We`ll email you a voucher worth $10 off your first order
-                      over $50.
-                    </p>
+                    <p className="subscribe-desc"></p>
                   </div>
                   <div className="footer-subscribe-bottom">
                     <form>
                       <input
                         type="text"
-                        placeholder="Enter your email address."
+                        placeholder="Mail Adresinizi Giriniz."
                       />
-                      <button className="btn">Subscribe</button>
+                      <button className="btn">Kaydol</button>
                     </form>
                     <p className="privacy-text">
-                      By subscribing you agree to our{" "}
+                      Kaydolarak şartları kabul ediyorum{" "}
                       <a href="#">
-                        Terms & Conditions and Privacy & Cookies Policy.
+                        Şartlar ve Koşullar, Çerezler ve Gizlilik Politikamız.
                       </a>
                     </p>
                   </div>
                 </div>
               </div>
               <div className="footer-contact-wrapper">
-                <div className="footer-contact-top">
+                <div className="footer-contact-info">
                   <h3 className="contact-title">
-                    Need help? <br />
+                    Bize Ulaşın <br />
                     (+90) 123 456 78 90
                   </h3>
                   <p className="contact-desc">
-                    We are available 8:00am – 7:00pm
+                    Mesai saatleri: <br />
+                    Pazartesi - Cuma 9:00 - 18:00
+                  </p>
+                  <p className="privacy-text">
+                    <strong>E-posta :</strong> info@example.com
+                    <br />
+                    <strong>Faks :</strong> (+800) 1234 5678 90
                   </p>
                 </div>
-                <div className="footer-contact-bottom">
-                  <div className="download-app">
-                    <a href="#">
-                      <img src="/img/footer/app-store.png" alt="" />
-                    </a>
-                    <a href="#">
-                      <img src="/img/footer/google-play.png" alt="" />
-                    </a>
-                  </div>
-                  <p className="privacy-text">
-                    <strong>Shopping App:</strong> Try our View in Your Room
-                    feature, manage registries and save payment info.
-                  </p>
+
+                <div className="footer-contact-logo">
+                  <img src="/logo/logo.png" alt="Logo" />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="widgets-row">
+        {/* </div> */}
+        {/* <div className="widgets-row">
           <div className="container">
             <div className="footer-widgets">
               <div className="brand-info">
                 <div className="footer-logo">
-                 <Link to={"/"} className="logo">
-                LOGO
-              </Link>
+                  <Link to={"/"} className="logo">
+                    LOGO
+                  </Link>
                 </div>
                 <div className="footer-desc">
                   <p>
@@ -87,7 +81,7 @@ const Footer = () => {
                   <p>
                     <a href="tel:555 555 55 55">(+800) 1234 5678 90</a> –{" "}
                     <a href="mailto:info@example.com">info@example.com</a>
-                  </p> 
+                  </p>
                 </div>
               </div>
               <div className="widget-nav-menu">
@@ -172,8 +166,8 @@ const Footer = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="copyright-row">
+        </div> */}
+        {/* <div className="copyright-row">
           <div className="container">
             <div className="footer-copyright">
               <div className="site-copyright">
@@ -200,7 +194,7 @@ const Footer = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </footer>
     </React.Fragment>
   );

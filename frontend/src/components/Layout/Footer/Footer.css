@@ -1,187 +1,158 @@
-/*! subscribe start  */
+/* Redesigned Footer - Clean, aligned, and elegant */
+
+.footer {
+  background-color: #f4f1ea;
+  color: #2e2c28;
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+}
 
 .footer .subscribe-row {
-    background-color: #000;
-    color: white;
-    padding: 80px 0;
-  }
-  
-  .footer .footer-row-wrapper {
-    display: flex;
-    justify-content: space-between;
-    column-gap: 200px;
-  }
-  
+  padding: 80px 0;
+  border-bottom: 1px solid #e0dccc;
+}
+
+.footer .footer-row-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 60px;
+  align-items: start;
+}
+
+/* SOL BLOK */
+.footer-subscribe-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer .subscribe-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #2e2c28;
+}
+
+.footer .subscribe-desc {
+  color: #6a6762;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer .footer-subscribe-bottom form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.footer .footer-subscribe-bottom form > input {
+  flex: 1;
+  height: 48px;
+  padding: 0 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #2e2c28;
+  background-color: #fff;
+}
+
+.footer .footer-subscribe-bottom form > button {
+  background-color: #4e3b1f;
+  color: #fff;
+  border: none;
+  padding: 0 24px;
+  height: 48px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.footer .footer-subscribe-bottom form > button:hover {
+  background-color: #6c522f;
+}
+
+.footer .privacy-text {
+  font-size: 12px;
+  color: #928d86;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.footer .privacy-text a {
+  color: #6c522f;
+  text-decoration: underline;
+}
+.footer-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* SAĞ BLOK */
+.footer-contact-wrapper {
+  display: flex;
+  flex-direction: row; /* ✅ logo ve içerik yanyana */
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  text-align: left; /* metin sola dayalı */
+}
+.footer .footer-contact-logo img {
+  width: 200px;
+  height: auto;
+  display: block;
+}
+
+.footer .footer-contact-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.footer .footer-contact-top p strong,
+.footer .footer-contact-top strong {
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.footer .footer-contact-top br {
+  margin-bottom: 4px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
   .footer .subscribe-title,
   .footer .contact-title {
-    font-size: 30px;
-    max-width: 500px;
-    font-weight: 500;
-    line-height: 1.2;
+    font-size: 20px;
   }
-  
-  .footer .subscribe-desc,
-  .footer .contact-desc {
-    font-size: 14px;
-    opacity: 0.6;
-    margin-top: 4px;
-  }
-  
-  .footer .footer-subscribe-bottom,
-  .footer .footer-contact-bottom {
-    margin-top: 40px;
-  }
-  
+
   .footer .footer-subscribe-bottom form {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .footer .footer-subscribe-bottom form > input {
-    flex: 1;
-    height: 48px;
-    border: none;
-  }
-  
-  .footer .footer-subscribe-bottom form > button {
-    height: 48px !important;
-    border-color: #fff;
-    background-color: #000;
-    color: #fff;
-  }
-  
-  .footer .privacy-text,
-  .footer .privacy-text a {
-    font-size: 10px;
-    color: #75767c;
-    margin-top: 4px;
-    font-weight: 500;
-  }
-  
-  .footer .footer-contact-bottom .download-app {
-    display: flex;
-    align-items: center;
-    column-gap: 10px;
-  }
-  
-  /*! subscribe end  */
-  
-  /*! widgets start  */
-  .widgets-row {
-    padding: 60px 0;
-    border-bottom: 1px solid #dee0ea;
-  }
-  
-  .widgets-row .footer-widgets {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .widgets-row .footer-widgets > div {
-    flex: 1;
-  }
-  
-  .widgets-row .footer-widgets > .brand-info {
-    flex: 3;
-  }
-  
-  .footer-widgets .brand-info .footer-desc {
-    width: 400px;
-    font-size: 14px;
-    margin: 15px 0;
-  }
-  
-  .footer-widgets .brand-info .footer-contact {
-    font-size: 14px;
-  }
-  
-  .footer-widgets .widget-nav-menu h4 {
-    font-weight: 600;
-    font-size: 15px;
-  }
-  
-  .footer-widgets .widget-nav-menu ul {
-    margin-top: 20px;
-    font-size: 13px;
-    display: flex;
     flex-direction: column;
-    row-gap: 5px;
   }
-  
-  .footer-widgets .widget-nav-menu ul li a {
-    transition: 0.2s ease all;
+
+  .footer .footer-subscribe-bottom form > button,
+  .footer .footer-subscribe-bottom form > input {
+    width: 100%;
   }
-  
-  .footer-widgets .widget-nav-menu ul li a:hover {
-    opacity: 0.5;
+
+  .footer-contact-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
   }
-  
-  /*! widgets end  */
-  
-  /*! copyright start  */
-  .footer-copyright {
-    margin: 40px 0;
-    display: flex;
-    align-items: center;
+  .footer-contact-logo img {
+    max-width: 120px;
   }
-  
-  .footer-copyright .site-copyright {
-    font-size: 12px;
-    margin-right: 10px;
+  .footer .footer-contact-logo img {
+    max-width: 120px;
   }
-  
-  .footer-copyright .footer-menu {
-    margin-left: auto;
+
+  .footer-contact-info {
+    align-items: flex-start;
   }
-  
-  .footer-copyright .footer-menu-list {
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    column-gap: 10px;
+  .footer .footer-contact-top {
+    align-items: flex-end;
   }
-  
-  .footer-copyright .footer-menu-list .list-item:not(:last-child) {
-    padding-right: 10px;
-    border-right: 1px solid #dee0ea;
-  }
-  /*! copyright end  */
-  
-  /*! responsive  */
-  
-  @media (max-width: 768px) {
-    .footer .footer-row-wrapper {
-      flex-direction: column;
-      row-gap: 20px;
-    }
-  
-    .footer .brand-info {
-      margin-bottom: 20px;
-    }
-  
-    .footer-widgets .brand-info .footer-desc {
-      width: unset;
-    }
-  
-    .widgets-row .footer-widgets > div {
-      flex: unset !important;
-    }
-  
-    .footer .brand-info {
-      margin-bottom: 20px;
-    }
-  
-    .footer-copyright {
-      flex-direction: column;
-      text-align: center;
-      row-gap: 10px;
-    }
-  
-    .footer-copyright .footer-menu {
-      margin-left: unset;
-    }
-  }
-  
+}

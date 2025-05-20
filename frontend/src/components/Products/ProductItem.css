@@ -1,11 +1,12 @@
 .product-item {
   text-align: center;
-  background-color: #f8f8f8;
+  background-color: #f5e9c52d;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.085);
   overflow: hidden;
   position: relative;
   transition: box-shadow 0.3s ease;
+  margin-bottom: 20px;
 }
 
 .product-item:hover {
@@ -24,6 +25,7 @@
   object-fit: cover;
   transition: transform 0.4s ease;
   display: block;
+  border-radius: 5px;
 }
 
 .product-item:hover .product-image img {
@@ -36,6 +38,7 @@
   margin-top: 15px;
   display: inline-block;
   color: #333;
+  margin-bottom: 5px;
 }
 
 .product-star {
@@ -74,7 +77,7 @@
   top: 15px;
   right: 15px;
   background: #ff3c20;
-  color: #fff;
+  color: #fff; 
   width: 40px;
   height: 40px;
   font-size: 12px;

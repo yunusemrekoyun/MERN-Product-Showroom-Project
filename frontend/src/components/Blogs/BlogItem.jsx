@@ -1,24 +1,32 @@
-import "./BlogItem.css"
+import PropTypes from "prop-types";
+import "./BlogItem.css";
 
-const BlogItem = () => {
+const BlogItem = ({ image, title, date, comments }) => {
   return (
     <li className="blog-item">
       <a href="#" className="blog-image">
-        <img src="/img/blogs/blog1.jpg" alt="" />
+        <img src={image} alt={title} />
       </a>
       <div className="blog-info">
         <div className="blog-info-top">
-          <span>25 Feb, 2021 </span>-<span>0 Comments</span>
+          <span>{date} </span>-<span>{comments} Yorum</span>
         </div>
         <div className="blog-info-center">
-          <a href="#">Aliquam hendrerit mi metus</a>
+          <a href="#">{title}</a>
         </div>
         <div className="blog-info-bottom">
-          <a href="#">Read More</a>
+          <a href="#">Daha Fazla</a>
         </div>
       </div>
     </li>
   );
+};
+
+BlogItem.propTypes = {
+  image: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+  comments: PropTypes.number.isRequired,
 };
 
 export default BlogItem;

@@ -1,11 +1,11 @@
-import { useContext, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { CartContext } from "../../../context/CartProvider";
+// import { CartContext } from "../../../context/CartProvider";
 import "./Header.css";
 import Search from "../../Modals/Search/Search";
 
 const Header = () => {
-  const { cartItems } = useContext(CartContext);
+  // const { cartItems } = useContext(CartContext);
   const user = localStorage.getItem("user");
   const { pathname } = useLocation();
 
@@ -44,17 +44,19 @@ const Header = () => {
               <i className="bi bi-person-plus"></i>
               <span>Üye Ol</span>
             </Link>
-            <Link to="/cart" className="header-icon">
+            {/* <Link to="/cart" className="header-icon">
               <i className="bi bi-bag"></i>
               <span>Sepetim</span>
               {cartItems.length > 0 && (
                 <span className="header-cart-count">{cartItems.length}</span>
               )}
-            </Link>
+            </Link> */}
             {user && (
-              <button
-                className="logout-button"
-                onClick={() => {
+              <Link
+                to="/"
+                className="header-icon"
+                onClick={(e) => {
+                  e.preventDefault();
                   if (window.confirm("Çıkış yapmak istiyor musunuz?")) {
                     localStorage.removeItem("user");
                     window.location.href = "/";
@@ -62,7 +64,8 @@ const Header = () => {
                 }}
               >
                 <i className="bi bi-box-arrow-right"></i>
-              </button>
+                <span>Çıkış</span>
+              </Link>
             )}
           </div>
         </div>

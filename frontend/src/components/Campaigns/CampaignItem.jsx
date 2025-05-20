@@ -12,7 +12,7 @@ const CampaignItem = ({ campaign }) => {
       <h3 className="campaign-title">{campaign.title}</h3>
       <p className="campaign-desc">{campaign.description}</p>
       <a href="#" className="btn btn-primary">
-        View All <i className="bi bi-arrow-right"></i>
+        Ürünleri Görüntüle <i className="bi bi-arrow-right"></i>
       </a>
     </div>
   );
