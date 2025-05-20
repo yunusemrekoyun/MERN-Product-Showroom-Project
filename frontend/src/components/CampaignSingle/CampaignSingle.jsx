@@ -5,11 +5,11 @@ const CampaignSingle = () => {
     <section className="campaign-single">
     <div className="container">
       <div className="campaign-wrapper">
-        <h2>New Season Sale</h2>
-        <strong>40% OFF</strong>
-        <span></span>
+        <h2>                     </h2>
+        <strong>                    </strong>
+        {/* <span></span> */}
         <Link to={"/shop"} className="btn btn-lg">
-          SHOP NOW
+          ÜRÜNLERE GÖZ ATIN
           <i className="bi bi-arrow-right"></i>
         </Link>
       </div>

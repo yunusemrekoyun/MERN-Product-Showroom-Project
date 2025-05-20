@@ -1,6 +1,8 @@
+// CreateCampaignPage.jsx
 import { Button, Form, Input, Select, Spin, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import imageCompression from "browser-image-compression";
 
 const CreateCampaignPage = () => {
   const [loading, setLoading] = useState(false);
@@ -26,20 +28,31 @@ const CreateCampaignPage = () => {
     fetchProducts();
   }, [apiUrl]);
 
-  const handleUpload = ({ fileList }) => setFileList(fileList);
+  const handleUpload = ({ fileList }) => {
+    setFileList(fileList);
+  };
 
   const onFinish = async (values) => {
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("description", values.description);
-    formData.append("products", JSON.stringify(values.products));
-    if (fileList[0]) {
-      formData.append("background", fileList[0].originFileObj);
-    }
-
     try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("products", JSON.stringify(values.products));
+
+      if (fileList[0]?.originFileObj) {
+        // Görseli sıkıştır
+        const compressedFile = await imageCompression(
+          fileList[0].originFileObj,
+          {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+          }
+        );
+        formData.append("background", compressedFile);
+      }
+
       const response = await fetch(`${apiUrl}/api/campaigns`, {
         method: "POST",
         body: formData,
@@ -53,7 +66,7 @@ const CreateCampaignPage = () => {
         message.error("Kampanya oluşturulamadı.");
       }
     } catch (error) {
-      console.log("Hata:", error);
+      console.error("Hata:", error);
       message.error("Sunucu hatası oluştu.");
     } finally {
       setLoading(false);
@@ -62,7 +75,12 @@ const CreateCampaignPage = () => {
 
   return (
     <Spin spinning={loading}>
-      <Form layout="vertical" form={form} onFinish={onFinish}>
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={onFinish}
+        style={{ maxWidth: 600 }}
+      >
         <Form.Item
           label="Kampanya Başlığı"
           name="title"
@@ -81,13 +99,12 @@ const CreateCampaignPage = () => {
 
         <Form.Item
           label="Arka Plan Görseli"
-          name="background"
           rules={[{ required: true, message: "Görsel zorunludur" }]}
         >
           <Upload
             listType="picture"
             fileList={fileList}
-            beforeUpload={() => false} // manual upload
+            beforeUpload={() => false}
             onChange={handleUpload}
             accept="image/*"
             maxCount={1}

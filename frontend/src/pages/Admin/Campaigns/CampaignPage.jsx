@@ -44,7 +44,10 @@ const CampaignPage = () => {
         <Space>
           <Button
             type="primary"
-            onClick={() => navigate(`/admin/campaigns/update/${record._id}`)}
+            onClick={() => {
+              console.log("Row Record:", record); 
+              navigate(`/admin/campaigns/update/${record._id}`);
+            }}
           >
             Güncelle
           </Button>

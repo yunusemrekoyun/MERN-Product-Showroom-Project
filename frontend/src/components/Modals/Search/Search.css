@@ -11,7 +11,6 @@
   padding: 14px 18px;
   border-radius: 8px;
   font-size: 16px;
-
 }
 
 .search-input {
@@ -37,6 +36,7 @@
 
 .search-results-inline {
   position: absolute;
+  z-index: 2000;
   top: 100%;
   left: 0;
   margin-top: 8px;

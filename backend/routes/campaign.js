@@ -7,7 +7,20 @@ const multer = require("multer");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
+// READ SINGLE
+router.get("/:id", async (req, res) => {
+  try {
+    const campaign = await Campaign.findById(req.params.id).populate(
+      "products"
+    );
+    if (!campaign) {
+      return res.status(404).json({ error: "Kampanya bulunamadı" });
+    }
+    res.json(campaign);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // CREATE
 router.post("/", upload.single("background"), async (req, res) => {
   try {

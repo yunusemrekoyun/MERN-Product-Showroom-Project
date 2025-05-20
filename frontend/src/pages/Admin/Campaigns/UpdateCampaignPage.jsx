@@ -1,7 +1,9 @@
+// UpdateCampaignPage.jsx
 import { Button, Form, Input, Select, Spin, Upload, message } from "antd";
-import { useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import imageCompression from "browser-image-compression";
 
 const UpdateCampaignPage = () => {
   const [loading, setLoading] = useState(false);
@@ -12,33 +14,45 @@ const UpdateCampaignPage = () => {
   const { id } = useParams();
 
   useEffect(() => {
+    console.log("Fetching campaign with id:", id);
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [productsRes, campaignRes] = await Promise.all([
+        const [prodRes, campRes] = await Promise.all([
           fetch(`${apiUrl}/api/products`),
           fetch(`${apiUrl}/api/campaigns/${id}`),
         ]);
-
-        if (!productsRes.ok || !campaignRes.ok) {
+        if (!prodRes.ok || !campRes.ok) {
           message.error("Veri getirme hatası");
           return;
         }
-
-        const [productsData, campaignData] = await Promise.all([
-          productsRes.json(),
-          campaignRes.json(),
+        const [prodData, campData] = await Promise.all([
+          prodRes.json(),
+          campRes.json(),
         ]);
 
-        setProducts(productsData);
-
+        // Ürün ve form ilk değerleri
+        setProducts(prodData);
         form.setFieldsValue({
-          title: campaignData.title,
-          description: campaignData.description,
-          selectedProducts: campaignData.selectedProducts,
+          title: campData.title,
+          description: campData.description,
+          selectedProducts: campData.products.map((p) => p._id || p.id),
+          // En başta Upload için fileList değeri
+          image: campData.background
+            ? [
+                {
+                  uid: "-1",
+                  name: "Mevcut Görsel",
+                  status: "done",
+                  url: `data:image/png;base64,${campData.background}`,
+                  thumbUrl: `data:image/png;base64,${campData.background}`,
+                },
+              ]
+            : [],
         });
       } catch (err) {
         console.error("Hata:", err);
+        message.error("Sunucu hatası");
       } finally {
         setLoading(false);
       }
@@ -50,26 +64,27 @@ const UpdateCampaignPage = () => {
   const handleUpdate = async (values) => {
     setLoading(true);
     try {
-      const file = values.image?.file?.originFileObj;
-      let base64Image = null;
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("products", JSON.stringify(values.selectedProducts));
 
+      // values.image artık fileList
+      const fileList = values.image;
+      const file = fileList && fileList[0]?.originFileObj;
       if (file) {
-        base64Image = await toBase64(file);
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
+        });
+        formData.append("background", compressed);
       }
-
-      const payload = {
-        title: values.title,
-        description: values.description,
-        selectedProducts: values.selectedProducts,
-        ...(base64Image && { image: base64Image }),
-      };
 
       const res = await fetch(`${apiUrl}/api/campaigns/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
       });
-
       if (res.ok) {
         message.success("Kampanya başarıyla güncellendi");
         navigate("/admin/campaigns");
@@ -78,18 +93,11 @@ const UpdateCampaignPage = () => {
       }
     } catch (err) {
       console.error(err);
+      message.error("Bir hata oluştu");
     } finally {
       setLoading(false);
     }
   };
-
-  const toBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
 
   return (
     <Spin spinning={loading}>
@@ -115,12 +123,20 @@ const UpdateCampaignPage = () => {
           <Input.TextArea rows={4} />
         </Form.Item>
 
-        <Form.Item label="Görsel (Yeniden yüklemek için)">
-          <Form.Item name="image" noStyle>
-            <Upload maxCount={1} beforeUpload={() => false}>
-              <Button icon={<UploadOutlined />}>Görsel Yükle</Button>
-            </Upload>
-          </Form.Item>
+        <Form.Item
+          label="Görsel (Yeniden yüklemek için)"
+          name="image"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => e && e.fileList}
+        >
+          <Upload
+            listType="picture"
+            maxCount={1}
+            beforeUpload={() => false}
+            accept="image/*"
+          >
+            <Button icon={<UploadOutlined />}>Görsel Yükle</Button>
+          </Upload>
         </Form.Item>
 
         <Form.Item
@@ -128,9 +144,9 @@ const UpdateCampaignPage = () => {
           name="selectedProducts"
           rules={[{ required: true, message: "Ürün seçin" }]}
         >
-          <Select mode="multiple" allowClear placeholder="Ürün seçin">
+          <Select mode="multiple" placeholder="Ürün seçin">
             {products.map((p) => (
-              <Select.Option key={p._id} value={p._id}>
+              <Select.Option key={p._id || p.id} value={p._id || p.id}>
                 {p.name}
               </Select.Option>
             ))}

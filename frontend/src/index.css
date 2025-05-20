@@ -10,8 +10,8 @@
 
 body {
   overflow-x: hidden;
+  padding-top: 100px; 
 }
-
 ul,
 ol {
   margin: 0;
@@ -35,7 +35,7 @@ p {
 }
 
 .container {
-  max-width: 1700px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
 }
@@ -120,34 +120,33 @@ input[type="number"]::-webkit-inner-spin-button {
 
 @media (max-width: 1200px) {
   .container {
-    max-width: 1700px;
+    max-width: 992px;
   }
 }
 
 @media (max-width: 992px) {
   .container {
-    max-width: 1700px;
+    max-width: 768px;
   }
 }
 
 @media (max-width: 768px) {
   .container {
-    max-width: 1700px;
+    max-width: 576px;
   }
 }
 
 @media (max-width: 576px) {
   .container {
-    max-width: 1700px;
+    max-width: 400px;
   }
 }
 
 @media (max-width: 420px) {
   .container {
-    max-width: 1700px;
+    max-width: 350px;
   }
 }
-
 
 /* react-slick-css */
 .slick-slide > div {
@@ -156,4 +155,3 @@ input[type="number"]::-webkit-inner-spin-button {
 .slick-list {
   margin: 0 -10px;
 }
-
