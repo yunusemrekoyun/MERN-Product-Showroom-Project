@@ -1,6 +1,13 @@
+:root {
+  --accent-color: #d4a017;
+  --accent-hover: #b38b00;
+  --accent-light: #fdf3d0;
+}
+
 .slider {
   position: relative;
 }
+
 .slider-item {
   position: relative;
   height: calc((100vh - 137px) * 0.85);
@@ -10,8 +17,8 @@
   align-items: center;
   justify-content: center;
   margin-top: 20px;
-  border-radius: 16px; /* 👈 yumuşak köşe */
-  overflow: hidden; /* 👈 köşe dışına taşan görselleri gizle */
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .slider-item .slider-image img {
@@ -20,23 +27,31 @@
   left: 0;
   height: 100%;
   object-fit: cover;
-  object-position: center bottom; /* merkezden başlayıp ALT kısmı gösterir */
+  object-position: center bottom;
   z-index: -1;
 }
 
 .slider-item .slider-title {
   font-size: 18px;
   font-weight: 500;
+  color: #222;
 }
 
 .slider-item .slider-heading {
   font-size: 60px;
   font-weight: 600;
+  color: var(--accent-color); /* Vurgu sarı */
 }
 
 .slider-item a {
   position: relative;
   z-index: 1;
+  color: var(--accent-color);
+  transition: color 0.2s ease;
+}
+
+.slider-item a:hover {
+  color: var(--accent-hover);
 }
 
 .slider .slider-buttons {
@@ -55,17 +70,18 @@
   width: 60px;
   height: 60px;
   border-radius: 100%;
-  border: 1px solid #dee0ea;
+  border: 1px solid #eee4c6;
   background-color: white;
   opacity: 0.5;
   transition: 0.2s ease all;
+  color: var(--accent-color);
 }
 
 .slider-buttons button:hover {
-  background-color: #1367ef;
+  background-color: var(--accent-color);
   opacity: 1;
   color: #fff;
-  border-color: #1367ef;
+  border-color: var(--accent-color);
 }
 
 .slider-buttons button i {
@@ -97,7 +113,7 @@
   display: inline-block;
   width: 12px;
   height: 12px;
-  background-color: #1367ef;
+  background-color: var(--accent-color);
   border-radius: 100%;
 }
 
