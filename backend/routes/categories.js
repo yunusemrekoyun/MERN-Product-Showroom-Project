@@ -1,83 +1,98 @@
+// routes/category.js
 const express = require("express");
 const router = express.Router();
-const Category = require("../models/Category.js");
+const mongoose = require("mongoose");
+const Category = require("../models/Category");
+const multer = require("multer");
 
-// Yeni bir kategori oluşturma (Create)
-router.post("/", async (req, res) => {
+// Multer Memory Storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// CREATE (resimli)
+router.post("/", upload.single("img"), async (req, res) => {
   try {
-    const { name, img } = req.body;
+    const { name } = req.body;
+    if (!req.file) {
+      return res.status(400).json({ error: "Kategori resmi gerekli." });
+    }
+    const imgBase64 = req.file.buffer.toString("base64");
 
-    const newCategory = new Category({ name, img });
+    const newCategory = new Category({
+      name,
+      img: imgBase64,
+    });
     await newCategory.save();
-
     res.status(201).json(newCategory);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error." });
+    console.error(error);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
 
-// Tüm kategorileri getirme (Read - All)
+// READ ALL
 router.get("/", async (req, res) => {
   try {
     const categories = await Category.find();
-
     res.status(200).json(categories);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error." });
+    console.error(error);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
-// Belirli bir kategoriyi getirme (Read - Single)
+
+// READ SINGLE
 router.get("/:categoryId", async (req, res) => {
   try {
-    const categoryId = req.params.categoryId;
-    try {
-      const category = await Category.findById(categoryId);
-      res.status(200).json(category);
-    } catch (error) {
-      console.log(error);
-      res.status(404).json({ error: "Category not found." });
+    const category = await Category.findById(req.params.categoryId);
+    if (!category) {
+      return res.status(404).json({ error: "Kategori bulunamadı." });
     }
+    res.status(200).json(category);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error." });
+    console.error(error);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
 
-//kategori güncelleme
-router.put("/:categoryId", async (req, res) => {
+// UPDATE (resim opsiyonel)
+router.put("/:categoryId", upload.single("img"), async (req, res) => {
   try {
-    const categoryId = req.params.categoryId;
-    const updates = req.body;
-    const existingCategory = await Category.findById(categoryId);
-    if (!existingCategory) {
-      res.status(404).json({ error: "Category not found." });
+    const { name } = req.body;
+    const updateData = { name };
+
+    if (req.file) {
+      updateData.img = req.file.buffer.toString("base64");
     }
+
     const updatedCategory = await Category.findByIdAndUpdate(
-      categoryId,
-      updates,
+      req.params.categoryId,
+      updateData,
       { new: true }
     );
+    if (!updatedCategory) {
+      return res.status(404).json({ error: "Kategori bulunamadı." });
+    }
     res.status(200).json(updatedCategory);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error." });
+    console.error(error);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
 
-// Kategori silme (Delete)
+// DELETE
 router.delete("/:categoryId", async (req, res) => {
   try {
-    const categoryId = req.params.categoryId;
-    const deletedCategory = await Category.findByIdAndDelete(categoryId);
+    const deletedCategory = await Category.findByIdAndDelete(
+      req.params.categoryId
+    );
     if (!deletedCategory) {
-      return res.status(404).json({ error: "Category not found." });
+      return res.status(404).json({ error: "Kategori bulunamadı." });
     }
     res.status(200).json(deletedCategory);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error." });
+    console.error(error);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
 

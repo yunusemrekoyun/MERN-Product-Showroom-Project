@@ -44,8 +44,8 @@ const Products = () => {
     <section className="products custom-products">
       <div className="container">
         <div className="section-title">
-          <h2>Featured Products</h2>
-          <p>Summer Collection New Morden Design</p>
+          <h2>Öne Çıkan Ürünler</h2>
+          <p></p>
         </div>
 
         <div className="product-slider-wrapper">

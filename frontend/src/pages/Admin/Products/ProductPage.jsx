@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Space, Table, message } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProductPage = () => {
@@ -8,40 +8,89 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [categoriesRes, productsRes] = await Promise.all([
+        fetch(`${apiUrl}/api/categories`),
+        fetch(`${apiUrl}/api/products`),
+      ]);
+      if (!categoriesRes.ok || !productsRes.ok) {
+        message.error("Veri getirme başarısız.");
+        return;
+      }
+      const [categories, products] = await Promise.all([
+        categoriesRes.json(),
+        productsRes.json(),
+      ]);
+      const withCat = products.map((p) => {
+        const cat = categories.find((c) => c._id === p.category);
+        return { ...p, categoryName: cat?.name || "" };
+      });
+      setDataSource(withCat);
+    } catch (err) {
+      console.error("Veri hatası:", err);
+      message.error("Sunucu hatası.");
+    } finally {
+      setLoading(false);
+    }
+  }, [apiUrl]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const deleteProduct = async (id) => {
+    try {
+      const res = await fetch(`${apiUrl}/api/products/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        message.success("Ürün başarıyla silindi.");
+        setDataSource((prev) => prev.filter((p) => p._id !== id));
+      } else {
+        message.error("Silme işlemi başarısız.");
+      }
+    } catch (err) {
+      console.error("Silme hatası:", err);
+      message.error("Sunucu hatası.");
+    }
+  };
+
   const columns = [
     {
       title: "Product Görseli",
       dataIndex: "img",
       key: "img",
-      render: (imgSrc) => <img src={imgSrc[0]} alt="Image" width={100} />,
+      render: (imgs) => (
+        <img src={`data:image/png;base64,${imgs[0]}`} alt="Ürün" width={100} />
+      ),
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      render: (text) => <b>{text}</b>,
+      render: (t) => <b>{t}</b>,
     },
     {
       title: "Kategori",
       dataIndex: "categoryName",
       key: "categoryName",
-      render: (text) => <span>{text}</span>,
     },
     {
       title: "Fiyat",
       dataIndex: "price",
       key: "price",
-      render: (text) => <span>{text.current.toFixed(2)}</span>,
+      render: ({ current }) => <span>${current.toFixed(2)}</span>,
     },
     {
       title: "İndirim",
       dataIndex: "price",
-      key: "price",
-      render: (text) => <span>%{text.discount}</span>,
+      key: "discount",
+      render: ({ discount }) => <span> %{discount}</span>,
     },
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
       render: (_, record) => (
         <Space>
@@ -52,86 +101,24 @@ const ProductPage = () => {
             Güncelle
           </Button>
           <Popconfirm
-            title="Kategoriyi Sil"
-            description="Kategoriyi silmek istediğinizden emin misiniz?"
-            okText="Yes"
-            cancelText="No"
+            title="Ürünü sil"
+            description="Silmek istediğinizden emin misiniz?"
+            okText="Evet"
+            cancelText="Hayır"
             onConfirm={() => deleteProduct(record._id)}
           >
-            <Button type="primary" danger>
-              Sil
-            </Button>
+            <Button danger>Sil</Button>
           </Popconfirm>
         </Space>
       ),
     },
   ];
 
-  const deleteProduct = async (productId) => {
-    try {
-      const response = await fetch(`${apiUrl}/api/products/${productId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        message.success("Kategori başarıyla silindi.");
-        setDataSource((prevProducts) => {
-          return prevProducts.filter((product) => product._id !== productId);
-        });
-      } else {
-        message.error("Silme işlemi başarısız.");
-      }
-    } catch (error) {
-      console.log("Silme hatası:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      try {
-        const [categoriesResponse, productsResponse] = await Promise.all([
-          fetch(`${apiUrl}/api/categories`),
-          fetch(`${apiUrl}/api/products`),
-        ]);
-
-        if (!categoriesResponse.ok || !productsResponse.ok) {
-          message.error("Veri getirme başarısız.");
-        }
-
-        const [categoriesData, productsData] = await Promise.all([
-          categoriesResponse.json(),
-          productsResponse.json(),
-        ]);
-
-        const productsWithCategories = productsData.map((product) => {
-          const categoryId = product.category;
-          const category = categoriesData.find(
-            (item) => item._id === categoryId
-          );
-
-          return {
-            ...product,
-            categoryName: category ? category.name : "",
-          };
-        });
-
-        setDataSource(productsWithCategories);
-      } catch (error) {
-        console.log("Veri hatası:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [apiUrl]);
-
   return (
     <Table
       dataSource={dataSource}
       columns={columns}
-      rowKey={(record) => record._id}
+      rowKey={(r) => r._id}
       loading={loading}
     />
   );

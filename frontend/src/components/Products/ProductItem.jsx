@@ -1,3 +1,4 @@
+// src/components/Products/ProductItem.jsx
 import PropTypes from "prop-types";
 import { useContext } from "react";
 import { CartContext } from "../../context/CartProvider";
@@ -19,7 +20,11 @@ const ProductItem = ({ productItem }) => {
   return (
     <div className="product-item">
       <div className="product-image">
-        <img src={productItem.img[0]} alt={productItem.name} />
+        {/* Base64 prefix’i ekledik */}
+        <img
+          src={`data:image/png;base64,${productItem.img[0]}`}
+          alt={productItem.name}
+        />
       </div>
 
       <div className="product-info">
@@ -28,9 +33,13 @@ const ProductItem = ({ productItem }) => {
         </a>
         <ul className="product-star">
           {[...Array(4)].map((_, i) => (
-            <li key={i}><i className="bi bi-star-fill"></i></li>
+            <li key={i}>
+              <i className="bi bi-star-fill"></i>
+            </li>
           ))}
-          <li><i className="bi bi-star-half"></i></li>
+          <li>
+            <i className="bi bi-star-half"></i>
+          </li>
         </ul>
 
         <div className="product-prices">
@@ -65,8 +74,16 @@ const ProductItem = ({ productItem }) => {
   );
 };
 
-export default ProductItem;
-
 ProductItem.propTypes = {
-  productItem: PropTypes.object.isRequired,
+  productItem: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    img: PropTypes.arrayOf(PropTypes.string).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.shape({
+      current: PropTypes.number.isRequired,
+      discount: PropTypes.number,
+    }).isRequired,
+  }).isRequired,
 };
+
+export default ProductItem;

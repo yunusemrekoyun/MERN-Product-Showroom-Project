@@ -1,212 +1,236 @@
-import { Button, Form, Input, InputNumber, Select, Spin, message } from "antd";
+// src/pages/UpdateProductPage.jsx
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Spin,
+  Upload,
+  message,
+  Space,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import imageCompression from "browser-image-compression";
+
 const UpdateProductPage = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
-  const navigate = useNavigate();
+  const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const { id: productId } = useParams();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-  const params = useParams();
-  const productId = params.id;
+
+  // İlk verileri çek ve form ile fileList'e yerleştir
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [categoriesResponse, singleProductResponse] = await Promise.all([
+        const [catRes, prodRes] = await Promise.all([
           fetch(`${apiUrl}/api/categories`),
           fetch(`${apiUrl}/api/products/${productId}`),
         ]);
-        if (!categoriesResponse.ok || !singleProductResponse.ok) {
-          message.error("Veri getirme başarısız.");
-          return;
-        }
-        const [categoriesData, singleProductData] = await Promise.all([
-          categoriesResponse.json(),
-          singleProductResponse.json(),
-        ]);
-        setCategories(categoriesData);
-        if (singleProductData) {
-          form.setFieldsValue({
-            name: singleProductData.name,
-            current: singleProductData.price.current,
-            discount: singleProductData.price.discount,
-            description: singleProductData.description,
-            img: singleProductData.img.join("\n"),
-            colors: singleProductData.colors.join("\n"),
-            sizes: singleProductData.sizes.join("\n"),
-            category: singleProductData.category,
-          });
-        }
-      } catch (error) {
-        console.log("Veri hatası:", error);
+        if (!catRes.ok || !prodRes.ok) throw new Error();
+        const [cats, prod] = await Promise.all([catRes.json(), prodRes.json()]);
+        setCategories(cats);
+        form.setFieldsValue({
+          name: prod.name,
+          category: prod.category,
+          current: prod.price.current,
+          discount: prod.price.discount,
+          description: prod.description,
+          colors: prod.colors.join("\n"),
+          sizes: prod.sizes.join("\n"),
+        });
+        // Mevcut resimleri preview için fileList'e ekle
+        setFileList(
+          prod.img.map((b64, i) => ({
+            uid: `${prod._id}-${i}`,
+            name: `Resim ${i + 1}`,
+            status: "done",
+            url: `data:image/png;base64,${b64}`,
+            thumbUrl: `data:image/png;base64,${b64}`,
+          }))
+        );
+      } catch (err) {
+        console.error(err);
+        message.error("Veri yüklenirken hata oldu.");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
   }, [apiUrl, productId, form]);
+
+  const handleUploadChange = ({ fileList }) => {
+    // Maksimum 5 resim
+    setFileList(fileList.slice(-5));
+  };
+
   const onFinish = async (values) => {
-    console.log(values);
-    const imgLinks = values.img.split("\n").map((link) => link.trim());
-    const colors = values.colors.split("\n").map((link) => link.trim());
-    const sizes = values.sizes.split("\n").map((link) => link.trim());
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/products/${productId}`, {
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("category", values.category);
+      formData.append(
+        "price",
+        JSON.stringify({ current: values.current, discount: values.discount })
+      );
+      formData.append("description", values.description);
+      formData.append(
+        "colors",
+        JSON.stringify(values.colors.trim().split("\n"))
+      );
+      formData.append("sizes", JSON.stringify(values.sizes.trim().split("\n")));
+
+      // Sadece yeni yüklenen dosyaları ekle
+      for (const file of fileList) {
+        if (file.originFileObj) {
+          const compressed = await imageCompression(file.originFileObj, {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+          });
+          formData.append("img", compressed);
+        }
+      }
+
+      const res = await fetch(`${apiUrl}/api/products/${productId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...values,
-          price: {
-            current: values.current,
-            discount: values.discount,
-          },
-          colors,
-          sizes,
-          img: imgLinks,
-        }),
+        body: formData,
       });
-      if (response.ok) {
+
+      if (res.ok) {
         message.success("Ürün başarıyla güncellendi.");
         navigate("/admin/products");
       } else {
-        message.error("Ürün güncellenirken bir hata oluştu.");
+        message.error("Ürün güncellenirken hata oluştu.");
       }
-    } catch (error) {
-      console.log("Ürün güncelleme hatası:", error);
+    } catch (err) {
+      console.error(err);
+      message.error("Sunucu hatası.");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <Spin spinning={loading}>
-      <Form name="basic" layout="vertical" onFinish={onFinish} form={form}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        style={{ maxWidth: 600 }}
+      >
         <Form.Item
           label="Ürün İsmi"
           name="name"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen Ürün adını girin!",
-            },
-          ]}
+          rules={[{ required: true, message: "Ürün adı zorunlu" }]}
         >
           <Input />
         </Form.Item>
+
         <Form.Item
           label="Ürün Kategorisi"
           name="category"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen 1 kategori seçin!",
-            },
-          ]}
+          rules={[{ required: true, message: "Kategori seçin" }]}
         >
-          <Select>
-            {categories.map((category) => (
-              <Select.Option value={category._id} key={category._id}>
-                {category.name}
+          <Select placeholder="Kategori seçin">
+            {categories.map((c) => (
+              <Select.Option key={c._id} value={c._id}>
+                {c.name}
               </Select.Option>
             ))}
           </Select>
         </Form.Item>
-        <Form.Item
-          label="Fiyat"
-          name="current"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen ürün fiyatını girin!",
-            },
-          ]}
-        >
-          <InputNumber />
+
+        <Form.Item label="Fiyat">
+          <Input.Group compact>
+            <Form.Item
+              name="current"
+              noStyle
+              rules={[{ required: true, message: "Fiyat girin" }]}
+            >
+              <InputNumber
+                style={{ width: "60%" }}
+                formatter={(v) => `₺ ${v}`}
+                parser={(v) => v.replace(/₺\s?|(,*)/g, "")}
+              />
+            </Form.Item>
+            <Form.Item
+              name="discount"
+              noStyle
+              rules={[{ required: true, message: "İndirim oranı girin" }]}
+            >
+              <InputNumber
+                style={{ width: "40%" }}
+                formatter={(v) => `${v}%`}
+                parser={(v) => v.replace("%", "")}
+              />
+            </Form.Item>
+          </Input.Group>
         </Form.Item>
-        <Form.Item
-          label="İndirim Oranı"
-          name="discount"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen bir ürün indirim oranı girin!",
-            },
-          ]}
-        >
-          <InputNumber />
-        </Form.Item>
+
         <Form.Item
           label="Ürün Açıklaması"
           name="description"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen bir ürün açıklaması girin!",
-            },
-          ]}
+          rules={[{ required: true, message: "Açıklama zorunlu" }]}
         >
-          <ReactQuill
-            theme="snow"
-            style={{
-              backgroundColor: "white",
-            }}
-          />
+          <ReactQuill theme="snow" style={{ background: "white" }} />
         </Form.Item>
-        <Form.Item
-          label="Ürün Görselleri (Linkler)"
-          name="img"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen en az 4 ürün görsel linki girin!",
-            },
-          ]}
-        >
-          <Input.TextArea
-            placeholder="Her bir görsel linkini yeni bir satıra yazın."
-            autoSize={{ minRows: 4 }}
-          />
+
+        <Form.Item label="Ürün Görselleri">
+          <Upload
+            listType="picture-card"
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={handleUploadChange}
+            accept="image/*"
+            multiple
+          >
+            {fileList.length < 5 && (
+              <div>
+                <UploadOutlined />
+                <div style={{ marginTop: 8 }}>Yükle</div>
+              </div>
+            )}
+          </Upload>
+          <small>En fazla 5 görsel yükleyebilirsiniz.</small>
         </Form.Item>
+
         <Form.Item
-          label="Ürün Renkleri (RGB Kodları)"
+          label="Ürün Renkleri (Her satır bir renk)"
           name="colors"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen en az 1 ürün rengi girin!",
-            },
-          ]}
+          rules={[{ required: true, message: "Renk girin" }]}
         >
-          <Input.TextArea
-            placeholder="Her bir RGB kodunu yeni bir satıra yazın."
-            autoSize={{ minRows: 4 }}
-          />
+          <Input.TextArea autoSize={{ minRows: 2 }} placeholder="#FF0000" />
         </Form.Item>
+
         <Form.Item
-          label="Ürün Bedenleri"
+          label="Ürün Bedenleri (Her satır bir beden)"
           name="sizes"
-          rules={[
-            {
-              required: true,
-              message: "Lütfen en az 1 ürün beden ölçüsü girin!",
-            },
-          ]}
+          rules={[{ required: true, message: "Beden girin" }]}
         >
-          <Input.TextArea
-            placeholder="Her bir beden ölçüsünü yeni bir satıra yazın."
-            autoSize={{ minRows: 4 }}
-          />
+          <Input.TextArea autoSize={{ minRows: 2 }} placeholder="S" />
         </Form.Item>
-        <Button type="primary" htmlType="submit">
-          Update
-        </Button>
+
+        <Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit">
+              Güncelle
+            </Button>
+            <Button onClick={() => navigate(-1)}>İptal</Button>
+          </Space>
+        </Form.Item>
       </Form>
     </Spin>
   );
 };
+
 export default UpdateProductPage;

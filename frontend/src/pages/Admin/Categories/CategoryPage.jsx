@@ -13,7 +13,13 @@ const CategoryPage = () => {
       title: "Kategori Görseli",
       dataIndex: "img",
       key: "img",
-      render: (imgSrc) => <img src={imgSrc} alt="Image" width={100} />,
+      render: (imgBase64) => (
+        <img
+          src={`data:image/png;base64,${imgBase64}`}
+          alt="Kategori"
+          width={100}
+        />
+      ),
     },
     {
       title: "Name",
@@ -23,7 +29,6 @@ const CategoryPage = () => {
     },
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
       render: (_, record) => (
         <Space>
@@ -35,9 +40,9 @@ const CategoryPage = () => {
           </Button>
           <Popconfirm
             title="Kategoriyi Sil"
-            description="Kategoriyi silmek istediğinizden emin misiniz?"
-            okText="Yes"
-            cancelText="No"
+            description="Silmek istediğinizden emin misiniz?"
+            okText="Evet"
+            cancelText="Hayır"
             onConfirm={() => deleteCategory(record._id)}
           >
             <Button type="primary" danger>
@@ -51,10 +56,8 @@ const CategoryPage = () => {
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
-
     try {
       const response = await fetch(`${apiUrl}/api/categories`);
-
       if (response.ok) {
         const data = await response.json();
         setDataSource(data);
@@ -73,7 +76,6 @@ const CategoryPage = () => {
       const response = await fetch(`${apiUrl}/api/categories/${categoryId}`, {
         method: "DELETE",
       });
-
       if (response.ok) {
         message.success("Kategori başarıyla silindi.");
         fetchCategories();
