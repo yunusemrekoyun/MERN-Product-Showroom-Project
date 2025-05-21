@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { message } from "antd";
+import "./register.css";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,79 +23,98 @@ const Register = () => {
     try {
       const response = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        // const { password, ...rest } = data;
-
         localStorage.setItem("user", JSON.stringify(data));
         message.success("Kayıt başarılı.");
         navigate("/");
       } else {
         message.error("Kayıt başarısız.");
       }
-    } catch (error) {
-      console.log("Giriş hatası:", error);
+    } catch (err) {
+      console.error("Register error:", err);
+      message.error("Bir hata oluştu.");
     }
   };
 
   return (
-    <div className="account-column">
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <div>
-          <label>
-            <span>
-              Username <span className="required">*</span>
-            </span>
-            <input
-              type="text"
-              onChange={handleInputChange}
-              name="username"
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            <span>
-              Email address <span className="required">*</span>
-            </span>
-            <input
-              type="email"
-              onChange={handleInputChange}
-              name="email"
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            <span>
-              Password <span className="required">*</span>
-            </span>
-            <input
-              type="password"
-              onChange={handleInputChange}
-              name="password"
-              required
-            />
-          </label>
-        </div>
-        <div className="privacy-policy-text remember">
+    <div className="register-page mirror-layout">
+      {/* Sağ tarafa geçmiş görsel + metin */}
+      <div className="register-right mirror-visual">
+        <div className="right-content">
+          <h2>Birlikte büyüyoruz</h2>
           <p>
-            Your personal data will be used to support your experience
-            throughout this website, to manage access to your account, and for
-            other purposes described in our <a href="#">privacy policy.</a>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+            enim ad minim veniam, quis nostrud exercitation ullamco laboris
+            nisi ut aliquip ex ea commodo consequat.
           </p>
-          <button className="btn btn-sm">Register</button>
         </div>
-      </form>
+      </div>
+
+      {/* Sol tarafa geçmiş form */}
+      <div className="register-left mirror-form">
+        <div className="register-box">
+          <div className="text-center">
+<img src="/logo/logo.png" alt="Logo" className="auth-logo" />           
+      
+          </div>
+
+          <form onSubmit={handleRegister}>
+            <div className="form-group">
+              <label htmlFor="username">Kullanıcı Adı</label>
+              <input
+                type="text"
+                name="username"
+                id="username"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">E-posta</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Şifre</label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn-register-main">
+              KAYIT OL
+            </button>
+          </form>
+
+          <div className="login-prompt">
+            <span>Zaten bir hesabınız var mı?</span>
+            <button
+              type="button"
+              className="btn-login-alt"
+              onClick={() => navigate("/login")}
+            >
+              GİRİŞ YAP
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
