@@ -4,7 +4,10 @@ import ShopPage from "./pages/ShopPage";
 import BlogPage from "./pages/BlogPage";
 import ContactPage from "./pages/ContactPage";
 import CartPage from "./pages/CartPage";
-import AuthPage from "./pages/AuthPage";
+//import AuthPage from "./pages/AuthPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import BlogDetailsPage from "./pages/BlogDetailsPage";
 import DashboardPage from "./pages/Admin/DashBoardPage";
@@ -35,7 +38,8 @@ function App() {
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/cart" element={<CartPage />} />
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />
       <Route path="/success" element={<Success />} />

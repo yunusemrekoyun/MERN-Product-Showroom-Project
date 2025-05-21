@@ -36,11 +36,11 @@ const Header = () => {
             <Search />
           </div>
           <div className="header-right">
-            <Link to="/auth" className="header-icon">
+            <Link to="/login" className="header-icon">
               <i className="bi bi-person"></i>
               <span>Üye Girişi</span>
             </Link>
-            <Link to="/auth" className="header-icon">
+            <Link to="/register" className="header-icon">
               <i className="bi bi-person-plus"></i>
               <span>Üye Ol</span>
             </Link>

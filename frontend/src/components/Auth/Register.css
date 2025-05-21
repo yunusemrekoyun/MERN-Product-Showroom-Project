@@ -1,0 +1,152 @@
+.register-page {
+  display: flex;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+    align-items: start;
+
+}
+.auth-logo {
+  width: 200px;
+  height: auto;
+
+}
+/* Ayna efekti için ters yönlendirme */
+.mirror-layout {
+  flex-direction: row-reverse;
+}
+
+.register-left,
+.register-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mirror-form {
+  background-color: #ffffff;
+  padding: 40px;
+}
+
+.register-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.text-center {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.subtitle {
+  margin-top: 10px;
+  color: #666;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.btn-register-main {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #e63b51;
+  color: white;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-register-main:hover {
+  opacity: 0.9;
+}
+
+.login-prompt {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.login-prompt span {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.btn-login-alt {
+  border: 1px solid #d8363a;
+  background: transparent;
+  color: #d8363a;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-login-alt:hover {
+  background-color: #d8363a;
+  color: white;
+}
+
+/* Sağdaki görsel + metin alanı */
+.mirror-visual {
+  background-image: url('/public/img/blogs/blog1.jpg'); /* ← GÖRSEL YOLUNU GÜNCELLE */
+  background-size: cover;
+  background-position: center;
+ height: auto;
+  color: white;
+  padding: 40px;
+  border-radius:30%;
+}
+
+.right-content {
+    margin-top: 70%;
+  max-width: 400px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.right-content h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.right-content p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .register-page {
+    flex-direction: column;
+  }
+
+  .mirror-visual {
+    height: 200px;
+    background-position: center;
+  }
+
+  .right-content {
+    padding: 10px;
+    font-size: 12px;
+  }
+}
