@@ -8,6 +8,8 @@ import AuthPage from "./pages/AuthPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import BlogDetailsPage from "./pages/BlogDetailsPage";
 import DashboardPage from "./pages/Admin/DashBoardPage";
+import CreateBlogPage from "./pages/Admin/Blogs/CreateBlogPage";
+import UpdateBlogPage from "./pages/Admin/Blogs/UpdateBlogPage.jsx";
 import "./App.css";
 import UserPage from "./pages/Admin/UserPage";
 import CategoryPage from "./pages/Admin/Categories/CategoryPage";
@@ -24,6 +26,7 @@ import OrderPage from "./pages/Admin/OrderPage";
 import CampaignPage from "./pages/Admin/Campaigns/CampaignPage";
 import CreateCampaignPage from "./pages/Admin/Campaigns/CreateCampaignPage";
 import UpdateCampaignPage from "./pages/Admin/Campaigns/UpdateCampaignPage";
+import AdminBlogsPage from "./pages/Admin/Blogs/AdminBlogsPage";
 function App() {
   return (
     <Routes>
@@ -34,10 +37,13 @@ function App() {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
-      <Route path="/blog/:id" element={<BlogDetailsPage />} />
+      <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />
       <Route path="/success" element={<Success />} />
       <Route path="/admin/*">
         <Route index element={<DashboardPage />} />
+        <Route path="blogs" element={<AdminBlogsPage />} />
+        <Route path="blogs/create" element={<CreateBlogPage />} />
+        <Route path="blogs/update/:blogId" element={<UpdateBlogPage />} />
         <Route path="users" element={<UserPage />} />
         <Route path="categories" element={<CategoryPage />} />
         <Route path="categories/create" element={<CreateCategoryPage />} />

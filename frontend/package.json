@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/compatible": "^5.1.4",
     "@stripe/stripe-js": "^2.1.6",
     "antd": "^5.9.3",
     "browser-image-compression": "^2.0.2",
@@ -20,7 +21,7 @@
     "react-slick": "^0.29.0",
     "recharts": "^2.15.0",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.2.6"
+    "swiper": "^11.2.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

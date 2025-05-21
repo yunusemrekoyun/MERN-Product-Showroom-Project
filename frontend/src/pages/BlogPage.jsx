@@ -1,6 +1,6 @@
 
 import Blogs from "../components/Blogs/Blogs";
-const AuthPage = () => {
+const BlogPage = () => {
   return (
   
       <div className="blog-page">
@@ -10,4 +10,4 @@ const AuthPage = () => {
   );
 };
 
-export default AuthPage;
+export default BlogPage;

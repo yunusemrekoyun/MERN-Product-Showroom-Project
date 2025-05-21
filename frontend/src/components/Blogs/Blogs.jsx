@@ -1,45 +1,91 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 import BlogItem from "./BlogItem";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "./Blogs.css";
 
 const Blogs = () => {
-  const blogData = [
-    {
-      image: "/img/blogs/blog1.jpg",
-      title: "Çini sanatıyla geçmişe zarif bir yolculuk",
-      date: "25 Şub, 2021",
-      comments: 0,
-    },
-    {
-      image: "/img/blogs/blog2.jpg",
-      title: "Minimal seramikle sıcak dokunuş",
-      date: "10 Mar, 2021",
-      comments: 2,
-    },
-    {
-      image: "/img/blogs/blog3.jpg",
-      title: "Vazolarla dekorasyonda sade şıklık",
-      date: "18 Nis, 2021",
-      comments: 5,
-    },
-  ];
+  const [blogs, setBlogs] = useState([]);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/blogs`);
+        if (!res.ok) throw new Error("Fetch error");
+        const data = await res.json();
+        setBlogs(data);
+      } catch (err) {
+        console.error(err);
+        message.error("Bloglar yüklenemedi");
+      }
+    };
+    fetchBlogs();
+  }, [apiUrl]);
 
   return (
     <section className="blogs">
       <div className="container">
-        <div className="section-title">
+        <div className="blogs-header">
           <h2>Bloğumuza Göz Atın</h2>
+          <button className="view-all-btn" onClick={() => navigate("/blog")}>
+            Tümünü Gör
+          </button>
         </div>
-        <ul className="blog-list">
-          {blogData.map((item, index) => (
-            <BlogItem
-              key={index}
-              image={item.image}
-              title={item.title}
-              date={item.date}
-              comments={item.comments}
-            />
-          ))}
-        </ul>
+
+        {blogs.length > 3 ? (
+          <div className="blog-swiper-wrapper">
+            <Swiper
+              spaceBetween={20}
+              slidesPerView={3}
+              autoplay={{ delay: 3500, disableOnInteraction: false }}
+              navigation={{
+                nextEl: ".custom-swiper-next",
+                prevEl: ".custom-swiper-prev",
+              }}
+              pagination={{ clickable: true }}
+              modules={[Autoplay, Navigation, Pagination]}
+              className="blog-swiper"
+            >
+              {blogs.map((blog) => (
+                <SwiperSlide key={blog.blogId}>
+                  <BlogItem
+                    blogId={blog.blogId}
+                    image={blog.images[0]}
+                    title={blog.title}
+                    date={blog.createdAt}
+                    comments={0}
+                    likes={blog.likedBy.length}
+                    onClick={() => navigate(`/blogs/${blog.blogId}`)}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            <button className="custom-swiper-prev">❮</button>
+            <button className="custom-swiper-next">❯</button>
+          </div>
+        ) : (
+          <ul className="blog-list">
+            {blogs.map((blog) => (
+              <BlogItem
+                key={blog.blogId}
+                blogId={blog.blogId}
+                image={blog.images[0]}
+                title={blog.title}
+                date={blog.createdAt}
+                comments={0}
+                likes={blog.likedBy.length}
+                onClick={() => navigate(`/blogs/${blog.blogId}`)}
+              />
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );

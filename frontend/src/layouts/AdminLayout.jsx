@@ -125,6 +125,25 @@ const AdminLayout = ({ children }) => {
       ],
     },
     {
+      key: "17",
+      icon: <AppstoreOutlined />,
+      label: "Bloglar",
+      children: [
+        {
+          key: "18",
+          label: "Blog Listesi",
+          path: "/admin/blogs",
+          onClick: () => navigate("/admin/blogs"),
+        },
+        {
+          key: "19",
+          label: "Yeni Blog Oluştur",
+          path: "/admin/blogs/create",
+          onClick: () => navigate("/admin/blogs/create"),
+        },
+      ],
+    },
+    {
       key: "11",
       icon: <UserOutlined />,
       label: "Kullanıcı Listesi",
@@ -183,20 +202,15 @@ const AdminLayout = ({ children }) => {
       }
     }
   };
+
   if (userRole === "admin") {
     return (
       <div className="admin-layout">
-        <Layout
-          style={{
-            minHeight: "100vh",
-          }}
-        >
+        <Layout style={{ minHeight: "100vh" }}>
           <Sider width={200} theme="dark">
             <Menu
               mode="vertical"
-              style={{
-                height: "100%",
-              }}
+              style={{ height: "100%" }}
               items={menuItems}
               defaultSelectedKeys={[getActiveKey()]}
             />
@@ -234,8 +248,8 @@ const AdminLayout = ({ children }) => {
   }
 };
 
-export default AdminLayout;
-
 AdminLayout.propTypes = {
   children: PropTypes.node,
 };
+
+export default AdminLayout;

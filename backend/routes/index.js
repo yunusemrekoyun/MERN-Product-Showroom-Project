@@ -9,7 +9,9 @@ const couponRoute = require("./coupons.js");
 const userRoute = require("./users.js");
 const paymentRoute = require("./payment.js");
 const campaignRoute = require("./campaign.js");
+const blogRoute = require("./blogs.js");
 // Her rotayı ilgili yol altında kullanıyoruz
+router.use("/blogs", blogRoute);
 router.use("/categories", categoryRoute);
 router.use("/campaigns", campaignRoute);
 router.use("/auth", authRoute);
