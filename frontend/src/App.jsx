@@ -31,6 +31,9 @@ import CampaignPage from "./pages/Admin/Campaigns/CampaignPage";
 import CreateCampaignPage from "./pages/Admin/Campaigns/CreateCampaignPage";
 import UpdateCampaignPage from "./pages/Admin/Campaigns/UpdateCampaignPage";
 import AdminBlogsPage from "./pages/Admin/Blogs/AdminBlogsPage";
+import UserAccountPage from "./pages/UserAccountPage";
+
+
 function App() {
   return (
     <Routes>
@@ -40,6 +43,7 @@ function App() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/account" element={<UserAccountPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />

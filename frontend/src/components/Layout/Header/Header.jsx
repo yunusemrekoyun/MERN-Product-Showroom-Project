@@ -1,12 +1,10 @@
 import { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-// import { CartContext } from "../../../context/CartProvider";
 import "./Header.css";
 import Search from "../../Modals/Search/Search";
 
 const Header = () => {
-  // const { cartItems } = useContext(CartContext);
-  const user = localStorage.getItem("user");
+  const user = JSON.parse(localStorage.getItem("user")); // ✅ parse edildi
   const { pathname } = useLocation();
 
   const [activeMenu, setActiveMenu] = useState(null);
@@ -36,36 +34,38 @@ const Header = () => {
             <Search />
           </div>
           <div className="header-right">
-            <Link to="/login" className="header-icon">
-              <i className="bi bi-person"></i>
-              <span>Üye Girişi</span>
-            </Link>
-            <Link to="/register" className="header-icon">
-              <i className="bi bi-person-plus"></i>
-              <span>Üye Ol</span>
-            </Link>
-            {/* <Link to="/cart" className="header-icon">
-              <i className="bi bi-bag"></i>
-              <span>Sepetim</span>
-              {cartItems.length > 0 && (
-                <span className="header-cart-count">{cartItems.length}</span>
-              )}
-            </Link> */}
-            {user && (
-              <Link
-                to="/"
-                className="header-icon"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (window.confirm("Çıkış yapmak istiyor musunuz?")) {
-                    localStorage.removeItem("user");
-                    window.location.href = "/";
-                  }
-                }}
-              >
-                <i className="bi bi-box-arrow-right"></i>
-                <span>Çıkış</span>
-              </Link>
+            {!user ? (
+              <>
+                <Link to="/login" className="header-icon">
+                  <i className="bi bi-person"></i>
+                  <span>Üye Girişi</span>
+                </Link>
+                <Link to="/register" className="header-icon">
+                  <i className="bi bi-person-plus"></i>
+                  <span>Üye Ol</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/account" className="header-icon user-info">
+                  <i className="bi bi-person-circle"></i>
+                  <span>{user.username}</span>
+                </Link>
+                <Link
+                  to="/"
+                  className="header-icon"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.confirm("Çıkış yapmak istiyor musunuz?")) {
+                      localStorage.removeItem("user");
+                      window.location.href = "/";
+                    }
+                  }}
+                >
+                  <i className="bi bi-box-arrow-right"></i>
+                  <span>Çıkış</span>
+                </Link>
+              </>
             )}
           </div>
         </div>
