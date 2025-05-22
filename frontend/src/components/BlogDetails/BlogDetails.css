@@ -8,9 +8,14 @@
 
 .blog-image {
   width: 100%;
+  
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   object-fit: cover;
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 .blog-slider {
@@ -79,4 +84,106 @@
   text-align: center;
   font-size: 18px;
   color: #999;
+}
+.blog-like-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #d6363a;
+  transition: 0.2s;
+  margin-left: 8px;
+}
+
+.blog-like-button:hover {
+  transform: scale(1.1);
+}
+
+.blog-like-button.liked {
+  font-weight: bold;
+  color: #b22222;
+}
+/* Görsel yüksekliği sınırı */
+.limited-image {
+  width: 100%;
+  max-width: 700px; /* Örnek: sabit genişlik */
+  height: auto;     /* Oranı bozulmasın */
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+/* Buton */
+.toggle-details-button {
+  margin: 20px 0;
+  padding: 10px 20px;
+  border: none;
+  background-color: #d8363a;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-details-button:hover {
+  background-color: #b22222;
+}
+
+/* Açılır kutu */
+.details-box {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.4s ease;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 0 20px;
+  margin-top: 10px;
+  color: #333;
+}
+
+/* Aktifken göster */
+.details-box.show {
+  max-height: 1000px;
+  opacity: 1;
+  padding: 20px;
+  border: 1px solid #eee;
+}
+.toggle-details-button {
+  margin: 30px 0;
+  padding: 10px 20px;
+  border: none;
+  background-color: #d8363a;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-details-button:hover {
+  background-color: #b22222;
+}
+.toggle-details-button {
+  margin: 30px 0;
+  padding: 10px 20px;
+  border: none;
+  background-color: #d8363a;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-details-button:hover {
+  background-color: #b22222;
+}
+
+.comment-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
 }
