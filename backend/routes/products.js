@@ -1,4 +1,4 @@
-// routes/product.js
+// 📁 routes/product.js
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -12,26 +12,17 @@ const upload = multer({ storage });
 // CREATE
 router.post("/", upload.array("img", 5), async (req, res) => {
   try {
-    // multipart/form-data içinden gelen text alanlar string olarak
-    const {
-      name,
-      description,
-      category,
-      colors,
-      sizes,
-      price, // e.g. { current: 100, discount: 10 }
-    } = req.body;
+    const { name, description, category, colors, sizes, price } = req.body;
 
-    // gelen dosyaları base64’e çevir
     const img = req.files.map((file) => file.buffer.toString("base64"));
 
     const newProduct = new Product({
       name,
       description,
-      category, // ObjectId string
-      colors: JSON.parse(colors), // client: JSON.stringify(colorsArray)
-      sizes: JSON.parse(sizes), // client: JSON.stringify(sizesArray)
-      price: JSON.parse(price), // client: JSON.stringify({ current, discount })
+      category,
+      colors: JSON.parse(colors),
+      sizes: JSON.parse(sizes),
+      price: JSON.parse(price),
       img,
     });
 
@@ -81,7 +72,6 @@ router.put("/:productId", upload.array("img", 5), async (req, res) => {
     if (req.body.sizes) updates.sizes = JSON.parse(req.body.sizes);
     if (req.body.price) updates.price = JSON.parse(req.body.price);
 
-    // Eğer yeni resimler yüklenmişse onları base64 olarak güncelle
     if (req.files && req.files.length > 0) {
       updates.img = req.files.map((file) => file.buffer.toString("base64"));
     }
@@ -90,10 +80,12 @@ router.put("/:productId", upload.array("img", 5), async (req, res) => {
       req.params.productId,
       updates,
       { new: true }
-    );
+    ).populate("category");
+
     if (!updatedProduct) {
       return res.status(404).json({ error: "Product not found." });
     }
+
     res.status(200).json(updatedProduct);
   } catch (error) {
     console.error(error);
@@ -120,7 +112,7 @@ router.get("/search/:productName", async (req, res) => {
   try {
     const products = await Product.find({
       name: { $regex: req.params.productName, $options: "i" },
-    });
+    }).populate("category");
     res.status(200).json(products);
   } catch (error) {
     console.error(error);

@@ -3,13 +3,8 @@ import PropTypes from "prop-types";
 import Reviews from "../../Reviews/Reviews";
 import "./Tabs.css";
 
-const Tabs = ({ singleProduct, setSingleProduct }) => {
+const Tabs = ({ singleProduct, setSingleProduct, onReviewUpdate }) => {
   const [activeTab, setActiveTab] = useState("desc");
-
-  const handleTabClick = (e, tab) => {
-    e.preventDefault();
-    setActiveTab(tab);
-  };
 
   return (
     <div className="single-tabs">
@@ -18,7 +13,10 @@ const Tabs = ({ singleProduct, setSingleProduct }) => {
           <a
             href="#"
             className={`tab-button ${activeTab === "desc" ? "active" : ""}`}
-            onClick={(e) => handleTabClick(e, "desc")}
+            onClick={(e) => {
+              e.preventDefault();
+              setActiveTab("desc");
+            }}
           >
             Description
           </a>
@@ -26,22 +24,17 @@ const Tabs = ({ singleProduct, setSingleProduct }) => {
         <li>
           <a
             href="#"
-            className={`tab-button ${activeTab === "info" ? "active" : ""}`}
-            onClick={(e) => handleTabClick(e, "info")}
-          >
-            Additional information
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
             className={`tab-button ${activeTab === "reviews" ? "active" : ""}`}
-            onClick={(e) => handleTabClick(e, "reviews")}
+            onClick={(e) => {
+              e.preventDefault();
+              setActiveTab("reviews");
+            }}
           >
             Reviews
           </a>
         </li>
       </ul>
+
       <div className="tab-panel">
         <div
           className={`tab-panel-descriptions content ${
@@ -51,55 +44,24 @@ const Tabs = ({ singleProduct, setSingleProduct }) => {
           <div
             className="product-description"
             dangerouslySetInnerHTML={{ __html: singleProduct.description }}
-          ></div>
+          />
         </div>
-        <div
-          className={`tab-panel-information content ${
-            activeTab === "info" ? "active" : ""
-          }`}
-          id="info"
-        >
-          <h3>Additional information</h3>
-          <table>
-            <tbody>
-              <tr>
-                <th>Color</th>
-                <td>
-                  <p>
-                    Apple Red, Bio Blue, Sweet Orange, Blue, Green, Pink, Black,
-                    White
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <th>Size</th>
-                <td>
-                  <p>
-                    {singleProduct.sizes.map((item, index) => (
-                      <span key={index}>
-                        {item.toUpperCase()}
-                        {index < singleProduct.sizes.length - 1 && ", "}
-                      </span>
-                    ))}
-                  </p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+
         <Reviews
           active={activeTab === "reviews" ? "content active" : "content"}
           singleProduct={singleProduct}
           setSingleProduct={setSingleProduct}
+          onReviewUpdate={onReviewUpdate}
         />
       </div>
     </div>
   );
 };
 
-export default Tabs;
-
 Tabs.propTypes = {
-  singleProduct: PropTypes.object,
-  setSingleProduct: PropTypes.func,
+  singleProduct: PropTypes.object.isRequired,
+  setSingleProduct: PropTypes.func.isRequired,
+  onReviewUpdate: PropTypes.func.isRequired,
 };
+
+export default Tabs;

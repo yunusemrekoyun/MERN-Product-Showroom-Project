@@ -1,48 +1,50 @@
+import { useEffect, useState, useCallback } from "react";
+import PropTypes from "prop-types";
+import { message } from "antd";
 import ReviewForm from "./ReviewForm";
 import ReviewItem from "./ReviewItem";
-import PropTypes from "prop-types";
 import "./Reviews.css";
-import { useEffect, useState } from "react";
-import { message } from "antd";
 
-const Reviews = ({ active, singleProduct, setSingleProduct }) => {
-  const [users, setUsers] = useState([]);
+const Reviews = ({
+  active,
+  singleProduct,
+
+  onReviewUpdate,
+}) => {
+  const [reviews, setReviews] = useState([]);
+  const [reviewCount, setReviewCount] = useState(0);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-  const thisReview = [];
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `${apiUrl}/api/product-reviews/${singleProduct._id}`
+      );
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setReviews(data.reviews);
+      setReviewCount(data.total);
+    } catch {
+      message.error("Yorumlar yüklenemedi.");
+    }
+  }, [apiUrl, singleProduct._id]);
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/api/users`);
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(data);
-        } else {
-          message.error("Veri getirme başarısız.");
-        }
-      } catch (error) {
-        console.log("Veri hatası:", error);
-      }
-    };
-    fetchUsers();
-  }, [apiUrl]);
-  singleProduct.reviews.forEach((review) => {
-    const matchingUsers = users?.filter((user) => user._id === review.user);
-    matchingUsers.forEach((matchingUser) => {
-      thisReview.push({
-        review: review,
-        user: matchingUser,
-      });
-    });
-  });
+    fetchReviews();
+  }, [fetchReviews]);
+
   return (
     <div className={`tab-panel-reviews ${active}`}>
-      {singleProduct.reviews.length > 0 ? (
+      {reviewCount > 0 ? (
         <>
-          <h3>2 reviews for Basic Colored Sweatpants With Elastic Hems</h3>
+          <h3>{reviewCount} yorum</h3>
           <div className="comments">
             <ol className="comment-list">
-              {thisReview.map((item, index) => (
-                <ReviewItem key={index} item={item} reviewItem={item} />
+              {reviews.map((item, idx) => (
+                <ReviewItem
+                  key={idx}
+                  reviewItem={{ review: item, user: item.user }}
+                />
               ))}
             </ol>
           </div>
@@ -50,22 +52,23 @@ const Reviews = ({ active, singleProduct, setSingleProduct }) => {
       ) : (
         <h3>Hiç yorum yok...</h3>
       )}
-
       <div className="review-form-wrapper">
-        <h2>Add a review</h2>
+        <h2>Yorum Yaz</h2>
         <ReviewForm
-          singleProduct={singleProduct}
-          setSingleProduct={setSingleProduct}
+          productId={singleProduct._id}
+          onReviewAdded={fetchReviews}
+          onReviewUpdate={onReviewUpdate}
         />
       </div>
     </div>
   );
 };
 
-export default Reviews;
-
 Reviews.propTypes = {
-  active: PropTypes.string,
-  singleProduct: PropTypes.object,
-  setSingleProduct: PropTypes.func,
+  active: PropTypes.string.isRequired,
+  singleProduct: PropTypes.object.isRequired,
+  setSingleProduct: PropTypes.func.isRequired,
+  onReviewUpdate: PropTypes.func.isRequired,
 };
+
+export default Reviews;

@@ -1,152 +1,72 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { message } from "antd";
+import { Form, Rate, Input, Button, message } from "antd";
 
-const ReviewForm = ({ singleProduct, setSingleProduct }) => {
+const ReviewForm = ({ productId, onReviewAdded, onReviewUpdate }) => {
+  const [submitting, setSubmitting] = useState(false);
   const [rating, setRating] = useState(0);
-  const [review, setReview] = useState("");
+  const [reviewText, setReviewText] = useState("");
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  const handleRatingChange = (e, newRating) => {
-    e.preventDefault();
-    setRating(newRating);
-  };
+  const handleFinish = async () => {
+    if (!user) return message.warning("Yorum yapmak için giriş yapmalısınız.");
+    if (rating === 0 || !reviewText.trim())
+      return message.warning("Lütfen puan ve yorumunuzu girin.");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (rating === 0) {
-      return message.warning("Puan seçiniz!");
-    }
-    const formData = {
-      reviews: [
-        ...singleProduct.reviews,
-        {
-          text: review,
-          rating: parseInt(rating),
-          user: user.id || user._id,
-        },
-      ],
-    };
-
+    setSubmitting(true);
     try {
-      const res = await fetch(`${apiUrl}/api/products/${singleProduct._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const res = await fetch(`${apiUrl}/api/product-reviews/${productId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: reviewText,
+          rating,
+          user: user._id || user.id,
+        }),
       });
 
-      if (!res.ok) {
-        message.error("Bir şeyler yanlış gitti.");
-        return;
-      }
-
-      const data = await res.json();
-      setSingleProduct(data);
-      setReview("");
+      if (!res.ok) throw new Error();
       setRating(0);
-      message.success("Yorum başarıyla eklendi.");
-    } catch (error) {
-      console.log(error);
-      message.error("Bir şeyler yanlış gitti.");
+      setReviewText("");
+      message.success("Yorumunuz eklendi.");
+      onReviewAdded();
+      onReviewUpdate(); // yıldız & yorum sayısını güncelle
+    } catch {
+      message.error("Yorum eklenirken bir hata oluştu.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <form className="comment-form" onSubmit={handleSubmit}>
-      <p className="comment-notes">
-        Your email address will not be published. Required fields are marked
-        <span className="required">*</span>
-      </p>
-      <div className="comment-form-rating">
-        <label>
-          Your rating
-          <span className="required">*</span>
-        </label>
-        <div className="stars">
-          <a
-            href="#"
-            className={`star ${rating === 1 && "active"}`}
-            onClick={(e) => handleRatingChange(e, 1)}
-          >
-            <i className="bi bi-star-fill"></i>
-          </a>
-          <a
-            href="#"
-            className={`star ${rating === 2 && "active"}`}
-            onClick={(e) => handleRatingChange(e, 2)}
-          >
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-          </a>
-          <a
-            href="#"
-            className={`star ${rating === 3 && "active"}`}
-            onClick={(e) => handleRatingChange(e, 3)}
-          >
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-          </a>
-          <a
-            href="#"
-            className={`star ${rating === 4 && "active"}`}
-            onClick={(e) => handleRatingChange(e, 4)}
-          >
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-          </a>
-          <a
-            href="#"
-            className={`star ${rating === 5 && "active"}`}
-            onClick={(e) => handleRatingChange(e, 5)}
-          >
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-            <i className="bi bi-star-fill"></i>
-          </a>
-        </div>
-      </div>
-      <div className="comment-form-comment form-comment">
-        <label htmlFor="comment">
-          Your review
-          <span className="required">*</span>
-        </label>
-        <textarea
-          id="comment"
-          cols="50"
-          rows="10"
-          onChange={(e) => setReview(e.target.value)}
-          value={review}
-          required
-        ></textarea>
-      </div>
-      <div className="comment-form-cookies">
-        <input id="cookies" type="checkbox" />
-        <label htmlFor="cookies">
-          Save my name, email, and website in this browser for the next time I
-          comment.
-          <span className="required">*</span>
-        </label>
-      </div>
-      <div className="form-submit">
-        <input type="submit" className="btn submit" />
-      </div>
-    </form>
+    <Form layout="vertical" onFinish={handleFinish}>
+      <Form.Item label="Puanınız">
+        <Rate allowHalf value={rating} onChange={setRating} />
+      </Form.Item>
+      <Form.Item label="Yorumunuz">
+        <Input.TextArea
+          rows={4}
+          value={reviewText}
+          onChange={(e) => setReviewText(e.target.value)}
+          placeholder="Yorumunuzu yazın..."
+        />
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit" loading={submitting} block>
+          Gönder
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 
-export default ReviewForm;
-
 ReviewForm.propTypes = {
-  singleProduct: PropTypes.object,
-  setSingleProduct: PropTypes.func,
+  productId: PropTypes.string.isRequired,
+  onReviewAdded: PropTypes.func.isRequired,
+  onReviewUpdate: PropTypes.func.isRequired,
 };
+
+export default ReviewForm;
