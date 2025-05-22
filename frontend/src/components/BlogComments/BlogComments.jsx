@@ -23,8 +23,14 @@ const BlogComments = ({ blogId, user }) => {
   };
 
   useEffect(() => {
-    fetchComments();
-  }, [blogId]);
+    fetch(`${apiUrl}/api/blogs/${blogId}/comments`)
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(setComments)
+      .catch(() => message.error("Yorumlar yüklenemedi"));
+  }, [apiUrl, blogId]);
 
   const handleSubmit = async () => {
     if (!user) return message.warning("Yorum yapmak için giriş yapın");
