@@ -1,0 +1,60 @@
+.user-account-details {
+  max-width: 500px;
+  margin: 30px auto;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  font-family: "Segoe UI", sans-serif;
+  color: #3f362c;
+}
+
+.user-account-details .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.user-account-details .form-group label {
+  font-size: 15px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #444;
+}
+
+.user-account-details .form-group input {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #fefbf6;
+  transition: border-color 0.2s;
+}
+
+.user-account-details .form-group input:focus {
+  outline: none;
+  border-color: #d8363a;
+  background-color: #fff;
+}
+
+.update-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #d8363a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.update-button:hover {
+  background-color: #b22222;
+}
+
+.update-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
