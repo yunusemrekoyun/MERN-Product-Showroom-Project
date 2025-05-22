@@ -10,26 +10,22 @@ const BlogComments = ({ blogId, user }) => {
   const [comments, setComments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [value, setValue] = useState("");
+  const [visibleCount, setVisibleCount] = useState(5); // ✅ yeni
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const fetchComments = async () => {
     try {
       const res = await fetch(`${apiUrl}/api/blogs/${blogId}/comments`);
       if (!res.ok) throw new Error();
-      setComments(await res.json());
+      const data = await res.json();
+      setComments(data);
     } catch {
       message.error("Yorumlar yüklenemedi");
     }
   };
 
   useEffect(() => {
-    fetch(`${apiUrl}/api/blogs/${blogId}/comments`)
-      .then((res) => {
-        if (!res.ok) throw new Error();
-        return res.json();
-      })
-      .then(setComments)
-      .catch(() => message.error("Yorumlar yüklenemedi"));
+    fetchComments();
   }, [apiUrl, blogId]);
 
   const handleSubmit = async () => {
@@ -45,7 +41,7 @@ const BlogComments = ({ blogId, user }) => {
       });
       if (res.ok) {
         setValue("");
-        fetchComments();
+        await fetchComments();
       } else {
         message.error("Yorum eklenemedi");
       }
@@ -63,18 +59,31 @@ const BlogComments = ({ blogId, user }) => {
       {comments.length === 0 ? (
         <div className="no-comments">Henüz yorum yapılmamış. İlk sen ol!</div>
       ) : (
-        <List
-          dataSource={comments}
-          itemLayout="horizontal"
-          renderItem={(item) => (
-            <Comment
-              author={<strong>{item.user.username}</strong>}
-              avatar={<Avatar icon={<UserOutlined />} />}
-              content={<p>{item.content}</p>}
-              datetime={dayjs(item.createdAt).format("DD MMM YYYY HH:mm")}
-            />
+        <>
+          <List
+            dataSource={comments.slice(0, visibleCount)}
+            itemLayout="horizontal"
+            renderItem={(item) => (
+              <Comment
+                author={<strong>{item.user.username}</strong>}
+                avatar={<Avatar icon={<UserOutlined />} />}
+                content={<p>{item.content}</p>}
+                datetime={dayjs(item.createdAt).format("DD MMM YYYY HH:mm")}
+              />
+            )}
+          />
+
+          {visibleCount < comments.length && (
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <Button
+                className="load-more-button"
+                onClick={() => setVisibleCount(visibleCount + 5)}
+              >
+                Daha fazla görüntüle
+              </Button>
+            </div>
           )}
-        />
+        </>
       )}
 
       {user && (

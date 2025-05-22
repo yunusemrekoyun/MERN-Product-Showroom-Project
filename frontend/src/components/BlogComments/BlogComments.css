@@ -63,3 +63,17 @@
   background-color: #d98f37;
   border-color: #d98f37;
 }
+.load-more-button {
+  padding: 10px 20px;
+  background-color: #d8363a;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.load-more-button:hover {
+  background-color: #b22222;
+}

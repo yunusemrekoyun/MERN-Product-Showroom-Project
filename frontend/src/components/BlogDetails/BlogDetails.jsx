@@ -15,14 +15,21 @@ import "./BlogDetails.css";
 const BlogDetails = () => {
   const { blogId } = useParams();
   const [blog, setBlog] = useState(null);
+  const [likesCount, setLikesCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [showComments, setShowComments] = useState(false); // ✅ yorumları aç/kapat
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
         if (!res.ok) throw new Error();
-        setBlog(await res.json());
+        const data = await res.json();
+        setBlog(data);
+        setLikesCount(data.likedBy.length);
+        setLiked(data.likedBy.includes(storedUser?._id));
       } catch (err) {
         console.error(err);
         message.error("Blog yüklenemedi");
@@ -31,9 +38,26 @@ const BlogDetails = () => {
     fetchBlog();
   }, [apiUrl, blogId]);
 
-  if (!blog) return <div className="loading">Yükleniyor...</div>;
+  const handleLike = async () => {
+    if (!storedUser) return message.warning("Beğenmek için giriş yapın!");
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+    try {
+      const res = await fetch(`${apiUrl}/api/blogs/${blogId}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: storedUser._id }),
+      });
+
+      const data = await res.json();
+      setLikesCount(data.likesCount);
+      setLiked((prev) => !prev);
+    } catch (err) {
+      console.error(err);
+      message.error("Beğeni güncellenemedi");
+    }
+  };
+
+  if (!blog) return <div className="loading">Yükleniyor...</div>;
 
   return (
     <section className="single-blog">
@@ -54,7 +78,7 @@ const BlogDetails = () => {
                   <img
                     src={`data:image/png;base64,${img}`}
                     alt={blog.title}
-                    className="blog-image"
+                    className="blog-image limited-image"
                   />
                 </SwiperSlide>
               ))}
@@ -63,7 +87,7 @@ const BlogDetails = () => {
             <img
               src={`data:image/png;base64,${blog.images[0]}`}
               alt={blog.title}
-              className="blog-image"
+              className="blog-image limited-image"
             />
           )}
 
@@ -73,22 +97,37 @@ const BlogDetails = () => {
                 {dayjs(blog.createdAt).format("DD MMM, YYYY")}
               </span>
               <span className="blog-id">#{blog.blogId}</span>
-              <span className="blog-likes">
-                ❤️ {blog.likedBy.length} beğeni
-              </span>
+              <button
+                className={`blog-like-button ${liked ? "liked" : ""}`}
+                onClick={handleLike}
+              >
+                {liked ? "❤️" : "🤍"} {likesCount} beğeni
+              </button>
             </div>
+
             <h1 className="blog-title">{blog.title}</h1>
             <div
               className="blog-content"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
+
+            {/* Blog yorumları aç/kapat */}
+            <button
+              className="toggle-details-button"
+              onClick={() => setShowComments(!showComments)}
+            >
+              {showComments ? "Yorumları Gizle" : "Blog Yorumları"}
+            </button>
           </div>
         </article>
 
-        <div className="comment-section">
-          <h3>Yorumlar</h3>
-          <BlogComments blogId={blogId} user={storedUser} />
-        </div>
+        {/* Yorumlar kutusu sadece gösterilince görünür */}
+        {showComments && (
+          <div className="comment-section">
+            
+            <BlogComments blogId={blogId} user={storedUser} />
+          </div>
+        )}
       </div>
     </section>
   );
