@@ -65,12 +65,6 @@ const Info = ({ singleProduct, updateFlag }) => {
         dangerouslySetInnerHTML={{ __html: singleProduct.description }}
       />
 
-      <div className="buy-link">
-        <a href="#" className="btn btn-primary">
-          Satın Al
-        </a>
-      </div>
-
       <div className="product-extra-buttons">
         <button className="wishlist-btn" disabled>
           <i className="bi bi-heart"></i> Add to Wishlist

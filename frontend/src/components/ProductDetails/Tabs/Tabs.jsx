@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import PropTypes from "prop-types";
 import Reviews from "../../Reviews/Reviews";
@@ -9,6 +10,18 @@ const Tabs = ({ singleProduct, setSingleProduct, onReviewUpdate }) => {
   return (
     <div className="single-tabs">
       <ul className="tab-list">
+        <li>
+          <a
+            href="#"
+            className={`tab-button ${activeTab === "buy" ? "active" : ""}`}
+            onClick={(e) => {
+              e.preventDefault();
+              setActiveTab("buy");
+            }}
+          >
+            Satın Al
+          </a>
+        </li>
         <li>
           <a
             href="#"
@@ -36,6 +49,16 @@ const Tabs = ({ singleProduct, setSingleProduct, onReviewUpdate }) => {
       </ul>
 
       <div className="tab-panel">
+        <div
+          className={`tab-panel-buy content ${
+            activeTab === "buy" ? "active" : ""
+          }`}
+        >
+          <p className="coming-soon-msg">
+            🛒 Bu ürün yakında satışa çıkacaktır.
+          </p>
+        </div>
+
         <div
           className={`tab-panel-descriptions content ${
             activeTab === "desc" ? "active" : ""
