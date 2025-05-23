@@ -8,7 +8,7 @@ import Tabs from "./Tabs/Tabs";
 import "./ProductDetails.css";
 
 const ProductDetails = ({ singleProduct, setSingleProduct }) => {
-  const [updateFlag, setUpdateFlag] = useState(0);
+  const [ setUpdateFlag] = useState(0);
 
   const handleReviewUpdate = () => {
     setUpdateFlag((prev) => prev + 1);

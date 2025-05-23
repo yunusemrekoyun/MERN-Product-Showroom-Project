@@ -17,12 +17,15 @@ const ProductItem = ({ productItem }) => {
         </Link>
       </div>
 
-      <div className="product-info">
+      <div className="product-item-info">
         <Link to={`/product/${productItem._id}`} className="product-title">
           {productItem.name}
         </Link>
 
         <div className="product-links">
+          {/* <Link to={`/product/${productItem._id}`} className="product-link">
+            <i className="bi bi-eye-fill"></i>
+          </Link> */}
           <button>
             <i className="bi bi-heart-fill"></i>
           </button>

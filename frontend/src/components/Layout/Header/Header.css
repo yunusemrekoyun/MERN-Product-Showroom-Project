@@ -92,19 +92,19 @@ header {
 
 .header-bottom {
   position: sticky;
-  top: 100px; /* .header-top'un yüksekliği kadar */
+  top: 100px;
   z-index: 999;
   background-color: #fff;
   border-bottom: 1px solid #eee4c6;
+  padding: 10px 0; /* 👈 Menü bloğuna üst-alt boşluk ekler */
 }
 
 .header-menu {
   display: flex;
   align-items: center;
   gap: 32px;
-  padding: 14px 0;
+  padding: 0; /* padding kaldırıldı çünkü dışarıdan padding veriyoruz artık */
 }
-
 .menu-link {
   font-size: 14px;
   color: #222;
@@ -139,6 +139,7 @@ header {
 
 .menu-item {
   position: relative;
+  padding: 6px 0; /* 👈 Her bir item’ın etrafına biraz dikey boşluk */
 }
 
 .menu-item:hover .submenu,
@@ -149,7 +150,7 @@ header {
 .submenu {
   display: none;
   position: absolute;
-  top: calc(100% + 18px);
+  top: 100%; /* 👈 Menü bloğunun hemen altına denk getirir */
   left: 0;
   min-width: 220px;
   background-color: white;
@@ -158,6 +159,7 @@ header {
   flex-direction: column;
   z-index: 999;
   border-radius: 4px;
+  margin-top: 14px; /* 👈 sadece çok az aşağı çeksin */
   animation: fadeIn 0.2s ease-in-out;
 }
 
