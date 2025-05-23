@@ -57,12 +57,10 @@ const Blogs = () => {
                 <SwiperSlide key={blog.blogId}>
                   <BlogItem
                     blogId={blog.blogId}
-                    image={blog.images[0]}
                     title={blog.title}
                     date={blog.createdAt}
                     comments={0}
                     likes={blog.likedBy.length}
-                    onClick={() => navigate(`/blogs/${blog.blogId}`)}
                   />
                 </SwiperSlide>
               ))}
@@ -76,12 +74,10 @@ const Blogs = () => {
               <BlogItem
                 key={blog.blogId}
                 blogId={blog.blogId}
-                image={blog.images[0]}
                 title={blog.title}
                 date={blog.createdAt}
                 comments={0}
                 likes={blog.likedBy.length}
-                onClick={() => navigate(`/blogs/${blog.blogId}`)}
               />
             ))}
           </ul>

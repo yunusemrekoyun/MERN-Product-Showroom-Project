@@ -12,7 +12,12 @@ const ReviewSchema = mongoose.Schema(
 const ProductSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    img: [{ type: String, required: true }],
+    img: [
+      {
+        data: Buffer,
+        contentType: String,
+      },
+    ],
     reviews: [ReviewSchema],
     colors: [{ type: String, required: true }],
     sizes: [{ type: String, required: true }],
@@ -30,5 +35,4 @@ const ProductSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const Product = mongoose.model("Product", ProductSchema);
-module.exports = Product;
+module.exports = mongoose.model("Product", ProductSchema);

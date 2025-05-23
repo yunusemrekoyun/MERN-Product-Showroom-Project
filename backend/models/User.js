@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require("mongoose");
 
 const UserSchema = mongoose.Schema(
@@ -7,7 +6,10 @@ const UserSchema = mongoose.Schema(
     email: { type: String, required: true },
     password: { type: String, required: true },
     role: { type: String, default: "user", enum: ["user", "admin"] },
-    avatar: { type: String, required: false },
+    avatar: {
+      data: Buffer,
+      contentType: String,
+    },
   },
   { timestamps: true }
 );

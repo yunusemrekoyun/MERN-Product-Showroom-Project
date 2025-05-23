@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { message, Tabs } from "antd";
+import imageCompression from "browser-image-compression";
 import "./UserAccountDetails.css";
 
 const { TabPane } = Tabs;
@@ -68,7 +69,15 @@ const UserAccountDetails = () => {
       form.append("username", formData.username);
       form.append("email", formData.email);
       if (formData.password) form.append("password", formData.password);
-      if (formData.avatar) form.append("avatar", formData.avatar);
+
+      if (formData.avatar) {
+        const compressed = await imageCompression(formData.avatar, {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 512,
+          useWebWorker: true,
+        });
+        form.append("avatar", compressed);
+      }
 
       const res = await fetch(`${apiUrl}/api/users/${userId}`, {
         method: "PUT",
@@ -98,12 +107,18 @@ const UserAccountDetails = () => {
           <div className="user-account-details">
             <div className="user-account-header">
               <div className="user-avatar-large">
-                {userData.avatar && (
-                  <img
-                    src={`data:image/png;base64,${userData.avatar}`}
-                    alt="Avatar"
-                  />
-                )}
+                <img
+                  src={
+                    userId
+                      ? `${apiUrl}/api/users/${userId}/image`
+                      : "/img/avatars/avatar1.jpg"
+                  }
+                  alt="Avatar"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/img/avatars/avatar1.jpg";
+                  }}
+                />
               </div>
               <div className="user-form-section">
                 <div className="form-group">

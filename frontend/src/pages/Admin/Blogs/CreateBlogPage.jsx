@@ -1,4 +1,3 @@
-// src/pages/Blogs/CreateBlogPage.jsx
 import { Button, Form, Input, Spin, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useState } from "react";
@@ -13,8 +12,7 @@ const CreateBlogPage = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleUploadChange = ({ fileList }) => {
-    // En fazla 3 resim
-    setFileList(fileList.slice(-3));
+    setFileList(fileList.slice(-3)); // En fazla 3 görsel
   };
 
   const onFinish = async (values) => {
@@ -28,14 +26,16 @@ const CreateBlogPage = () => {
       formData.append("title", values.title);
       formData.append("content", values.content);
 
-      // Görselleri sıkıştırıp ekle
       for (const fileWrapper of fileList) {
         const file = fileWrapper.originFileObj;
+        if (!file) continue;
+
         const compressed = await imageCompression(file, {
           maxSizeMB: 0.5,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
         });
+
         formData.append("images", compressed);
       }
 

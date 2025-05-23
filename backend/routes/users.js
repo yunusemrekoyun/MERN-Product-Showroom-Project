@@ -37,14 +37,15 @@ router.put("/:userId", upload.single("avatar"), async (req, res) => {
   try {
     const updates = { ...req.body };
 
-    // Şifre varsa hashle
     if (updates.password) {
       updates.password = await bcrypt.hash(updates.password, 10);
     }
 
-    // Avatar base64 olarak eklenmişse
     if (req.file) {
-      updates.avatar = req.file.buffer.toString("base64");
+      updates.avatar = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
     }
 
     const updated = await User.findByIdAndUpdate(req.params.userId, updates, {
@@ -55,9 +56,7 @@ router.put("/:userId", upload.single("avatar"), async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Şifreyi frontend'e geri döndürme
     const { password, ...rest } = updated.toObject();
-
     res.json(rest);
   } catch (error) {
     console.error(error);
@@ -78,5 +77,15 @@ router.delete("/:userId", async (req, res) => {
     res.status(500).json({ error: "Server error." });
   }
 });
+router.get("/:userId/image", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("avatar");
+    if (!user || !user.avatar?.data) return res.status(404).end();
 
+    res.set("Content-Type", user.avatar.contentType);
+    res.send(user.avatar.data);
+  } catch (err) {
+    res.status(500).json({ error: "Avatar yüklenemedi." });
+  }
+});
 module.exports = router;

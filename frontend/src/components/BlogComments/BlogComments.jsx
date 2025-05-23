@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { List, Avatar, Form, Button, Input, message } from "antd";
 import { Comment } from "@ant-design/compatible";
-import { UserOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import "./BlogComments.css";
@@ -66,7 +65,13 @@ const BlogComments = ({ blogId, user }) => {
             renderItem={(item) => (
               <Comment
                 author={<strong>{item.user.username}</strong>}
-                avatar={<Avatar icon={<UserOutlined />} />}
+                avatar={
+                  <Avatar
+                    src={`${apiUrl}/api/users/${item.user._id}/image`}
+                    alt={item.user.username}
+                    onError={(e) => (e.target.src = "/img/avatars/avatar1.jpg")}
+                  />
+                }
                 content={<p>{item.content}</p>}
                 datetime={dayjs(item.createdAt).format("DD MMM YYYY HH:mm")}
               />

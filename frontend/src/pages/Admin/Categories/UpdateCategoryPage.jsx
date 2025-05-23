@@ -27,8 +27,8 @@ const UpdateCategoryPage = () => {
             uid: data._id,
             name: "Mevcut Görsel",
             status: "done",
-            url: `data:image/png;base64,${data.img}`,
-            thumbUrl: `data:image/png;base64,${data.img}`,
+            url: `${apiUrl}/api/categories/${data._id}/image`,
+            thumbUrl: `${apiUrl}/api/categories/${data._id}/image`,
           },
         ]);
       } catch (err) {
@@ -60,13 +60,10 @@ const UpdateCategoryPage = () => {
         formData.append("img", compressed);
       }
 
-      const res = await fetch(
-        `${apiUrl}/api/categories/${categoryId}`,
-        {
-          method: "PUT",
-          body: formData,
-        }
-      );
+      const res = await fetch(`${apiUrl}/api/categories/${categoryId}`, {
+        method: "PUT",
+        body: formData,
+      });
 
       if (res.ok) {
         message.success("Kategori başarıyla güncellendi.");
@@ -112,12 +109,10 @@ const UpdateCategoryPage = () => {
         </Form.Item>
 
         <Form.Item>
-
-            <Button type="primary" htmlType="submit">
-              Güncelle
-            </Button>
-            <Button onClick={() => navigate(-1)}>İptal</Button>
-
+          <Button type="primary" htmlType="submit">
+            Güncelle
+          </Button>
+          <Button onClick={() => navigate(-1)}>İptal</Button>
         </Form.Item>
       </Form>
     </Spin>

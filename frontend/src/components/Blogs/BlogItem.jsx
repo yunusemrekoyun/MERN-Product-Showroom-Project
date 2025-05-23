@@ -3,34 +3,38 @@ import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import "./BlogItem.css";
 
-const BlogItem = ({ blogId, image, title, date, comments, likes }) => (
-  <li className="blog-item">
-    <Link to={`/blogs/${blogId}`} className="blog-image-wrapper">
-      <img
-        src={`data:image/png;base64,${image}`}
-        alt={title}
-        className="blog-image"
-      />
-    </Link>
-    <div className="blog-info">
-      <div className="blog-info-top">
-        <span>{dayjs(date).format("DD MMM, YYYY")}</span> -
-        <span>{comments} Yorum</span>
+const BlogItem = ({ blogId, title, date, comments, likes }) => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  return (
+    <li className="blog-item">
+      <Link to={`/blogs/${blogId}`} className="blog-image-wrapper">
+        <img
+          src={`${apiUrl}/api/blogs/${blogId}/image/0`}
+          alt={title}
+          className="blog-image"
+          onError={(e) => (e.target.src = "/img/fallback.jpg")}
+        />
+      </Link>
+      <div className="blog-info">
+        <div className="blog-info-top">
+          <span>{dayjs(date).format("DD MMM, YYYY")}</span> -
+          <span>{comments} Yorum</span>
+        </div>
+        <div className="blog-info-center">
+          <Link to={`/blogs/${blogId}`}>{title}</Link>
+        </div>
+        <div className="blog-info-bottom">
+          <Link to={`/blogs/${blogId}`}>Daha Fazla</Link>
+        </div>
+        <div className="blog-info-likes">{likes} Beğeni</div>
       </div>
-      <div className="blog-info-center">
-        <Link to={`/blogs/${blogId}`}>{title}</Link>
-      </div>
-      <div className="blog-info-bottom">
-        <Link to={`/blogs/${blogId}`}>Daha Fazla</Link>
-      </div>
-      <div className="blog-info-likes">{likes} Beğeni</div>
-    </div>
-  </li>
-);
+    </li>
+  );
+};
 
 BlogItem.propTypes = {
   blogId: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   comments: PropTypes.number.isRequired,

@@ -32,7 +32,7 @@ const CreateCategoryPage = () => {
         maxWidthOrHeight: 1024,
         useWebWorker: true,
       });
-      formData.append("img", compressedFile);
+      formData.append("img", compressedFile, file.name);
 
       const response = await fetch(`${apiUrl}/api/categories`, {
         method: "POST",

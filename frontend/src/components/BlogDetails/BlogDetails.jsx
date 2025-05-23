@@ -76,9 +76,10 @@ const BlogDetails = () => {
               {blog.images.map((img, idx) => (
                 <SwiperSlide key={idx}>
                   <img
-                    src={`data:image/png;base64,${img}`}
+                    src={`${apiUrl}/api/blogs/${blogId}/image/${idx}`}
                     alt={blog.title}
                     className="blog-image limited-image"
+                    onError={(e) => (e.target.src = "/img/fallback.jpg")}
                   />
                 </SwiperSlide>
               ))}
@@ -124,7 +125,6 @@ const BlogDetails = () => {
         {/* Yorumlar kutusu sadece gösterilince görünür */}
         {showComments && (
           <div className="comment-section">
-            
             <BlogComments blogId={blogId} user={storedUser} />
           </div>
         )}

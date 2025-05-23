@@ -37,15 +37,20 @@ const AllBlogs = () => {
               onClick={() => navigate(`/blogs/${blog.blogId}`)}
             >
               <img
-                src={`data:image/png;base64,${blog.images[0]}`}
+                src={`${apiUrl}/api/blogs/${blog.blogId}/image/0`}
                 alt={blog.title}
                 className="blog-image"
+                onError={(e) => (e.target.src = "/img/fallback.jpg")}
               />
               <p className="blog-date">
                 {dayjs(blog.createdAt).format("DD MMM YYYY")}
               </p>
               <h3 className="blog-title">{blog.title}</h3>
-              <p className="blog-preview">{blog.content}</p>
+              <p className="blog-preview">
+                {blog.content.length > 120
+                  ? blog.content.slice(0, 120) + "..."
+                  : blog.content}
+              </p>
             </div>
           ))}
         </div>

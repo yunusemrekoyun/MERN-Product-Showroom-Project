@@ -14,7 +14,6 @@ const UpdateCampaignPage = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    console.log("Fetching campaign with id:", id);
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -31,21 +30,19 @@ const UpdateCampaignPage = () => {
           campRes.json(),
         ]);
 
-        // Ürün ve form ilk değerleri
         setProducts(prodData);
         form.setFieldsValue({
           title: campData.title,
           description: campData.description,
           selectedProducts: campData.products.map((p) => p._id || p.id),
-          // En başta Upload için fileList değeri
           image: campData.background
             ? [
                 {
                   uid: "-1",
                   name: "Mevcut Görsel",
                   status: "done",
-                  url: `data:image/png;base64,${campData.background}`,
-                  thumbUrl: `data:image/png;base64,${campData.background}`,
+                  url: `${apiUrl}/api/campaigns/${campData._id}/image`,
+                  thumbUrl: `${apiUrl}/api/campaigns/${campData._id}/image`,
                 },
               ]
             : [],
@@ -69,7 +66,6 @@ const UpdateCampaignPage = () => {
       formData.append("description", values.description);
       formData.append("products", JSON.stringify(values.selectedProducts));
 
-      // values.image artık fileList
       const fileList = values.image;
       const file = fileList && fileList[0]?.originFileObj;
       if (file) {

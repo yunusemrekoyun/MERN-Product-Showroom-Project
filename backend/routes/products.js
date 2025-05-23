@@ -13,8 +13,10 @@ const upload = multer({ storage });
 router.post("/", upload.array("img", 5), async (req, res) => {
   try {
     const { name, description, category, colors, sizes, price } = req.body;
-
-    const img = req.files.map((file) => file.buffer.toString("base64"));
+    const img = req.files.map((file) => ({
+      data: file.buffer,
+      contentType: file.mimetype,
+    }));
 
     const newProduct = new Product({
       name,
@@ -73,7 +75,10 @@ router.put("/:productId", upload.array("img", 5), async (req, res) => {
     if (req.body.price) updates.price = JSON.parse(req.body.price);
 
     if (req.files && req.files.length > 0) {
-      updates.img = req.files.map((file) => file.buffer.toString("base64"));
+      updates.img = req.files.map((file) => ({
+        data: file.buffer,
+        contentType: file.mimetype,
+      }));
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -93,6 +98,21 @@ router.put("/:productId", upload.array("img", 5), async (req, res) => {
   }
 });
 
+// GET PRODUCT IMAGE
+router.get("/:productId/image/:index", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId).select("img");
+
+    const index = parseInt(req.params.index);
+    const image = product?.img?.[index];
+    if (!image) return res.status(404).end();
+
+    res.set("Content-Type", image.contentType);
+    res.send(image.data);
+  } catch (err) {
+    res.status(500).json({ error: "Görsel yüklenemedi." });
+  }
+});
 // DELETE
 router.delete("/:productId", async (req, res) => {
   try {

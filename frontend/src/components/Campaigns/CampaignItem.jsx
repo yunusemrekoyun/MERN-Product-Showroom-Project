@@ -2,11 +2,13 @@ import PropTypes from "prop-types";
 import "./CampaignItem.css";
 
 const CampaignItem = ({ campaign }) => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
   return (
     <div
       className="campaign-item"
       style={{
-        backgroundImage: `url(data:image/jpeg;base64,${campaign.background})`,
+        backgroundImage: `url(${apiUrl}/api/campaigns/${campaign._id}/image)`,
       }}
     >
       <h3 className="campaign-title">{campaign.title}</h3>
@@ -20,10 +22,9 @@ const CampaignItem = ({ campaign }) => {
 
 CampaignItem.propTypes = {
   campaign: PropTypes.shape({
-    _id: PropTypes.string,
-    title: PropTypes.string,
-    background: PropTypes.string,
-    description: PropTypes.string,
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
     products: PropTypes.array,
   }).isRequired,
 };

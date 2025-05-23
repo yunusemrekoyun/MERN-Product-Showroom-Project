@@ -11,13 +11,16 @@ const CategoryPage = () => {
   const columns = [
     {
       title: "Kategori Görseli",
-      dataIndex: "img",
+      dataIndex: "_id",
       key: "img",
-      render: (imgBase64) => (
+      render: (id) => (
         <img
-          src={`data:image/png;base64,${imgBase64}`}
+          src={`${
+            import.meta.env.VITE_API_BASE_URL
+          }/api/categories/${id}/image`}
           alt="Kategori"
           width={100}
+          loading="lazy"
         />
       ),
     },

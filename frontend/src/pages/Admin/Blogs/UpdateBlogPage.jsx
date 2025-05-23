@@ -6,15 +6,6 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import imageCompression from "browser-image-compression";
 
-const convertToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(",")[1]); // sadece base64 kısmı
-    reader.onerror = (error) => reject(error);
-  });
-};
-
 const UpdateBlogPage = () => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
@@ -30,17 +21,19 @@ const UpdateBlogPage = () => {
         const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
         if (!res.ok) throw new Error("Blog bulunamadı");
         const blog = await res.json();
+
         form.setFieldsValue({
           title: blog.title,
           content: blog.content,
         });
+
         setFileList(
-          blog.images.map((b64, i) => ({
+          blog.images.map((_, i) => ({
             uid: `${blog.blogId}-${i}`,
             name: `Görsel ${i + 1}`,
             status: "done",
-            url: `data:image/png;base64,${b64}`,
-            thumbUrl: `data:image/png;base64,${b64}`,
+            url: `${apiUrl}/api/blogs/${blog.blogId}/image/${i}`,
+            thumbUrl: `${apiUrl}/api/blogs/${blog.blogId}/image/${i}`,
           }))
         );
       } catch (err) {
@@ -64,23 +57,16 @@ const UpdateBlogPage = () => {
       formData.append("title", values.title);
       formData.append("content", values.content);
 
-      const base64Images = [];
-
-      for (const fileItem of fileList) {
-        if (fileItem.originFileObj) {
-          const compressed = await imageCompression(fileItem.originFileObj, {
+      for (const file of fileList) {
+        if (file.originFileObj) {
+          const compressed = await imageCompression(file.originFileObj, {
             maxSizeMB: 0.5,
             maxWidthOrHeight: 1024,
             useWebWorker: true,
           });
-          const base64 = await convertToBase64(compressed);
-          base64Images.push(base64);
-        } else if (fileItem.url) {
-          base64Images.push(fileItem.url.split(",")[1]);
+          formData.append("images", compressed);
         }
       }
-
-      formData.append("images", JSON.stringify(base64Images));
 
       const res = await fetch(`${apiUrl}/api/blogs/${blogId}`, {
         method: "PUT",

@@ -1,4 +1,3 @@
-// src/pages/Blogs/AdminBlogsPage.jsx
 import { Button, Popconfirm, Space, Table, message } from "antd";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -50,10 +49,15 @@ const AdminBlogsPage = () => {
     },
     {
       title: "Görsel",
-      dataIndex: "images",
-      key: "images",
-      render: (imgs) => (
-        <img src={`data:image/png;base64,${imgs[0]}`} alt="Kapak" width={100} />
+      dataIndex: "blogId", // 🔁 artık blogId kullanıyoruz
+      key: "image",
+      render: (blogId) => (
+        <img
+          src={`${apiUrl}/api/blogs/${blogId}/image/0`}
+          alt="Kapak"
+          width={100}
+          onError={(e) => (e.target.src = "/img/fallback.jpg")}
+        />
       ),
     },
     {

@@ -60,10 +60,17 @@ const ProductPage = () => {
   const columns = [
     {
       title: "Product Görseli",
-      dataIndex: "img",
+      dataIndex: "_id",
       key: "img",
-      render: (imgs) => (
-        <img src={`data:image/png;base64,${imgs[0]}`} alt="Ürün" width={100} />
+      render: (id) => (
+        <img
+          src={`${
+            import.meta.env.VITE_API_BASE_URL
+          }/api/products/${id}/image/0`}
+          alt="Ürün"
+          width={100}
+          loading="lazy"
+        />
       ),
     },
     {

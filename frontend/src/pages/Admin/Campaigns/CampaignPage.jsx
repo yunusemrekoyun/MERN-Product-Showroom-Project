@@ -11,11 +11,11 @@ const CampaignPage = () => {
   const columns = [
     {
       title: "Görsel",
-      dataIndex: "background",
+      dataIndex: "_id", // çünkü artık görsel id ile çağrılıyor
       key: "background",
-      render: (base64) => (
+      render: (id) => (
         <img
-          src={`data:image/png;base64,${base64}`}
+          src={`${apiUrl}/api/campaigns/${id}/image`}
           alt="Campaign Visual"
           width={100}
         />
@@ -44,10 +44,7 @@ const CampaignPage = () => {
         <Space>
           <Button
             type="primary"
-            onClick={() => {
-              console.log("Row Record:", record); 
-              navigate(`/admin/campaigns/update/${record._id}`);
-            }}
+            onClick={() => navigate(`/admin/campaigns/update/${record._id}`)}
           >
             Güncelle
           </Button>
@@ -109,3 +106,4 @@ const CampaignPage = () => {
 };
 
 export default CampaignPage;
+

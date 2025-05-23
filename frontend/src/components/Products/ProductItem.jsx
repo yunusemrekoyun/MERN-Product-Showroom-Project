@@ -8,8 +8,11 @@ const ProductItem = ({ productItem }) => {
       <div className="product-image">
         <Link to={`/product/${productItem._id}`}>
           <img
-            src={`data:image/png;base64,${productItem.img[0]}`}
+            src={`${import.meta.env.VITE_API_BASE_URL}/api/products/${
+              productItem._id
+            }/image/0`}
             alt={productItem.name}
+            loading="lazy"
           />
         </Link>
       </div>
@@ -20,9 +23,6 @@ const ProductItem = ({ productItem }) => {
         </Link>
 
         <div className="product-links">
-          {/* <Link to={`/product/${productItem._id}`} className="product-link">
-            <i className="bi bi-eye-fill"></i>
-          </Link> */}
           <button>
             <i className="bi bi-heart-fill"></i>
           </button>
@@ -38,7 +38,6 @@ const ProductItem = ({ productItem }) => {
 ProductItem.propTypes = {
   productItem: PropTypes.shape({
     _id: PropTypes.string.isRequired,
-    img: PropTypes.arrayOf(PropTypes.string).isRequired,
     name: PropTypes.string.isRequired,
     price: PropTypes.shape({
       current: PropTypes.number.isRequired,

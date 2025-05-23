@@ -1,4 +1,3 @@
-// routes/category.js
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -16,11 +15,13 @@ router.post("/", upload.single("img"), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "Kategori resmi gerekli." });
     }
-    const imgBase64 = req.file.buffer.toString("base64");
 
     const newCategory = new Category({
       name,
-      img: imgBase64,
+      img: {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      },
     });
     await newCategory.save();
     res.status(201).json(newCategory);
@@ -33,7 +34,7 @@ router.post("/", upload.single("img"), async (req, res) => {
 // READ ALL
 router.get("/", async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find().select("name"); // Görseli döndürmüyoruz
     res.status(200).json(categories);
   } catch (error) {
     console.error(error);
@@ -44,7 +45,9 @@ router.get("/", async (req, res) => {
 // READ SINGLE
 router.get("/:categoryId", async (req, res) => {
   try {
-    const category = await Category.findById(req.params.categoryId);
+    const category = await Category.findById(req.params.categoryId).select(
+      "-img"
+    );
     if (!category) {
       return res.status(404).json({ error: "Kategori bulunamadı." });
     }
@@ -55,6 +58,22 @@ router.get("/:categoryId", async (req, res) => {
   }
 });
 
+// GET IMAGE (yeni)
+router.get("/:categoryId/image", async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.categoryId).select(
+      "img"
+    );
+    if (!category || !category.img?.data) return res.status(404).end();
+
+    res.set("Content-Type", category.img.contentType);
+    res.send(category.img.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Resim alınamadı." });
+  }
+});
+
 // UPDATE (resim opsiyonel)
 router.put("/:categoryId", upload.single("img"), async (req, res) => {
   try {
@@ -62,7 +81,10 @@ router.put("/:categoryId", upload.single("img"), async (req, res) => {
     const updateData = { name };
 
     if (req.file) {
-      updateData.img = req.file.buffer.toString("base64");
+      updateData.img = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
     }
 
     const updatedCategory = await Category.findByIdAndUpdate(

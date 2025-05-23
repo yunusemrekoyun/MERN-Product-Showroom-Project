@@ -1,14 +1,13 @@
-// src/components/ProductDetails/Gallery/Gallery.jsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import Slider from "react-slick";
 import "./Gallery.css";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 function PrevBtn({ onClick }) {
   return (
     <button
       className="glide__arrow glide__arrow--left"
-      data-glide-dir="<"
       onClick={onClick}
       style={{ zIndex: 2 }}
     >
@@ -22,7 +21,6 @@ function NextBtn({ onClick }) {
   return (
     <button
       className="glide__arrow glide__arrow--right"
-      data-glide-dir=">"
       onClick={onClick}
       style={{ zIndex: 2 }}
     >
@@ -33,18 +31,8 @@ function NextBtn({ onClick }) {
 NextBtn.propTypes = { onClick: PropTypes.func };
 
 const Gallery = ({ singleProduct }) => {
-  const [activeImg, setActiveImg] = useState({
-    img: "",
-    imgIndex: 0,
-  });
-
-  useEffect(() => {
-    // ilk base64 string’i alıyoruz
-    setActiveImg({
-      img: singleProduct.img[0],
-      imgIndex: 0,
-    });
-  }, [singleProduct.img]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const sliderSettings = {
     dots: false,
@@ -53,44 +41,56 @@ const Gallery = ({ singleProduct }) => {
     slidesToScroll: 1,
     nextArrow: <NextBtn />,
     prevArrow: <PrevBtn />,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 3,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 2,
+        },
+      },
+    ],
   };
+
+  const renderImageUrl = (index) =>
+    `${apiUrl}/api/products/${singleProduct._id}/image/${index}`;
 
   return (
     <div className="product-gallery">
       <div className="single-image-wrapper">
         <img
-          src={`data:image/png;base64,${activeImg.img}`}
+          src={renderImageUrl(activeIndex)}
           id="single-image"
           alt={singleProduct.name}
+          loading="lazy"
         />
       </div>
       <div className="product-thumb">
-        <div className="glide__track" data-glide-el="track">
-          <ol className="gallery-thumbs glide__slides">
+       
             <Slider {...sliderSettings}>
-              {singleProduct.img.map((itemImg, index) => (
-                <li
+              {singleProduct.img.map((_, index) => (
+                <div
                   className="glide__slide"
                   key={index}
-                  onClick={() =>
-                    setActiveImg({
-                      img: itemImg,
-                      imgIndex: index,
-                    })
-                  }
+                  onClick={() => setActiveIndex(index)}
                 >
                   <img
-                    src={`data:image/png;base64,${itemImg}`}
+                    src={renderImageUrl(index)}
                     alt={`${singleProduct.name} thumbnail ${index + 1}`}
                     className={`img-fluid ${
-                      activeImg.imgIndex === index ? "active" : ""
+                      activeIndex === index ? "active" : ""
                     }`}
+                    loading="lazy"
                   />
-                </li>
+                </div>
               ))}
             </Slider>
-          </ol>
-        </div>
+        
         <div className="glide__arrows" data-glide-el="controls"></div>
       </div>
     </div>
@@ -100,7 +100,8 @@ const Gallery = ({ singleProduct }) => {
 Gallery.propTypes = {
   singleProduct: PropTypes.shape({
     name: PropTypes.string,
-    img: PropTypes.arrayOf(PropTypes.string).isRequired,
+    _id: PropTypes.string.isRequired,
+    img: PropTypes.array.isRequired, // içeriği kullanmıyoruz, sadece uzunluğu için
   }).isRequired,
 };
 

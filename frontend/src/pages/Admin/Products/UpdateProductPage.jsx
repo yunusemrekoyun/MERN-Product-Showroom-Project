@@ -49,12 +49,12 @@ const UpdateProductPage = () => {
         });
         // Mevcut resimleri preview için fileList'e ekle
         setFileList(
-          prod.img.map((b64, i) => ({
+          prod.img.map((_, i) => ({
             uid: `${prod._id}-${i}`,
             name: `Resim ${i + 1}`,
             status: "done",
-            url: `data:image/png;base64,${b64}`,
-            thumbUrl: `data:image/png;base64,${b64}`,
+            url: `${apiUrl}/api/products/${prod._id}/image/${i}`,
+            thumbUrl: `${apiUrl}/api/products/${prod._id}/image/${i}`,
           }))
         );
       } catch (err) {

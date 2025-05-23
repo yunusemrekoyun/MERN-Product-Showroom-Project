@@ -22,6 +22,7 @@ const Products = () => {
         }
       } catch (error) {
         console.log("Veri hatası:", error);
+        message.error("Veri alınamadı.");
       }
     };
     fetchProducts();
@@ -37,7 +38,6 @@ const Products = () => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  // Kayan mesafeyi hesapla
   const slideOffset = -(currentIndex * (100 / visibleProducts));
 
   return (
@@ -45,11 +45,12 @@ const Products = () => {
       <div className="container">
         <div className="section-title">
           <h2>Öne Çıkan Ürünler</h2>
-          <p></p>
         </div>
 
         <div className="product-slider-wrapper">
-          <button className="custom-arrow prev" onClick={prev}>❮</button>
+          <button className="custom-arrow prev" onClick={prev}>
+            ❮
+          </button>
 
           <div className="product-slider-window">
             <div
@@ -66,7 +67,9 @@ const Products = () => {
             </div>
           </div>
 
-          <button className="custom-arrow next" onClick={next}>❯</button>
+          <button className="custom-arrow next" onClick={next}>
+            ❯
+          </button>
         </div>
       </div>
     </section>

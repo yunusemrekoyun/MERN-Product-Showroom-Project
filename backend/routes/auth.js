@@ -3,42 +3,38 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User.js");
 
-const generateRandomAvatar = () => {
-  const randomAvatar = Math.floor(Math.random() * 71);
-  return `https://i.pravatar.cc/300?img=${randomAvatar}`;
-};
-// Kullanıcı Oluşturma (Create - Register)
+// Kullanıcı Oluşturma (Register)
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    const defaultAvatar = generateRandomAvatar();
 
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return res
         .status(400)
-        .json({ error: "Email address is already registed." });
+        .json({ error: "Email address is already registered." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await new User({
+    const newUser = new User({
       username,
       email,
       password: hashedPassword,
-      avatar: defaultAvatar,
+      // avatar alanı boş bırakılıyor, ayrı endpoint ile alınacak
     });
 
     await newUser.save();
 
-    res.status(201).json(newUser);
+    const { password: _, ...rest } = newUser.toObject(); // Şifreyi döndürme
+    res.status(201).json(rest);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: "Server error." });
   }
 });
 
+// Kullanıcı Girişi (Login)
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -60,7 +56,11 @@ router.post("/login", async (req, res) => {
       email: user.email,
       username: user.username,
       role: user.role,
-      avatar: user.avatar,
+      avatar: user.avatar?.data
+        ? `data:${user.avatar.contentType};base64,${user.avatar.data.toString(
+            "base64"
+          )}`
+        : null,
     });
   } catch (error) {
     console.log(error);
