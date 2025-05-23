@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { message } from "antd";
+import { message, Tabs } from "antd";
 import "./UserAccountDetails.css";
+
+const { TabPane } = Tabs;
 
 const UserAccountDetails = () => {
   const [userData, setUserData] = useState(null);
@@ -9,18 +11,18 @@ const UserAccountDetails = () => {
     username: "",
     email: "",
     password: "",
+    avatar: null,
   });
   const [loading, setLoading] = useState(false);
-  const [showInfo, setShowInfo] = useState(true);
-  const [showEdit, setShowEdit] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = storedUser?._id || storedUser?.id || storedUser?._userId;
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${apiUrl}/api/users/${storedUser._id}`);
+        const res = await fetch(`${apiUrl}/api/users/${userId}`);
         if (!res.ok) throw new Error();
         const data = await res.json();
         setUserData(data);
@@ -28,16 +30,19 @@ const UserAccountDetails = () => {
           username: data.username || "",
           email: data.email || "",
           password: "",
+          avatar: null,
         });
+        setEditMode(false);
       } catch (err) {
+        console.error("❌ Kullanıcı bilgisi alınamadı:", err);
         message.error("Kullanıcı bilgileri alınamadı");
       }
     };
 
-    if (storedUser?._id) {
+    if (userId) {
       fetchUser();
     }
-  }, [apiUrl, storedUser]);
+  }, [apiUrl, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,15 +50,29 @@ const UserAccountDetails = () => {
       ...prev,
       [name]: value,
     }));
+    setEditMode(true);
+  };
+
+  const handleAvatarChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      avatar: e.target.files[0] || null,
+    }));
+    setEditMode(true);
   };
 
   const handleUpdate = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/api/users/${storedUser._id}`, {
+      const form = new FormData();
+      form.append("username", formData.username);
+      form.append("email", formData.email);
+      if (formData.password) form.append("password", formData.password);
+      if (formData.avatar) form.append("avatar", formData.avatar);
+
+      const res = await fetch(`${apiUrl}/api/users/${userId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: form,
       });
 
       if (!res.ok) throw new Error();
@@ -63,7 +82,7 @@ const UserAccountDetails = () => {
       setEditMode(false);
       message.success("Bilgiler güncellendi");
     } catch (err) {
-      console.error(err);
+      console.error("❌ Güncelleme hatası:", err);
       message.error("Güncelleme başarısız");
     } finally {
       setLoading(false);
@@ -73,65 +92,92 @@ const UserAccountDetails = () => {
   if (!userData) return <p>Yükleniyor...</p>;
 
   return (
-    <div className="user-account-details">
-      <button onClick={() => setShowInfo(!showInfo)} className="toggle-section">
-        {showInfo ? "Temel Bilgileri Gizle" : "Temel Bilgileri Göster"}
-      </button>
+    <div className="user-account-wrapper">
+      <Tabs defaultActiveKey="1" centered>
+        <TabPane tab="Hesap Bilgileri" key="1">
+          <div className="user-account-details">
+            <div className="user-account-header">
+              <div className="user-avatar-large">
+                {userData.avatar && (
+                  <img
+                    src={`data:image/png;base64,${userData.avatar}`}
+                    alt="Avatar"
+                  />
+                )}
+              </div>
+              <div className="user-form-section">
+                <div className="form-group">
+                  <label>Kullanıcı Adı</label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                  />
+                </div>
 
-      {showInfo && (
-        <div className="user-info-box">
-          <p><strong>Kullanıcı Adı:</strong> {userData.username}</p>
-          <p><strong>Email:</strong> {userData.email}</p>
-          <p><strong>Üyelik Tarihi:</strong> {new Date(userData.createdAt).toLocaleDateString("tr-TR")}</p>
-        </div>
-      )}
+                <div className="form-group">
+                  <label>Email Adresi</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
 
-      <button onClick={() => setShowEdit(!showEdit)} className="toggle-section">
-        {showEdit ? "Güncellemeyi Gizle" : "Bilgileri Güncelle"}
-      </button>
+                <div className="form-group">
+                  <label>Yeni Şifre</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Boş bırakırsan şifre değişmez"
+                  />
+                </div>
 
-      {showEdit && (
-        <div className="user-edit-box">
-          <div className="form-group">
-            <label>Kullanıcı Adı</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-            />
+                <div className="form-group">
+                  <label>Profil Fotoğrafı</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                  />
+                </div>
+
+                {editMode && (
+                  <p className="edit-warning">
+                    Değişiklik yapıldı. Lütfen kaydedin.
+                  </p>
+                )}
+
+                <button
+                  className="update-button"
+                  onClick={handleUpdate}
+                  disabled={loading || !editMode}
+                >
+                  {loading ? "Güncelleniyor..." : "Kaydet"}
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div className="form-group">
-            <label>Email Adresi</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Yeni Şifre</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Boş bırakırsan şifre değişmez"
-            />
-          </div>
-
-          <button
-            className="update-button"
-            onClick={handleUpdate}
-            disabled={loading}
-          >
-            {loading ? "Güncelleniyor..." : "Kaydet"}
-          </button>
-        </div>
-      )}
+        </TabPane>
+        <TabPane tab="İstek Listesi" key="2">
+          <ul className="static-list">
+            <li>iPhone 15 Pro Max</li>
+            <li>PlayStation 5</li>
+            <li>MacBook Air M3</li>
+          </ul>
+        </TabPane>
+        <TabPane tab="Beğenilenler" key="3">
+          <ul className="static-list">
+            <li>Samsung Galaxy Watch</li>
+            <li>Logitech MX Master 3</li>
+            <li>Amazon Kindle Paperwhite</li>
+          </ul>
+        </TabPane>
+      </Tabs>
     </div>
   );
 };
