@@ -7,6 +7,10 @@ const CategorySchema = mongoose.Schema(
       data: Buffer,
       contentType: String,
     },
+    subcategories: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -8,21 +8,29 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// CREATE (resimli)
+// CREATE
 router.post("/", upload.single("img"), async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, subcategories } = req.body;
     if (!req.file) {
       return res.status(400).json({ error: "Kategori resmi gerekli." });
     }
 
+    const parsedSubs = Array.isArray(subcategories)
+      ? subcategories
+      : typeof subcategories === "string"
+      ? JSON.parse(subcategories)
+      : [];
+
     const newCategory = new Category({
       name,
+      subcategories: parsedSubs,
       img: {
         data: req.file.buffer,
         contentType: req.file.mimetype,
       },
     });
+
     await newCategory.save();
     res.status(201).json(newCategory);
   } catch (error) {
@@ -34,7 +42,7 @@ router.post("/", upload.single("img"), async (req, res) => {
 // READ ALL
 router.get("/", async (req, res) => {
   try {
-    const categories = await Category.find().select("name"); // Görseli döndürmüyoruz
+    const categories = await Category.find().select("name subcategories");
     res.status(200).json(categories);
   } catch (error) {
     console.error(error);
@@ -58,7 +66,7 @@ router.get("/:categoryId", async (req, res) => {
   }
 });
 
-// GET IMAGE (yeni)
+// GET IMAGE
 router.get("/:categoryId/image", async (req, res) => {
   try {
     const category = await Category.findById(req.params.categoryId).select(
@@ -74,11 +82,21 @@ router.get("/:categoryId/image", async (req, res) => {
   }
 });
 
-// UPDATE (resim opsiyonel)
+// UPDATE
 router.put("/:categoryId", upload.single("img"), async (req, res) => {
   try {
-    const { name } = req.body;
-    const updateData = { name };
+    const { name, subcategories } = req.body;
+
+    const parsedSubs = Array.isArray(subcategories)
+      ? subcategories
+      : typeof subcategories === "string"
+      ? JSON.parse(subcategories)
+      : [];
+
+    const updateData = {
+      name,
+      subcategories: parsedSubs,
+    };
 
     if (req.file) {
       updateData.img = {
