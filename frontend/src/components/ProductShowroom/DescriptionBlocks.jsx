@@ -1,25 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import "./DescriptionBlocks.css"; // 👈 yeni CSS import'u
+import { useEffect } from "react";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import "./DescriptionBlocks.css";
 
 const DescriptionBlocks = () => {
-  const blocksRef = useRef([]);
-  const [visibleBlocks, setVisibleBlocks] = useState([]);
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = Number(entry.target.dataset.index);
-            setVisibleBlocks((prev) => [...new Set([...prev, index])]);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    blocksRef.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
+    AOS.init({
+      duration: 1200,
+      once: false,
+      offset: 100,
+      easing: "ease-in-out"
+    });
   }, []);
 
   const blocks = [
@@ -27,11 +18,13 @@ const DescriptionBlocks = () => {
       title: "Doğal Malzeme",
       text: "Ürünlerimiz tamamen doğal çamur ve sır kullanılarak elde şekillendirilmiştir.",
       image: "/img/products/product1/2.png",
+      aos: "fade-up-right"
     },
     {
       title: "El İşçiliği",
       text: "Her bir parça ustalarımız tarafından tek tek boyanır ve desenlenir.",
       image: "/img/products/product1/3.png",
+      aos: "fade-up-left"
     },
   ];
 
@@ -40,11 +33,8 @@ const DescriptionBlocks = () => {
       {blocks.map((block, index) => (
         <div
           key={index}
-          className={`desc-block ${
-            visibleBlocks.includes(index) ? "visible" : ""
-          }`}
-          ref={(el) => (blocksRef.current[index] = el)}
-          data-index={index}
+          className="desc-block"
+          data-aos={block.aos}
         >
           <div className="desc-image">
             <img src={block.image} alt={block.title} />
