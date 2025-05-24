@@ -1,7 +1,11 @@
+/* PurchaseAndReviews.css */
 .bottom-tabs-section {
-  padding: 80px 20px;
+  padding: 50px 20px;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 40px auto 0 auto;
+  background-color: #fefbf6;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .tab-header {
@@ -18,7 +22,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  transition: 0.2s;
+  transition: background 0.2s;
 }
 
 .tab-header button.active,
@@ -32,6 +36,7 @@
   flex-direction: column;
   gap: 12px;
   align-items: center;
+  min-height: 280px; /* Yorumlar yüksekliğine eşit */
 }
 
 .buy-btn {
@@ -42,4 +47,91 @@
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.buy-btn:hover {
+  background-color: #8c5b3f;
+}
+
+/* Yorumlar bölümü */
+.comments-section {
+  background-color: #fefbf6;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  min-height: 280px;
+}
+
+.comments-section h3 {
+  font-size: 22px;
+  color: #b45309;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.no-comments {
+  background-color: #fcf0cd;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #7a5e3a;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ant-comment-content {
+  background-color: #fffaf1;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.ant-comment-content p {
+  margin: 0;
+  font-size: 15px;
+  color: #4a3b2c;
+}
+
+.ant-comment-actions {
+  display: none;
+}
+
+.ant-form-item {
+  margin-bottom: 12px;
+}
+
+.ant-input-textarea {
+  border-radius: 8px !important;
+}
+
+/* 🎯 Yorum butonu: pastel turuncu */
+.comments-section .ant-btn-primary {
+  background-color: #eaa44d;
+  border-color: #eaa44d;
+  color: #fff;
+  font-weight: 500;
+  padding: 6px 18px;
+  border-radius: 8px;
+}
+
+.comments-section .ant-btn-primary:hover {
+  background-color: #d98f37;
+  border-color: #d98f37;
+}
+
+.load-more-button {
+  padding: 10px 20px;
+  background-color: #d8363a;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 16px;
+}
+
+.load-more-button:hover {
+  background-color: #b22222;
 }
