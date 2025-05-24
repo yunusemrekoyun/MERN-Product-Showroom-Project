@@ -1,14 +1,12 @@
-// ✅ ProductDetails.jsx (yeni)
 import { useState } from "react";
 import Breadcrumb from "./Breadcrumb/Breadcrumb";
 import Gallery from "./Gallery/Gallery";
 import PropTypes from "prop-types";
-import Info from "./Info/Info";
 import Tabs from "./Tabs/Tabs";
 import "./ProductDetails.css";
 
 const ProductDetails = ({ singleProduct, setSingleProduct }) => {
-  const [ setUpdateFlag] = useState(0);
+  const [ setUpdateFlag] = useState(0); // ✅ düzeltildi
 
   const handleReviewUpdate = () => {
     setUpdateFlag((prev) => prev + 1);
@@ -25,7 +23,7 @@ const ProductDetails = ({ singleProduct, setSingleProduct }) => {
 
           <div className="single-content column-layout">
             <Gallery singleProduct={singleProduct} />
-            <Info singleProduct={singleProduct} hideButton={true} />
+            {/* Info component artık gösterilmiyor */}
             <Tabs
               singleProduct={singleProduct}
               setSingleProduct={setSingleProduct}

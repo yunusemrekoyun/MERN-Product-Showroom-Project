@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import PropTypes from "prop-types";
 import Reviews from "../../Reviews/Reviews";
@@ -64,10 +63,27 @@ const Tabs = ({ singleProduct, setSingleProduct, onReviewUpdate }) => {
             activeTab === "desc" ? "active" : ""
           }`}
         >
+          <h2 className="product-desc-heading">Ürün Detayları</h2>
+
           <div
             className="product-description"
             dangerouslySetInnerHTML={{ __html: singleProduct.description }}
           />
+
+          {/* Statik örnek görsel alanı */}
+          <img
+            src="/img/mega-menu.jpg"
+            alt="Detay görsel 1"
+            className="desc-image"
+          />
+          <p>Bu görsel ürünün dış kaplamasını göstermektedir.</p>
+
+          <img
+            src="/img/mega-menu.jpg"
+            alt="Detay görsel 2"
+            className="desc-image"
+          />
+          <p>İç yüzey detayları burada yer almaktadır.</p>
         </div>
 
         <Reviews

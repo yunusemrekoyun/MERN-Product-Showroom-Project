@@ -96,7 +96,7 @@ header {
   z-index: 999;
   background-color: #fff;
   border-bottom: 1px solid #eee4c6;
-  padding: 10px 0; /* 👈 Menü bloğuna üst-alt boşluk ekler */
+  padding: 10px 0; 
 }
 
 .header-menu {
