@@ -5,59 +5,72 @@ import { Comment } from "@ant-design/compatible";
 import dayjs from "dayjs";
 import "./PurchaseAndReviews.css";
 
-const PurchaseAndReviews = ({ productId }) => {
+const PurchaseAndReviews = ({ product }) => {
   const [activeTab, setActiveTab] = useState("buy");
   const [comments, setComments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [value, setValue] = useState("");
   const [rating, setRating] = useState(0);
   const [visibleCount, setVisibleCount] = useState(5);
+
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const fetchComments = async () => {
+  useEffect(() => {
+    if (activeTab === "reviews" && product?._id) {
+      const fetchComments = async () => {
+        try {
+          const res = await fetch(
+            `${apiUrl}/api/product-reviews/${product._id}`
+          );
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          setComments(data.reviews);
+        } catch {
+          message.error("Yorumlar yüklenemedi");
+        }
+      };
+
+      fetchComments();
+    }
+  }, [activeTab, product?._id, apiUrl]);
+
+  const handleSubmit = async () => {
+    if (!user) return message.warning("Yorum yapmak için giriş yapın");
+    if (!value.trim()) return message.warning("Yorum boş olamaz");
+    if (!rating || rating === 0) return message.warning("Lütfen puan verin");
+
+    setSubmitting(true);
     try {
-      const res = await fetch(`${apiUrl}/api/product-reviews/${productId}`);
+      const res = await fetch(`${apiUrl}/api/product-reviews/${product._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: value,
+          rating,
+          user: user._id || user.id,
+        }),
+      });
+
       if (!res.ok) throw new Error();
-      const data = await res.json();
-      setComments(data.reviews);
+
+      setValue("");
+      setRating(0);
+      // Yorumları yeniden çek
+      const updated = await fetch(
+        `${apiUrl}/api/product-reviews/${product._id}`
+      );
+      const updatedData = await updated.json();
+      setComments(updatedData.reviews);
     } catch {
-      message.error("Yorumlar yüklenemedi");
+      message.error("Yorum eklenemedi");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    if (activeTab === "reviews") fetchComments();
-  }, [activeTab, productId]);
+  if (!product) return null;
 
-const handleSubmit = async () => {
-  if (!user) return message.warning("Yorum yapmak için giriş yapın");
-  if (!value.trim()) return message.warning("Yorum boş olamaz");
-  if (!rating || rating === 0) return message.warning("Lütfen puan verin");
-
-  setSubmitting(true);
-  try {
-    const res = await fetch(`${apiUrl}/api/product-reviews/${productId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: value,
-        rating,
-        user: user._id, // 🔥 buraya dikkat
-      }),
-    });
-
-    if (!res.ok) throw new Error();
-
-    setValue("");
-    setRating(0);
-    await fetchComments();
-  } catch {
-    message.error("Yorum eklenemedi");
-  } finally {
-    setSubmitting(false);
-  }
-};
   return (
     <section className="bottom-tabs-section">
       <div className="tab-header">
@@ -77,12 +90,22 @@ const handleSubmit = async () => {
 
       {activeTab === "buy" && (
         <div className="purchase-links">
-          <a href="https://trendyol.com" target="_blank" rel="noopener noreferrer">
-            <button className="buy-btn">Trendyol'da Satın Al</button>
-          </a>
-          <a href="https://n11.com" target="_blank" rel="noopener noreferrer">
-            <button className="buy-btn">N11'de Satın Al</button>
-          </a>
+          {product?.buyLink?.length > 0 ? (
+            product.buyLink.map((link, index) => (
+              <a
+                key={index}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="buy-btn">
+                  {new URL(link).hostname.replace("www.", "")}&#39;da Satın Al
+                </button>
+              </a>
+            ))
+          ) : (
+            <div className="no-buy-link">Satın alma bağlantısı bulunamadı.</div>
+          )}
         </div>
       )}
 
@@ -91,7 +114,9 @@ const handleSubmit = async () => {
           <h3>Yorumlar ({comments.length})</h3>
 
           {comments.length === 0 ? (
-            <div className="no-comments">Henüz yorum yapılmamış. İlk sen ol!</div>
+            <div className="no-comments">
+              Henüz yorum yapılmamış. İlk sen ol!
+            </div>
           ) : (
             <>
               <List
@@ -128,10 +153,7 @@ const handleSubmit = async () => {
           {user && (
             <Form layout="vertical">
               <Form.Item>
-                <Rate
-                  value={rating}
-                  onChange={(value) => setRating(value)}
-                />
+                <Rate value={rating} onChange={(value) => setRating(value)} />
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }}>
                 <Input.TextArea
@@ -160,7 +182,10 @@ const handleSubmit = async () => {
 };
 
 PurchaseAndReviews.propTypes = {
-  productId: PropTypes.string.isRequired,
+  product: PropTypes.shape({
+    _id: PropTypes.string,
+    buyLink: PropTypes.arrayOf(PropTypes.string),
+  }),
 };
 
 export default PurchaseAndReviews;

@@ -2,9 +2,9 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import HeroImage from "./HeroImage";
 import DescriptionBlocks from "./DescriptionBlocks";
-// import ProductionSteps from "./ProductionSteps";
 import PurchaseAndReviews from "./PurchaseAndReviews";
-import "./ProductShowroom.css"; // Yeni CSS dosyası
+import ProductMainDescriptions from "./ProductMainDescriptions";
+import "./ProductShowroom.css";
 
 const ProductShowroom = () => {
   const { id: productId } = useParams();
@@ -14,9 +14,7 @@ const ProductShowroom = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const url = `${apiUrl}/api/products/${productId}`;
-        console.log("İstek atılan URL:", url); // ✨ ekle bunu
-        const res = await fetch(url);
+        const res = await fetch(`${apiUrl}/api/products/${productId}`);
         if (!res.ok) throw new Error("Ürün bulunamadı");
         const data = await res.json();
         setProduct(data);
@@ -33,9 +31,9 @@ const ProductShowroom = () => {
   return (
     <>
       <HeroImage product={product} />
-      <DescriptionBlocks />
-      {/* <ProductionSteps /> */}
-      <PurchaseAndReviews productId={product._id} />
+      <ProductMainDescriptions product={product} />
+      <DescriptionBlocks product={product} />
+      <PurchaseAndReviews product={product} />
     </>
   );
 };

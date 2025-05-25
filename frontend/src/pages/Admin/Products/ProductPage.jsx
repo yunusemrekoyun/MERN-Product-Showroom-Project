@@ -11,23 +11,10 @@ const ProductPage = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [categoriesRes, productsRes] = await Promise.all([
-        fetch(`${apiUrl}/api/categories`),
-        fetch(`${apiUrl}/api/products`),
-      ]);
-      if (!categoriesRes.ok || !productsRes.ok) {
-        message.error("Veri getirme başarısız.");
-        return;
-      }
-      const [categories, products] = await Promise.all([
-        categoriesRes.json(),
-        productsRes.json(),
-      ]);
-      const withCat = products.map((p) => {
-        const cat = categories.find((c) => c._id === p.category);
-        return { ...p, categoryName: cat?.name || "" };
-      });
-      setDataSource(withCat);
+      const res = await fetch(`${apiUrl}/api/products`);
+      if (!res.ok) throw new Error("Veri getirilemedi");
+      const products = await res.json();
+      setDataSource(products);
     } catch (err) {
       console.error("Veri hatası:", err);
       message.error("Sunucu hatası.");
@@ -59,14 +46,12 @@ const ProductPage = () => {
 
   const columns = [
     {
-      title: "Product Görseli",
+      title: "Görsel",
       dataIndex: "_id",
       key: "img",
       render: (id) => (
         <img
-          src={`${
-            import.meta.env.VITE_API_BASE_URL
-          }/api/products/${id}/image/0`}
+          src={`${apiUrl}/api/products/${id}/image/mainImages/0`}
           alt="Ürün"
           width={100}
           loading="lazy"
@@ -74,30 +59,37 @@ const ProductPage = () => {
       ),
     },
     {
-      title: "Name",
+      title: "İsim",
       dataIndex: "name",
       key: "name",
-      render: (t) => <b>{t}</b>,
+      render: (text) => <b>{text}</b>,
     },
     {
       title: "Kategori",
-      dataIndex: "categoryName",
-      key: "categoryName",
+      dataIndex: ["category", "name"],
+      key: "category",
+      render: (_, record) => record.category?.name || "—",
+    },
+    {
+      title: "Alt Kategori",
+      dataIndex: "subcategory",
+      key: "subcategory",
+      render: (s) => s || "—",
     },
     {
       title: "Fiyat",
       dataIndex: "price",
       key: "price",
-      render: ({ current }) => <span>${current.toFixed(2)}</span>,
+      render: (p) => (p?.current ? <span>₺{p.current.toFixed(2)}</span> : "—"),
     },
     {
       title: "İndirim",
       dataIndex: "price",
       key: "discount",
-      render: ({ discount }) => <span> %{discount}</span>,
+      render: (p) => (p?.discount ? <span>%{p.discount}</span> : "—"),
     },
     {
-      title: "Actions",
+      title: "İşlemler",
       key: "actions",
       render: (_, record) => (
         <Space>

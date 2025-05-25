@@ -5,7 +5,11 @@
   margin: 40px auto 0 auto;
   background-color: #fefbf6;
   border-radius: 16px;
+  transition: height 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+.comments-section form {
+  margin-top: 20px;
 }
 
 .tab-header {
@@ -36,7 +40,7 @@
   flex-direction: column;
   gap: 12px;
   align-items: center;
-  min-height: 280px; /* Yorumlar yüksekliğine eşit */
+  min-height: 350px; /* Yorumlar yüksekliğine eşit */
 }
 
 .buy-btn {
@@ -59,7 +63,7 @@
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-  min-height: 280px;
+  min-height: 350px;
 }
 
 .comments-section h3 {
@@ -113,6 +117,12 @@
   font-weight: 500;
   padding: 6px 18px;
   border-radius: 8px;
+}
+.purchase-links,
+.comments-section {
+  max-height: 380px; /* Sabit yükseklik */
+  overflow-y: auto; /* İçerik sığmazsa kaydırılabilir olsun */
+  padding-right: 8px; /* Scrollbar çarpışmasını engellemek için */
 }
 
 .comments-section .ant-btn-primary:hover {

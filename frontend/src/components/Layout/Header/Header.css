@@ -96,15 +96,16 @@ header {
   z-index: 999;
   background-color: #fff;
   border-bottom: 1px solid #eee4c6;
-  padding: 10px 0; 
+  padding: 10px 0;
 }
 
 .header-menu {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 32px;
-  padding: 0; /* padding kaldırıldı çünkü dışarıdan padding veriyoruz artık */
+  padding: 0 20px;
 }
+
 .menu-link {
   font-size: 14px;
   color: #222;
@@ -122,7 +123,6 @@ header {
 .menu-link.active {
   color: var(--accent-color);
 }
-
 .menu-link.active::after {
   content: "";
   width: 100%;
@@ -139,18 +139,28 @@ header {
 
 .menu-item {
   position: relative;
-  padding: 6px 0; /* 👈 Her bir item’ın etrafına biraz dikey boşluk */
+  padding: 6px 0;
+  flex-shrink: 0;
 }
 
 .menu-item:hover .submenu,
 .menu-item:has(.submenu:hover) .submenu {
   display: flex;
 }
-
+.scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
 .submenu {
   display: none;
   position: absolute;
-  top: 100%; /* 👈 Menü bloğunun hemen altına denk getirir */
+  top: 100%;
   left: 0;
   min-width: 220px;
   background-color: white;
@@ -159,10 +169,9 @@ header {
   flex-direction: column;
   z-index: 999;
   border-radius: 4px;
-  margin-top: 14px; /* 👈 sadece çok az aşağı çeksin */
+  margin-top: 14px;
   animation: fadeIn 0.2s ease-in-out;
 }
-
 .submenu a {
   padding: 12px 18px;
   color: #333;

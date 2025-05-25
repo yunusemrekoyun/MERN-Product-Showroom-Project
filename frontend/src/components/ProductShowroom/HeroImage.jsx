@@ -3,7 +3,8 @@ import "./HeroImage.css";
 
 const HeroImage = ({ product }) => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-  const imageUrl = `${apiUrl}/api/products/${product._id}/image/0`;
+
+  const imageUrl = `${apiUrl}/api/products/${product._id}/image/mainImages/0`;
 
   const scrollToDetails = () => {
     const target = document.getElementById("description-blocks");
@@ -38,7 +39,6 @@ HeroImage.propTypes = {
   product: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string,
-    description: PropTypes.string,
   }).isRequired,
 };
 

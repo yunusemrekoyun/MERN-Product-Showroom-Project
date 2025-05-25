@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 import "./ProductItem.css";
 
 const ProductItem = ({ productItem }) => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
   return (
     <div className="product-item">
       <div className="product-image">
         <Link to={`/product/${productItem._id}`}>
           <img
-            src={`${import.meta.env.VITE_API_BASE_URL}/api/products/${
-              productItem._id
-            }/image/0`}
+            src={`${apiUrl}/api/products/${productItem._id}/image/mainImages/0`}
             alt={productItem.name}
             loading="lazy"
           />
@@ -23,9 +23,6 @@ const ProductItem = ({ productItem }) => {
         </Link>
 
         <div className="product-links">
-          {/* <Link to={`/product/${productItem._id}`} className="product-link">
-            <i className="bi bi-eye-fill"></i>
-          </Link> */}
           <button>
             <i className="bi bi-heart-fill"></i>
           </button>

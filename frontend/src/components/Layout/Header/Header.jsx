@@ -1,14 +1,28 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import "./Header.css";
 import Search from "../../Modals/Search/Search";
+import "./Header.css";
 
 const Header = () => {
-  const user = JSON.parse(localStorage.getItem("user")); // ✅ parse edildi
+  const user = JSON.parse(localStorage.getItem("user"));
   const { pathname } = useLocation();
-
+  const [categories, setCategories] = useState([]);
   const [activeMenu, setActiveMenu] = useState(null);
   const timeoutRef = useRef(null);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/categories`);
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Kategoriler alınamadı:", error);
+      }
+    };
+    fetchCategories();
+  }, [apiUrl]);
 
   const handleMouseEnter = (key) => {
     clearTimeout(timeoutRef.current);
@@ -72,93 +86,37 @@ const Header = () => {
       </div>
 
       <div className="header-bottom">
-        <div className="container header-menu">
-          <div className="menu-item">
-            <Link
-              to="/"
-              className={`menu-link icon-link ${pathname === "/" && "active"}`}
-            >
-              <i className="bi bi-house"></i>
-            </Link>
-          </div>
-
-          {/* Alt Menü Kategorileri */}
-          {[
-            {
-              key: "3d",
-              name: "3D TASARIMLAR",
-              links: [
-                ["/3d/masaustu", "Masaüstü Objeler"],
-                ["/3d/dekoratif", "Dekoratif Tasarımlar"],
-              ],
-            },
-            {
-              key: "el",
-              name: "EL YAPIMI",
-              links: [
-                ["/el-yapimi/ahsap", "Ahşap Ürünler"],
-                ["/el-yapimi/kumas", "Kumaş Ürünler"],
-              ],
-            },
-            {
-              key: "seramik",
-              name: "SERAMİK KOLEKSİYONU",
-              links: [
-                ["/seramik/tabak", "Tabaklar"],
-                ["/seramik/kupa", "Kupalar"],
-              ],
-            },
-            {
-              key: "cam",
-              name: "CAM KOLEKSİYONU",
-              links: [
-                ["/cam/vazo", "Vazolar"],
-                ["/cam/sus", "Süs Eşyaları"],
-              ],
-            },
-            {
-              key: "pet",
-              name: "PET ÜRÜNLERİ",
-              links: [
-                ["/pet/oyuncak", "Oyuncaklar"],
-                ["/pet/mama", "Mama Kapları"],
-              ],
-            },
-            {
-              key: "aksesuar",
-              name: "AKSESUAR & YAŞAM",
-              links: [
-                ["/aksesuar/taki", "Takı & Aksesuar"],
-                ["/aksesuar/ev", "Ev Dekoru"],
-              ],
-            },
-            {
-              key: "anneler",
-              name: "ANNELER GÜNÜ HEDİYESİ",
-              links: [
-                ["/anneler-gunu/kisiye-ozel", "Kişiye Özel"],
-                ["/anneler-gunu/hazir-set", "Hazır Setler"],
-              ],
-            },
-          ].map(({ key, name, links }) => (
-            <div
-              key={key}
-              className="menu-item"
-              onMouseEnter={() => handleMouseEnter(key)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link to={`/${key}`} className="menu-link">
-                {name}
+        <div className="container header-menu-scroll">
+          <div className="header-menu">
+            <div className="menu-item">
+              <Link
+                to="/"
+                className={`menu-link icon-link ${pathname === "/" && "active"}`}
+              >
+                <i className="bi bi-house"></i>
               </Link>
-              <div className={`submenu ${activeMenu === key ? "show" : ""}`}>
-                {links.map(([url, label]) => (
-                  <Link to={url} key={url}>
-                    {label}
-                  </Link>
-                ))}
-              </div>
             </div>
-          ))}
+
+            {categories.map((cat) => (
+              <div
+                key={cat._id}
+                className="menu-item"
+                onMouseEnter={() => handleMouseEnter(cat._id)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link to={`/${cat.name}`} className="menu-link">
+                  {cat.name.toUpperCase()}
+                </Link>
+                <div className={`submenu ${activeMenu === cat._id ? "show" : ""}`}>
+                  {cat.subcategories.map((sub, i) => (
+                    <Link to={`/${cat.name}/${sub}`} key={i}>
+                      {sub}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </header>

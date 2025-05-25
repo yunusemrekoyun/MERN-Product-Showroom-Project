@@ -9,28 +9,43 @@ const ReviewSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+const ImageSchema = mongoose.Schema({
+  data: Buffer,
+  contentType: String,
+});
+
 const ProductSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    img: [
-      {
-        data: Buffer,
-        contentType: String,
-      },
-    ],
+
+    // 3 resim alanı, her biri dizi
+    mainImages: [ImageSchema],
+    childImages1: [ImageSchema],
+    childImages2: [ImageSchema],
+
     reviews: [ReviewSchema],
-    colors: [{ type: String, required: true }],
-    sizes: [{ type: String, required: true }],
+
+    opt1: [{ type: String }],
+    opt2: [{ type: String }],
+
     price: {
-      current: { type: Number, required: true },
+      current: { type: Number },
       discount: { type: Number },
     },
+
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
-    description: { type: String, required: true },
+
+    subcategory: {
+      type: String,
+    },
+
+    mainDescription: { type: String },
+    childDescription1: { type: String },
+    childDescription2: { type: String },
   },
   { timestamps: true }
 );
