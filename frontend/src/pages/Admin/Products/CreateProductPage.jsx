@@ -177,13 +177,13 @@ const CreateProductPage = () => {
           </Space.Compact>
         </Form.Item>
 
-        <Form.Item label="Opsiyon 1 (renk vs)" name="opt1">
+        {/* <Form.Item label="Opsiyon 1 (renk vs)" name="opt1">
           <Input.TextArea placeholder="Her satıra bir seçenek" />
         </Form.Item>
 
         <Form.Item label="Opsiyon 2 (beden vs)" name="opt2">
           <Input.TextArea placeholder="Her satıra bir seçenek" />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item label="Ana Açıklama" name="mainDescription">
           <Input.TextArea autoSize={{ minRows: 2 }} />

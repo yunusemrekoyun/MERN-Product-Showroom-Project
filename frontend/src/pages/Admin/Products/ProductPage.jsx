@@ -1,3 +1,5 @@
+// src/pages/Admin/Products/ProductPage.jsx
+
 import { Button, Popconfirm, Space, Table, message } from "antd";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +15,16 @@ const ProductPage = () => {
     try {
       const res = await fetch(`${apiUrl}/api/products`);
       if (!res.ok) throw new Error("Veri getirilemedi");
-      const products = await res.json();
-      setDataSource(products);
+
+      const result = await res.json();
+      // Eğer result.products varsa onu, yoksa result direkt dizi
+      const list = Array.isArray(result)
+        ? result
+        : Array.isArray(result.products)
+        ? result.products
+        : [];
+
+      setDataSource(list);
     } catch (err) {
       console.error("Veri hatası:", err);
       message.error("Sunucu hatası.");
@@ -32,12 +42,10 @@ const ProductPage = () => {
       const res = await fetch(`${apiUrl}/api/products/${id}`, {
         method: "DELETE",
       });
-      if (res.ok) {
-        message.success("Ürün başarıyla silindi.");
-        setDataSource((prev) => prev.filter((p) => p._id !== id));
-      } else {
-        message.error("Silme işlemi başarısız.");
-      }
+      if (!res.ok) throw new Error("Silme başarısız");
+
+      message.success("Ürün başarıyla silindi.");
+      setDataSource((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
       console.error("Silme hatası:", err);
       message.error("Sunucu hatası.");
@@ -76,18 +84,24 @@ const ProductPage = () => {
       key: "subcategory",
       render: (s) => s || "—",
     },
-    {
-      title: "Fiyat",
-      dataIndex: "price",
-      key: "price",
-      render: (p) => (p?.current ? <span>₺{p.current.toFixed(2)}</span> : "—"),
-    },
-    {
-      title: "İndirim",
-      dataIndex: "price",
-      key: "discount",
-      render: (p) => (p?.discount ? <span>%{p.discount}</span> : "—"),
-    },
+    // {
+    //   title: "Fiyat",
+    //   dataIndex: "price",
+    //   key: "price",
+    //   render: (p) =>
+    //     p?.current != null ? <span>₺{p.current.toFixed(2)}</span> : "—",
+    // },
+    // {
+    //   title: "İndirim",
+    //   dataIndex: "price",
+    //   key: "discount",
+    //   render: (p) =>
+    //     p?.discount != null && p.discount > 0 ? (
+    //       <span>%{p.discount}</span>
+    //     ) : (
+    //       "—"
+    //     ),
+    // },
     {
       title: "İşlemler",
       key: "actions",

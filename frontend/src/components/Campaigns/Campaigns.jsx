@@ -4,24 +4,31 @@ import "./Campaigns.css";
 
 const Campaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
+  // İlk sayfa, istersen ileride state’e taşıyıp “Daha fazla” yapabilirsin
+  const page = 1;
+  // Bir sayfada kaç kampanya gelsin? (10,20…100)
+  const limit = 100;
 
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/campaigns`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/api/campaigns?page=${page}&limit=${limit}`
         );
-        const data = await res.json();
-        setCampaigns(data);
+        const result = await res.json();
+        // artık result = { total, page, totalPages, campaigns: […] }
+        setCampaigns(result.campaigns);
       } catch (err) {
         console.error("Kampanyalar alınamadı:", err);
       }
     };
 
     fetchCampaigns();
-  }, []);
+  }, []); // page/limit değişmiyorsa boş bağlılık listesi
 
-  // Her 2'li kampanya için ayrı bir wrapper oluşturuluyor
+  // Her 2’li kampanyayı bir arada göstermek için
   const chunked = campaigns.reduce((acc, _, i) => {
     if (i % 2 === 0) acc.push(campaigns.slice(i, i + 2));
     return acc;

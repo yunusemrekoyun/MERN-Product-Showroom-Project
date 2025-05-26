@@ -16,12 +16,24 @@
   font-weight: 500;
 }
 
+/* Kare kuralı, object-fit: cover ile crop */
 .categories .category-item .category-image {
   width: 100%;
-  transition: transform ease 0.2s;
-  border-radius: 12px; /* 👈 köşe yumuşatma eklendi */
+  /* Kare için aspect-ratio */
+  aspect-ratio: 1 / 1;
+  /* Boyut bozulmadan, taşan kısımları gizleyerek kapla */
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px; /* köşe yumuşatma */
+  transition: transform 0.2s ease;
 }
 
 .categories .category-item .category-image:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
+}
+
+.categories .category-item .category-title {
+  display: block;
+  margin-top: 8px;
+  color: #333;
 }

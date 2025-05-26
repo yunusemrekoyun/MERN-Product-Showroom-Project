@@ -11,7 +11,7 @@ const CampaignPage = () => {
   const columns = [
     {
       title: "Görsel",
-      dataIndex: "_id", // çünkü artık görsel id ile çağrılıyor
+      dataIndex: "_id",
       key: "background",
       render: (id) => (
         <img
@@ -67,14 +67,13 @@ const CampaignPage = () => {
       const res = await fetch(`${apiUrl}/api/campaigns/${id}`, {
         method: "DELETE",
       });
-
       if (!res.ok) throw new Error("Silme başarısız");
 
       message.success("Kampanya silindi");
       setDataSource((prev) => prev.filter((c) => c._id !== id));
     } catch (err) {
       message.error("Silme hatası");
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -82,11 +81,12 @@ const CampaignPage = () => {
     const fetchCampaigns = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${apiUrl}/api/campaigns`);
-        const data = await res.json();
-        setDataSource(data);
+        const res = await fetch(`${apiUrl}/api/campaigns?page=1&limit=100`);
+        const result = await res.json();
+        // result = { total, page, totalPages, campaigns: [… ] }
+        setDataSource(result.campaigns);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         message.error("Kampanyalar alınamadı");
       } finally {
         setLoading(false);
@@ -106,4 +106,3 @@ const CampaignPage = () => {
 };
 
 export default CampaignPage;
-

@@ -13,15 +13,17 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/products`);
-        if (response.ok) {
-          const data = await response.json();
-          setProducts(data);
-        } else {
+        // sayfalama parametreleri ekledik, ilk 20 ürünü alıyoruz
+        const response = await fetch(`${apiUrl}/api/products?page=1&limit=20`);
+        if (!response.ok) {
           message.error("Veri getirme başarısız.");
+          return;
         }
+        const result = await response.json();
+        // result = { total, page, totalPages, products: [ … ] }
+        setProducts(result.products);
       } catch (error) {
-        console.log("Veri hatası:", error);
+        console.error("Veri hatası:", error);
         message.error("Veri alınamadı.");
       }
     };
