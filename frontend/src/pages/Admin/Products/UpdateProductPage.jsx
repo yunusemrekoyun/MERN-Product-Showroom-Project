@@ -205,13 +205,13 @@ const UpdateProductPage = () => {
             </Form.Item>
           </Space.Compact>
         </Form.Item>
-
+{/* 
         <Form.Item label="Opsiyon 1" name="opt1">
           <Input.TextArea />
         </Form.Item>
         <Form.Item label="Opsiyon 2" name="opt2">
           <Input.TextArea />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label="Açıklama" name="mainDescription">
           <Input.TextArea />
         </Form.Item>

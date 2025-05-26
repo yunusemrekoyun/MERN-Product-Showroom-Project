@@ -47,27 +47,46 @@ router.post("/", upload.single("background"), async (req, res) => {
 });
 
 // ✅ READ tüm kampanyalar
+// READ tüm kampanyalar (images hariç, pagination)
 router.get("/", async (req, res) => {
   try {
-    const campaigns = await Campaign.find().populate("products");
-    res.json(campaigns);
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 10, 1);
+
+    const total = await Campaign.countDocuments();
+    const campaigns = await Campaign.find()
+      // background.data Buffer’ını hariç tut
+      .select("-background.data")
+      .populate("products", "name") // yalnızca isim getir, gerekirse alan ekle
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    res.json({
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      campaigns,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Kampanyalar alınamadı." });
   }
 });
 
-// ✅ READ tek kampanya
+// READ tek kampanya (background.data hariç)
 router.get("/:id", async (req, res) => {
   try {
-    const campaign = await Campaign.findById(req.params.id).populate(
-      "products"
-    );
+    const campaign = await Campaign.findById(req.params.id)
+      .select("-background.data")
+      .populate("products", "name");
     if (!campaign) {
-      return res.status(404).json({ error: "Kampanya bulunamadı" });
+      return res.status(404).json({ error: "Kampanya bulunamadı." });
     }
     res.json(campaign);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
 

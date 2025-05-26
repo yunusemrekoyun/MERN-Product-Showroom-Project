@@ -62,15 +62,38 @@ router.post(
   }
 );
 
-// READ ALL
+// routes/products.js
+
+// READ ALL with pagination
 router.get("/", async (req, res) => {
   try {
+    // Filtreleme
     const query = {};
     if (req.query.category) query.category = req.query.category;
     if (req.query.subcategory) query.subcategory = req.query.subcategory;
 
-    const products = await Product.find(query).populate("category");
-    res.status(200).json(products);
+    // Pagination parametreleri
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 20, 1);
+
+    // Toplam kayıt sayısı
+    const total = await Product.countDocuments(query);
+
+    // İlgili sayfadaki ürünleri çek
+    const products = await Product.find(query)
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name")
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    // JSON içinde hem meta hem de ürünler
+    res.status(200).json({
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      products,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ürünler alınamadı." });
@@ -80,10 +103,15 @@ router.get("/", async (req, res) => {
 // READ ONE
 router.get("/:id", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate("category");
+    const product = await Product.findById(req.params.id)
+      // Buffer içeriğini hariç tut
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name");
+
     if (!product) return res.status(404).json({ error: "Ürün bulunamadı." });
     res.json(product);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Sunucu hatası." });
   }
 });
