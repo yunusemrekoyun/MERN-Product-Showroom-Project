@@ -1,6 +1,8 @@
 // import { useEffect, useState } from "react";
 import Footer from "../components/Layout/Footer/Footer";
 import Header from "../components/Layout/Header/Header";
+import HeaderBottom from "../components/Layout/Header/HeaderBottom";
+
 import Proptypes from "prop-types";
 // import Search from "../components/Modals/Search/Search";
 // import Dialog from "../components/Modals/Dialog/Dialog";
@@ -23,7 +25,8 @@ const MainLayout = ({ children }) => {
     <div className="main-layout">
       {/* <Dialog isDialogShow={isDialogShow} setIsDialogShow={setIsDialogShow} /> */}
       {/* <Search isSearchShow={isSearchShow} setIsSearchShow={setIsSearchShow} /> */}
-      <Header  />
+      <Header />
+      <HeaderBottom />
       {children}
       <Footer />
     </div>
