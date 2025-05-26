@@ -1,4 +1,3 @@
-// UpdateCampaignPage.jsx
 import { Button, Form, Input, Select, Spin, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -17,24 +16,33 @@ const UpdateCampaignPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Ürünler + kampanya verisi
         const [prodRes, campRes] = await Promise.all([
-          fetch(`${apiUrl}/api/products`),
+          fetch(`${apiUrl}/api/products?page=1&limit=100`),
           fetch(`${apiUrl}/api/campaigns/${id}`),
         ]);
         if (!prodRes.ok || !campRes.ok) {
           message.error("Veri getirme hatası");
           return;
         }
-        const [prodData, campData] = await Promise.all([
+        const [prodResult, campData] = await Promise.all([
           prodRes.json(),
           campRes.json(),
         ]);
+        // prodResult ya dizi ya objedir
+        const prodList = Array.isArray(prodResult)
+          ? prodResult
+          : Array.isArray(prodResult.products)
+          ? prodResult.products
+          : [];
 
-        setProducts(prodData);
+        setProducts(prodList);
+
+        // form alanlarını set et
         form.setFieldsValue({
           title: campData.title,
           description: campData.description,
-          selectedProducts: campData.products.map((p) => p._id || p.id),
+          selectedProducts: campData.products.map((p) => p._id),
           image: campData.background
             ? [
                 {
@@ -67,7 +75,7 @@ const UpdateCampaignPage = () => {
       formData.append("products", JSON.stringify(values.selectedProducts));
 
       const fileList = values.image;
-      const file = fileList && fileList[0]?.originFileObj;
+      const file = fileList?.[0]?.originFileObj;
       if (file) {
         const compressed = await imageCompression(file, {
           maxSizeMB: 0.5,
@@ -142,7 +150,7 @@ const UpdateCampaignPage = () => {
         >
           <Select mode="multiple" placeholder="Ürün seçin">
             {products.map((p) => (
-              <Select.Option key={p._id || p.id} value={p._id || p.id}>
+              <Select.Option key={p._id} value={p._id}>
                 {p.name}
               </Select.Option>
             ))}

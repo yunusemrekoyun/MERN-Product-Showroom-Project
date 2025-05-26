@@ -1,4 +1,6 @@
+// src/components/UserAccountDetails.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { message, Tabs } from "antd";
 import imageCompression from "browser-image-compression";
 import "./UserAccountDetails.css";
@@ -6,6 +8,7 @@ import "./UserAccountDetails.css";
 const { TabPane } = Tabs;
 
 const UserAccountDetails = () => {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,13 +21,24 @@ const UserAccountDetails = () => {
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = storedUser?._id || storedUser?.id || storedUser?._userId;
+  const userId =
+    storedUser?._id || storedUser?.id || storedUser?._userId || null;
 
+  // If not logged in, go to /login
   useEffect(() => {
+    if (!userId) {
+      navigate("/login", { replace: true });
+    }
+  }, [userId, navigate]);
+
+  // Fetch profile when we have a userId
+  useEffect(() => {
+    if (!userId) return;
+
     const fetchUser = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/users/${userId}`);
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         setUserData(data);
         setFormData({
@@ -40,17 +54,12 @@ const UserAccountDetails = () => {
       }
     };
 
-    if (userId) {
-      fetchUser();
-    }
+    fetchUser();
   }, [apiUrl, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setEditMode(true);
   };
 
@@ -83,8 +92,8 @@ const UserAccountDetails = () => {
         method: "PUT",
         body: form,
       });
+      if (!res.ok) throw new Error("Update failed");
 
-      if (!res.ok) throw new Error();
       const updated = await res.json();
       localStorage.setItem("user", JSON.stringify(updated));
       setUserData(updated);
@@ -98,6 +107,7 @@ const UserAccountDetails = () => {
     }
   };
 
+  if (!userId) return null; // waiting for redirect
   if (!userData) return <p>Yükleniyor...</p>;
 
   return (
@@ -108,15 +118,10 @@ const UserAccountDetails = () => {
             <div className="user-account-header">
               <div className="user-avatar-large">
                 <img
-                  src={
-                    userId
-                      ? `${apiUrl}/api/users/${userId}/image`
-                      : "/img/avatars/avatar1.jpg"
-                  }
+                  src={`${apiUrl}/api/users/${userId}/image`}
                   alt="Avatar"
                   onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/img/avatars/avatar1.jpg";
+                    e.currentTarget.src = "/img/avatars/avatar1.jpg";
                   }}
                 />
               </div>
@@ -178,6 +183,7 @@ const UserAccountDetails = () => {
             </div>
           </div>
         </TabPane>
+
         <TabPane tab="İstek Listesi" key="2">
           <ul className="static-list">
             <li>iPhone 15 Pro Max</li>
@@ -185,6 +191,7 @@ const UserAccountDetails = () => {
             <li>MacBook Air M3</li>
           </ul>
         </TabPane>
+
         <TabPane tab="Beğenilenler" key="3">
           <ul className="static-list">
             <li>Samsung Galaxy Watch</li>

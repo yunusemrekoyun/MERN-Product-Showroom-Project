@@ -1,11 +1,13 @@
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom"; // ← Link eklendi
 import "./CampaignItem.css";
 
 const CampaignItem = ({ campaign }) => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   return (
-    <div
+    <Link
+      to={`/shop?campaign=${campaign._id}`} // ← kampanya parametreli link
       className="campaign-item"
       style={{
         backgroundImage: `url(${apiUrl}/api/campaigns/${campaign._id}/image)`,
@@ -13,10 +15,10 @@ const CampaignItem = ({ campaign }) => {
     >
       <h3 className="campaign-title">{campaign.title}</h3>
       <p className="campaign-desc">{campaign.description}</p>
-      <a href="#" className="btn btn-primary">
+      <span className="btn btn-primary">
         Ürünleri Görüntüle <i className="bi bi-arrow-right"></i>
-      </a>
-    </div>
+      </span>
+    </Link>
   );
 };
 

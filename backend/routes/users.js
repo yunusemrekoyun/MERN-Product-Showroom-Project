@@ -21,13 +21,16 @@ router.get("/", async (req, res) => {
 });
 
 // 3) READ single user by ID
+// Düzeltilmiş
 router.get("/:userId", async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId)
+      .select("-avatar.data") // avatar.data Buffer’ını hariç tut
+      .lean();
     if (!user) return res.status(404).json({ error: "User not found." });
     res.json(user);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error." });
   }
 });

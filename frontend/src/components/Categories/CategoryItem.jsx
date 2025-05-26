@@ -1,4 +1,7 @@
+// src/components/Categories/CategoryItem.jsx
+
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import "./CategoryItem.css";
 
 const CategoryItem = ({ category }) => {
@@ -6,7 +9,7 @@ const CategoryItem = ({ category }) => {
 
   return (
     <li className="category-item">
-      <a href="#">
+      <Link to={`/shop?category=${category._id}`} className="category-link">
         <img
           src={`${apiUrl}/api/categories/${category._id}/image`}
           alt={category.name}
@@ -14,7 +17,7 @@ const CategoryItem = ({ category }) => {
           loading="lazy"
         />
         <span className="category-title">{category.name}</span>
-      </a>
+      </Link>
     </li>
   );
 };
