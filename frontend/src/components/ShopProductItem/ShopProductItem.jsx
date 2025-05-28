@@ -1,9 +1,42 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import ShareModal from "../Modals/Share/ShareModal";
 import "./ShopProductItem.css";
 
 const ShopProductItem = ({ product }) => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = storedUser?._id || storedUser?.id;
+
+  const [showShare, setShowShare] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [animateHeart, setAnimateHeart] = useState(false);
+
+  useEffect(() => {
+    if (!userId || !storedUser?.favorites) return;
+    setIsFavorite(storedUser.favorites.includes(product._id));
+  }, [storedUser, product._id, userId]);
+
+  const toggleFavorite = async () => {
+    if (!userId) return alert("Favorilere eklemek için giriş yapmalısınız.");
+
+    try {
+      const res = await fetch(
+        `${apiUrl}/api/users/${userId}/favorites/${product._id}`,
+        { method: "POST" }
+      );
+      const data = await res.json();
+      setIsFavorite(data.favorites.includes(product._id));
+      setAnimateHeart(true);
+      setTimeout(() => setAnimateHeart(false), 300);
+
+      const updatedUser = { ...storedUser, favorites: data.favorites };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error("Favori işlemi hatası:", err);
+    }
+  };
 
   return (
     <div className="shop-product-item">
@@ -21,15 +54,30 @@ const ShopProductItem = ({ product }) => {
           {product.name}
         </Link>
 
-        {/* fiyat ve indirim kısmı kaldırıldı */}
-
         <div className="shop-product-links">
-          <button>
-            <i className="bi bi-heart-fill"></i>
+          <button
+            onClick={toggleFavorite}
+            className={`heart-button ${animateHeart ? "animate" : ""}`}
+          >
+            <i
+              className="bi bi-heart-fill heart-icon"
+              style={{ color: isFavorite ? "#d8363a" : "#ccc" }}
+            ></i>
           </button>
-          <a href="#">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowShare(true);
+            }}
+          >
             <i className="bi bi-share-fill"></i>
           </a>
+          <ShareModal
+            isOpen={showShare}
+            onClose={() => setShowShare(false)}
+            shareUrl={`${window.location.origin}/product/${product._id}`}
+          />
         </div>
       </div>
     </div>
@@ -40,7 +88,6 @@ ShopProductItem.propTypes = {
   product: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    // artık price zorunlu değil
   }).isRequired,
 };
 

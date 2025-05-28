@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { message, Tabs } from "antd";
 import imageCompression from "browser-image-compression";
-import "./UserAccountDetails.css";
+import UserAccountFavProductItem from "../Products/UserAccountFavProductItem";
 
-const { TabPane } = Tabs;
+import "./UserAccountDetails.css";
 
 const UserAccountDetails = () => {
   const navigate = useNavigate();
@@ -24,14 +24,12 @@ const UserAccountDetails = () => {
   const userId =
     storedUser?._id || storedUser?.id || storedUser?._userId || null;
 
-  // If not logged in, go to /login
   useEffect(() => {
     if (!userId) {
       navigate("/login", { replace: true });
     }
   }, [userId, navigate]);
 
-  // Fetch profile when we have a userId
   useEffect(() => {
     if (!userId) return;
 
@@ -107,99 +105,138 @@ const UserAccountDetails = () => {
     }
   };
 
-  if (!userId) return null; // waiting for redirect
+  const removeFromFavorites = async (productId) => {
+    try {
+      const res = await fetch(
+        `${apiUrl}/api/users/${userId}/favorites/${productId}`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await res.json();
+      const updatedUser = {
+        ...userData,
+        favorites: userData.favorites.filter((p) => p._id !== productId),
+      };
+      setUserData(updatedUser);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...storedUser, favorites: data.favorites })
+      );
+    } catch (err) {
+      message.error("Favoriden kaldırılamadı.");
+    }
+  };
+
+  if (!userId) return null;
   if (!userData) return <p>Yükleniyor...</p>;
+
+  const items = [
+    {
+      key: "1",
+      label: "Hesap Bilgileri",
+      children: (
+        <div className="user-account-details">
+          <div className="user-account-header">
+            <div className="user-avatar-large">
+              <img
+                src={`${apiUrl}/api/users/${userId}/image`}
+                alt="Avatar"
+                onError={(e) => {
+                  e.currentTarget.src = "/img/avatars/avatar1.jpg";
+                }}
+              />
+            </div>
+            <div className="user-form-section">
+              <div className="form-group">
+                <label>Kullanıcı Adı</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email Adresi</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Yeni Şifre</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Boş bırakırsan şifre değişmez"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Profil Fotoğrafı</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                />
+              </div>
+
+              {editMode && (
+                <p className="edit-warning">
+                  Değişiklik yapıldı. Lütfen kaydedin.
+                </p>
+              )}
+
+              <button
+                className="update-button"
+                onClick={handleUpdate}
+                disabled={loading || !editMode}
+              >
+                {loading ? "Güncelleniyor..." : "Kaydet"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "2",
+      label: "Favori Ürünler",
+      children: (
+        <div className="fav-products-grid">
+          {userData?.favorites?.map((product) => (
+            <UserAccountFavProductItem
+              key={product._id}
+              product={product}
+              onRemove={removeFromFavorites}
+            />
+          ))}
+        </div>
+      ),
+    },
+    {
+      key: "3",
+      label: "Beğenilen İçerikler",
+      children: (
+        <ul className="static-list">
+          <li>Samsung Galaxy Watch</li>
+          <li>Logitech MX Master 3</li>
+          <li>Amazon Kindle Paperwhite</li>
+        </ul>
+      ),
+    },
+  ];
 
   return (
     <div className="user-account-wrapper">
-      <Tabs defaultActiveKey="1" centered>
-        <TabPane tab="Hesap Bilgileri" key="1">
-          <div className="user-account-details">
-            <div className="user-account-header">
-              <div className="user-avatar-large">
-                <img
-                  src={`${apiUrl}/api/users/${userId}/image`}
-                  alt="Avatar"
-                  onError={(e) => {
-                    e.currentTarget.src = "/img/avatars/avatar1.jpg";
-                  }}
-                />
-              </div>
-              <div className="user-form-section">
-                <div className="form-group">
-                  <label>Kullanıcı Adı</label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Email Adresi</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Yeni Şifre</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Boş bırakırsan şifre değişmez"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Profil Fotoğrafı</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarChange}
-                  />
-                </div>
-
-                {editMode && (
-                  <p className="edit-warning">
-                    Değişiklik yapıldı. Lütfen kaydedin.
-                  </p>
-                )}
-
-                <button
-                  className="update-button"
-                  onClick={handleUpdate}
-                  disabled={loading || !editMode}
-                >
-                  {loading ? "Güncelleniyor..." : "Kaydet"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </TabPane>
-
-        <TabPane tab="İstek Listesi" key="2">
-          <ul className="static-list">
-            <li>iPhone 15 Pro Max</li>
-            <li>PlayStation 5</li>
-            <li>MacBook Air M3</li>
-          </ul>
-        </TabPane>
-
-        <TabPane tab="Beğenilenler" key="3">
-          <ul className="static-list">
-            <li>Samsung Galaxy Watch</li>
-            <li>Logitech MX Master 3</li>
-            <li>Amazon Kindle Paperwhite</li>
-          </ul>
-        </TabPane>
-      </Tabs>
+      <Tabs defaultActiveKey="1" centered items={items} />
     </div>
   );
 };

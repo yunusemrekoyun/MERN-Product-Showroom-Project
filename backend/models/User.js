@@ -10,6 +10,7 @@ const UserSchema = mongoose.Schema(
       data: Buffer,
       contentType: String,
     },
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
   { timestamps: true }
 );

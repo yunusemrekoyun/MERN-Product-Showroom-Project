@@ -4,9 +4,9 @@ import {
   UserOutlined,
   LaptopOutlined,
   RollbackOutlined,
-  BarcodeOutlined,
+  // BarcodeOutlined,
   DashboardOutlined,
-  ShoppingCartOutlined,
+  // ShoppingCartOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -78,29 +78,29 @@ const AdminLayout = ({ children }) => {
         },
       ],
     },
-    {
-      key: "8",
-      icon: <BarcodeOutlined />,
-      label: "Kuponlar",
-      children: [
-        {
-          key: "9",
-          label: "Kupon Listesi",
-          path: "/admin/coupons",
-          onClick: () => {
-            navigate(`/admin/coupons`);
-          },
-        },
-        {
-          key: "10",
-          label: "Yeni Kupon Oluştur",
-          path: "/admin/coupons/create",
-          onClick: () => {
-            navigate("/admin/coupons/create");
-          },
-        },
-      ],
-    },
+    // {
+    //   key: "8",
+    //   icon: <BarcodeOutlined />,
+    //   label: "Kuponlar",
+    //   children: [
+    //     {
+    //       key: "9",
+    //       label: "Kupon Listesi",
+    //       path: "/admin/coupons",
+    //       onClick: () => {
+    //         navigate(`/admin/coupons`);
+    //       },
+    //     },
+    //     {
+    //       key: "10",
+    //       label: "Yeni Kupon Oluştur",
+    //       path: "/admin/coupons/create",
+    //       onClick: () => {
+    //         navigate("/admin/coupons/create");
+    //       },
+    //     },
+    //   ],
+    // },
     {
       key: "14",
       icon: <AppstoreOutlined />,
@@ -152,15 +152,15 @@ const AdminLayout = ({ children }) => {
         navigate(`/admin/users`);
       },
     },
-    {
-      key: "12",
-      icon: <ShoppingCartOutlined />,
-      label: "Siparişler",
-      path: "/admin/orders",
-      onClick: () => {
-        navigate(`/admin/orders`);
-      },
-    },
+    // {
+    //   key: "12",
+    //   icon: <ShoppingCartOutlined />,
+    //   label: "Siparişler",
+    //   path: "/admin/orders",
+    //   onClick: () => {
+    //     navigate(`/admin/orders`);
+    //   },
+    // },
     {
       key: "13",
       icon: <RollbackOutlined />,

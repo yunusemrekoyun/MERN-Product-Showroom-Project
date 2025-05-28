@@ -216,5 +216,25 @@ router.get("/:id/image/:type/:index", async (req, res) => {
     res.status(500).json({ error: "Resim alınamadı." });
   }
 });
+// routes/products.js içinde → GET /:id
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name")
+      .lean();
 
+    if (!product) return res.status(404).json({ error: "Ürün bulunamadı." });
+
+    // ⭐ Favori sayısını getir
+    const favoritedByCount = await mongoose.model("User").countDocuments({
+      favorites: product._id,
+    });
+
+    res.json({ ...product, favoritedByCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Sunucu hatası." });
+  }
+});
 module.exports = router;
