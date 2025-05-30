@@ -17,15 +17,17 @@ const BlogDetails = () => {
   const [blog, setBlog] = useState(null);
   const [likesCount, setLikesCount] = useState(0);
   const [liked, setLiked] = useState(false);
-  const [showComments, setShowComments] = useState(false); // ✅ yorumları aç/kapat
+  const [showComments, setShowComments] = useState(false);
+
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
+  // Blog detaylarını çek
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error("Sunucu hatası");
         const data = await res.json();
         setBlog(data);
         setLikesCount(data.likedBy.length);
@@ -35,9 +37,11 @@ const BlogDetails = () => {
         message.error("Blog yüklenemedi");
       }
     };
-    fetchBlog();
-  }, [apiUrl, blogId]);
 
+    fetchBlog();
+  }, [apiUrl, blogId, storedUser]);
+
+  // Beğeni işlemi
   const handleLike = async () => {
     if (!storedUser) return message.warning("Beğenmek için giriş yapın!");
 
@@ -48,6 +52,7 @@ const BlogDetails = () => {
         body: JSON.stringify({ userId: storedUser._id }),
       });
 
+      if (!res.ok) throw new Error();
       const data = await res.json();
       setLikesCount(data.likesCount);
       setLiked((prev) => !prev);
@@ -57,13 +62,15 @@ const BlogDetails = () => {
     }
   };
 
+  // Yüklenme durumu
   if (!blog) return <div className="loading">Yükleniyor...</div>;
 
   return (
     <section className="single-blog">
       <div className="container">
         <article>
-          {blog.images.length > 1 ? (
+          {/* Çoklu görsel varsa Swiper, yoksa tek görsel */}
+          {blog.images?.length > 1 ? (
             <Swiper
               modules={[Navigation, Pagination, Autoplay]}
               spaceBetween={20}
@@ -73,7 +80,7 @@ const BlogDetails = () => {
               autoplay={{ delay: 3500 }}
               className="blog-slider"
             >
-              {blog.images.map((img, idx) => (
+              {blog.images.map((_, idx) => (
                 <SwiperSlide key={idx}>
                   <img
                     src={`${apiUrl}/api/blogs/${blogId}/image/${idx}`}
@@ -85,11 +92,13 @@ const BlogDetails = () => {
               ))}
             </Swiper>
           ) : (
-            <img
-              src={`data:image/png;base64,${blog.images[0]}`}
-              alt={blog.title}
-              className="blog-image limited-image"
-            />
+            blog.images?.[0] && (
+              <img
+                src={`data:image/png;base64,${blog.images[0]}`}
+                alt={blog.title}
+                className="blog-image limited-image"
+              />
+            )
           )}
 
           <div className="blog-wrapper">
@@ -112,7 +121,6 @@ const BlogDetails = () => {
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
 
-            {/* Blog yorumları aç/kapat */}
             <button
               className="toggle-details-button"
               onClick={() => setShowComments(!showComments)}
@@ -122,7 +130,7 @@ const BlogDetails = () => {
           </div>
         </article>
 
-        {/* Yorumlar kutusu sadece gösterilince görünür */}
+        {/* Yorumlar sadece açıkken gösterilir */}
         {showComments && (
           <div className="comment-section">
             <BlogComments blogId={blogId} user={storedUser} />

@@ -2,19 +2,21 @@
   display: flex;
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
-    align-items: start;
-
+  align-items: start;
 }
+
+/* Logo */
 .auth-logo {
   width: 200px;
   height: auto;
-
 }
-/* Ayna efekti için ters yönlendirme */
+
+/* Masaüstünde ters yönlendirme için */
 .mirror-layout {
   flex-direction: row-reverse;
 }
 
+/* Form ve görsel alanı */
 .register-left,
 .register-right {
   flex: 1;
@@ -23,26 +25,25 @@
   justify-content: center;
 }
 
+/* Form arka plan ve padding */
 .mirror-form {
   background-color: #ffffff;
   padding: 40px;
 }
 
+/* Form kutusu genişliği */
 .register-box {
   width: 100%;
   max-width: 400px;
 }
 
+/* Ortala yazılar */
 .text-center {
   text-align: center;
   margin-bottom: 30px;
 }
 
-.subtitle {
-  margin-top: 10px;
-  color: #666;
-}
-
+/* Form inputlar */
 .form-group {
   margin-bottom: 20px;
 }
@@ -61,6 +62,7 @@
   font-size: 14px;
 }
 
+/* Kayıt butonu */
 .btn-register-main {
   width: 100%;
   padding: 12px;
@@ -77,6 +79,7 @@
   opacity: 0.9;
 }
 
+/* Login prompt */
 .login-prompt {
   margin-top: 30px;
   text-align: center;
@@ -87,6 +90,7 @@
   font-size: 14px;
 }
 
+/* Login butonu */
 .btn-login-alt {
   border: 1px solid #d8363a;
   background: transparent;
@@ -103,19 +107,20 @@
   color: white;
 }
 
-/* Sağdaki görsel + metin alanı */
+/* Görsel + metin alanı */
 .mirror-visual {
-  background-image: url('/public/img/blogs/blog1.jpg'); /* ← GÖRSEL YOLUNU GÜNCELLE */
+  background-image: url('/public/img/blogs/blog1.jpg'); /* GÖRSEL YOLUNU GÜNCELLE */
   background-size: cover;
   background-position: center;
- height: auto;
+  height: auto;
   color: white;
   padding: 40px;
-  border-radius:30%;
+  border-radius: 30%;
 }
 
+/* Sağdaki kutu içeriği */
 .right-content {
-    margin-top: 70%;
+  margin-top: 70%;
   max-width: 400px;
   text-align: center;
   background-color: rgba(0, 0, 0, 0.4);
@@ -134,19 +139,54 @@
   line-height: 1.6;
 }
 
-/* Responsive */
+/* --------- MOBİL ÖZEL --------- */
 @media (max-width: 768px) {
-  .register-page {
-    flex-direction: column;
+  .register-page,
+  .login-page {
+    flex-direction: column !important;
   }
 
+  /* Ters yönlendirmeyi iptal edip direk kolon yap */
+  .mirror-layout {
+    flex-direction: column !important;
+  }
+
+  /* Form alanı önce gelsin */
+  .register-left {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  /* Görsel alanı sonra gelsin */
+  .register-right {
+    order: 2 !important;
+    width: 100% !important;
+    height: 200px; /* İstersen değiştir */
+    border-radius: 0 !important; /* Mobilde yuvarlaklığı kaldır */
+    padding: 20px !important;
+  }
+
+  /* Görsel alanında background pozisyonu ve büyüklük */
   .mirror-visual {
-    height: 200px;
     background-position: center;
+    background-size: cover;
+    height: 200px !important;
+    border-radius: 0 !important;
   }
 
+  /* Kutudaki yazı fontu ve padding küçülsün */
   .right-content {
-    padding: 10px;
-    font-size: 12px;
+    margin-top: 0 !important;
+    max-width: 100% !important;
+    padding: 10px !important;
+    font-size: 12px !important;
+    border-radius: 0 !important;
+  }
+
+  /* Form kutusunu ortaya al, max genişlik sınırla */
+  .register-box {
+    margin: 20px auto !important;
+    max-width: 400px !important;
+    width: 90% !important;
   }
 }

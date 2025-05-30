@@ -39,18 +39,18 @@ const AllBlogs = () => {
               <img
                 src={`${apiUrl}/api/blogs/${blog.blogId}/image/0`}
                 alt={blog.title}
-                className="blog-image"
+                className="blog-image2"
                 onError={(e) => (e.target.src = "/img/fallback.jpg")}
               />
-              <p className="blog-date">
-                {dayjs(blog.createdAt).format("DD MMM YYYY")}
-              </p>
-              <h3 className="blog-title">{blog.title}</h3>
-              <p className="blog-preview">
-                {blog.content.length > 120
-                  ? blog.content.slice(0, 120) + "..."
-                  : blog.content}
-              </p>
+              <div className="blog-content">
+                <h3 className="blog-title">{blog.title}</h3>
+                <p className="blog-date">
+                  {dayjs(blog.createdAt).format("DD MMM YYYY")}
+                </p>
+                <p className="blog-preview">
+                  {blog.content}
+                </p>
+              </div>
             </div>
           ))}
         </div>
