@@ -1,86 +1,61 @@
-/* ✅ Gallery.css (düzenlenmiş ana görsel ve yatay slider yapısı) */
-
-.product-gallery {
+.horizontal-gallery {
   width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-.single-image-wrapper {
-  width: 100%;
-  max-height: 500px;
-  margin-bottom: 20px;
+.gallery-image-wrapper {
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid #ddd;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s, transform 0.2s ease;
   background-color: #fff;
 }
 
-#single-image {
-  max-width: 100%;
-  max-height: 500px;
-  object-fit: contain;
-  display: block;
-  border-radius: 10px;
-}
-
-.product-thumb {
-  margin-top: 20px;
-}
-
-.glide__slide {
-  padding: 0 5px;
-  display: inline-block;
-  width: auto !important;
-}
-
-.glide__slide img {
-  width: 100px;
-  height: auto;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: border-color 0.3s;
-}
-
-.glide__slide img.active,
-.glide__slide img:hover {
+.gallery-image-wrapper:hover {
   border-color: #d8363a;
+  transform: scale(1.02);
 }
 
-.glide__arrow {
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  color: #333;
-  cursor: pointer;
-  padding: 6px;
-  transition: 0.3s;
+.gallery-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
-.glide__arrow:hover {
-  color: #d8363a;
+/* Boyutlara göre */
+.gallery-image-wrapper.main {
+  width: 500px;
+  max-width: 100%;
 }
 
-.slick-slide {
-  display: inline-block;
-  float: none;
+.gallery-image-wrapper.medium {
+  width: 220px;
 }
 
-.slick-track {
-  display: flex !important;
-  align-items: center;
-  gap: 10px;
+.gallery-image-wrapper.small {
+  width: 120px;
 }
 
-/* Mobil uyumlu */
+/* Mobil uyum */
 @media (max-width: 768px) {
-  #single-image {
-    max-height: 300px;
+  .horizontal-gallery {
+    flex-direction: column;
+    align-items: center;
   }
-  .glide__slide img {
-    width: 80px;
+
+  .gallery-image-wrapper.main {
+    width: 90%;
+  }
+
+  .gallery-image-wrapper.medium,
+  .gallery-image-wrapper.small {
+    width: 70%;
   }
 }

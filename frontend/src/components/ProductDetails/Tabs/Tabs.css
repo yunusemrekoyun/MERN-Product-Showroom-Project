@@ -1,11 +1,23 @@
 /* ✅ Tabs.css */
 
-.single-tabs {
+/* .single-tabs {
   margin-top: 40px;
   border-top: 1px solid #e6e6e6;
   padding-top: 30px;
+} */
+.tab-panel {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
 }
-
+/* Description içi örnek görsel */
+.desc-image {
+  display: block;
+  max-width: 100%;
+  margin: 24px auto 8px auto;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
 .tab-list {
   list-style: none;
   display: flex;

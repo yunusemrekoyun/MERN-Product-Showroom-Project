@@ -23,11 +23,15 @@ router.get("/", async (req, res) => {
 // 3) READ single user by ID
 router.get("/:userId", async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId)
+      .select("-avatar.data")
+      .populate("favorites", "name") // sadece name alanı yeterli (isteğe göre genişletirsin)
+      .lean();
+
     if (!user) return res.status(404).json({ error: "User not found." });
     res.json(user);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error." });
   }
 });
@@ -86,6 +90,29 @@ router.get("/:userId/image", async (req, res) => {
     res.send(user.avatar.data);
   } catch (err) {
     res.status(500).json({ error: "Avatar yüklenemedi." });
+  }
+});
+
+// 🔁 Toggle favorite product
+router.post("/:userId/favorites/:productId", async (req, res) => {
+  const { userId, productId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const index = user.favorites.indexOf(productId);
+    if (index === -1) {
+      user.favorites.push(productId);
+    } else {
+      user.favorites.splice(index, 1);
+    }
+
+    await user.save();
+    res.json({ favorites: user.favorites });
+  } catch (err) {
+    console.error("❌ Favori işlemi hatası:", err);
+    res.status(500).json({ error: "Sunucu hatası" });
   }
 });
 module.exports = router;

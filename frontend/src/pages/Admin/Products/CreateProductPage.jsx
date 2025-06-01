@@ -7,72 +7,84 @@ import {
   Spin,
   Upload,
   message,
+  Space
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import imageCompression from "browser-image-compression";
 
 const CreateProductPage = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [fileList, setFileList] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [mainImages, setMainImages] = useState([]);
+  const [childImages1, setChildImages1] = useState([]);
+  const [childImages2, setChildImages2] = useState([]);
   const [form] = Form.useForm();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchCategories = async () => {
-      setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/api/categories`);
         if (!res.ok) throw new Error();
-        setCategories(await res.json());
+        const data = await res.json();
+        setCategories(data);
       } catch {
-        message.error("Kategori yüklenemedi.");
-      } finally {
-        setLoading(false);
+        message.error("Kategoriler yüklenemedi.");
       }
     };
     fetchCategories();
   }, [apiUrl]);
 
-  const handleUploadChange = ({ fileList }) => {
-    setFileList(fileList.slice(-5)); // max 5 görsel
+  const handleCategoryChange = (categoryId) => {
+    const selected = categories.find((cat) => cat._id === categoryId);
+    if (selected?.subcategories?.length > 0) {
+      setSubcategories(selected.subcategories);
+    } else {
+      setSubcategories([]);
+      message.info("Bu kategorinin alt kategorisi bulunamadı.");
+    }
+    form.setFieldsValue({ subcategory: undefined });
+  };
+
+  const compressAndAppend = async (images, fieldName, formData) => {
+    for (const fileWrapper of images) {
+      const file = fileWrapper.originFileObj;
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+      });
+      formData.append(fieldName, compressed);
+    }
   };
 
   const onFinish = async (values) => {
-    if (fileList.length === 0) {
-      return message.error("Lütfen en az 1 görsel seçin.");
+    if (mainImages.length === 0) {
+      return message.error("En az 1 ana görsel gereklidir.");
     }
 
     setLoading(true);
     try {
       const formData = new FormData();
-
       formData.append("name", values.name);
       formData.append("category", values.category);
+      formData.append("subcategory", values.subcategory || "");
+      formData.append("buyLink", values.buyLink || "");
       formData.append(
         "price",
         JSON.stringify({ current: values.current, discount: values.discount })
       );
-      formData.append("description", values.description);
-      formData.append(
-        "colors",
-        JSON.stringify(values.colors.trim().split("\n"))
-      );
-      formData.append("sizes", JSON.stringify(values.sizes.trim().split("\n")));
+      formData.append("opt1", JSON.stringify((values.opt1 || "").split("\n")));
+      formData.append("opt2", JSON.stringify((values.opt2 || "").split("\n")));
+      formData.append("mainDescription", values.mainDescription || "");
+      formData.append("childDescription1", values.childDescription1 || "");
+      formData.append("childDescription2", values.childDescription2 || "");
 
-      // Dosyaları sıkıştırıp ekle
-      for (const fileWrapper of fileList) {
-        const file = fileWrapper.originFileObj;
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
-        });
-        formData.append("img", compressed);
-      }
+      await compressAndAppend(mainImages, "mainImages", formData);
+      await compressAndAppend(childImages1, "childImages1", formData);
+      await compressAndAppend(childImages2, "childImages2", formData);
 
       const res = await fetch(`${apiUrl}/api/products`, {
         method: "POST",
@@ -80,15 +92,19 @@ const CreateProductPage = () => {
       });
 
       if (res.ok) {
-        message.success("Ürün başarıyla oluşturuldu.");
+        message.success("Ürün oluşturuldu.");
         form.resetFields();
-        setFileList([]);
+        setMainImages([]);
+        setChildImages1([]);
+        setChildImages2([]);
+        setSubcategories([]);
       } else {
-        message.error("Ürün oluşturulamadı.");
+        const result = await res.json();
+        message.error(result.error || "Ürün oluşturulamadı.");
       }
     } catch (err) {
       console.error(err);
-      message.error("Sunucu hatası oluştu.");
+      message.error("Sunucu hatası.");
     } finally {
       setLoading(false);
     }
@@ -111,11 +127,11 @@ const CreateProductPage = () => {
         </Form.Item>
 
         <Form.Item
-          label="Ürün Kategorisi"
+          label="Kategori"
           name="category"
           rules={[{ required: true, message: "Kategori seçin" }]}
         >
-          <Select placeholder="Kategori seçin">
+          <Select placeholder="Kategori seçin" onChange={handleCategoryChange}>
             {categories.map((c) => (
               <Select.Option key={c._id} value={c._id}>
                 {c.name}
@@ -124,71 +140,113 @@ const CreateProductPage = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Fiyat" required>
-          <Input.Group compact>
-            <Form.Item
-              name="current"
-              noStyle
-              rules={[{ required: true, message: "Fiyat girin" }]}
-            >
-              <InputNumber placeholder="₺0.00" style={{ width: "60%" }} />
+        <Form.Item label="Alt Kategori" name="subcategory">
+          <Select
+            placeholder={
+              subcategories.length > 0
+                ? "Alt kategori seçin"
+                : "Alt kategori bulunamadı"
+            }
+            disabled={subcategories.length === 0}
+          >
+            {subcategories.map((sub, index) => (
+              <Select.Option key={index} value={sub}>
+                {sub}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item label="Satın Alma Linki" name="buyLink">
+          <Input placeholder="https://..." />
+        </Form.Item>
+
+        <Form.Item label="Fiyat">
+          <Space.Compact style={{ width: "100%" }}>
+            <Form.Item name="current" noStyle>
+              <InputNumber placeholder="₺" style={{ width: "50%" }} />
             </Form.Item>
-            <Form.Item
-              name="discount"
-              noStyle
-              rules={[{ required: true, message: "İndirim oranı girin" }]}
-            >
+            <Form.Item name="discount" noStyle>
               <InputNumber
+                placeholder="%"
                 formatter={(v) => `${v}%`}
                 parser={(v) => v.replace("%", "")}
-                placeholder="0%"
-                style={{ width: "40%" }}
+                style={{ width: "50%" }}
               />
             </Form.Item>
-          </Input.Group>
+          </Space.Compact>
         </Form.Item>
 
-        <Form.Item
-          label="Ürün Açıklaması"
-          name="description"
-          rules={[{ required: true, message: "Açıklama zorunlu" }]}
-        >
-          <ReactQuill theme="snow" style={{ background: "white" }} />
+        {/* <Form.Item label="Opsiyon 1 (renk vs)" name="opt1">
+          <Input.TextArea placeholder="Her satıra bir seçenek" />
         </Form.Item>
 
-        <Form.Item label="Ürün Görselleri" required>
+        <Form.Item label="Opsiyon 2 (beden vs)" name="opt2">
+          <Input.TextArea placeholder="Her satıra bir seçenek" />
+        </Form.Item> */}
+
+        <Form.Item label="Ana Açıklama" name="mainDescription">
+          <Input.TextArea autoSize={{ minRows: 2 }} />
+        </Form.Item>
+        <Form.Item label="Alt Açıklama 1" name="childDescription1">
+          <Input.TextArea autoSize={{ minRows: 2 }} />
+        </Form.Item>
+        <Form.Item label="Alt Açıklama 2" name="childDescription2">
+          <Input.TextArea autoSize={{ minRows: 2 }} />
+        </Form.Item>
+
+        <Form.Item label="Ana Görseller">
           <Upload
             listType="picture-card"
-            fileList={fileList}
+            fileList={mainImages}
             beforeUpload={() => false}
-            onChange={handleUploadChange}
+            onChange={({ fileList }) => setMainImages(fileList)}
             accept="image/*"
             multiple
           >
-            {fileList.length < 5 && (
+            {mainImages.length < 5 && (
               <div>
                 <UploadOutlined />
-                <div style={{ marginTop: 8 }}>Yükle</div>
+                <div>Yükle</div>
               </div>
             )}
           </Upload>
-          <small>En fazla 5 görsel yükleyebilirsiniz.</small>
         </Form.Item>
 
-        <Form.Item
-          label="Ürün Renkleri (Her satır bir renk)"
-          name="colors"
-          rules={[{ required: true, message: "Renk girin" }]}
-        >
-          <Input.TextArea autoSize={{ minRows: 2 }} placeholder="ör: #FF0000" />
+        <Form.Item label="Alt Görseller 1">
+          <Upload
+            listType="picture-card"
+            fileList={childImages1}
+            beforeUpload={() => false}
+            onChange={({ fileList }) => setChildImages1(fileList)}
+            accept="image/*"
+            multiple
+          >
+            {childImages1.length < 5 && (
+              <div>
+                <UploadOutlined />
+                <div>Yükle</div>
+              </div>
+            )}
+          </Upload>
         </Form.Item>
 
-        <Form.Item
-          label="Ürün Bedenleri (Her satır bir beden)"
-          name="sizes"
-          rules={[{ required: true, message: "Beden girin" }]}
-        >
-          <Input.TextArea autoSize={{ minRows: 2 }} placeholder="ör: S" />
+        <Form.Item label="Alt Görseller 2">
+          <Upload
+            listType="picture-card"
+            fileList={childImages2}
+            beforeUpload={() => false}
+            onChange={({ fileList }) => setChildImages2(fileList)}
+            accept="image/*"
+            multiple
+          >
+            {childImages2.length < 5 && (
+              <div>
+                <UploadOutlined />
+                <div>Yükle</div>
+              </div>
+            )}
+          </Upload>
         </Form.Item>
 
         <Form.Item>

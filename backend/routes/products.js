@@ -1,143 +1,240 @@
-// 📁 routes/product.js
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const multer = require("multer");
 
-// Multer setup
+// Multer memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// CREATE
-router.post("/", upload.array("img", 5), async (req, res) => {
+// ── SEARCH must come *before* the “/:id” route ───────────────
+router.get("/search/:keyword", async (req, res) => {
   try {
-    const { name, description, category, colors, sizes, price } = req.body;
-    const img = req.files.map((file) => ({
-      data: file.buffer,
-      contentType: file.mimetype,
-    }));
-
-    const newProduct = new Product({
-      name,
-      description,
-      category,
-      colors: JSON.parse(colors),
-      sizes: JSON.parse(sizes),
-      price: JSON.parse(price),
-      img,
-    });
-
-    await newProduct.save();
-    res.status(201).json(newProduct);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
+    const keyword = req.params.keyword;
+    const regex = new RegExp(keyword, "i");
+    const products = await Product.find({ name: { $regex: regex } })
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name")
+      .lean();
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Arama hatası." });
   }
 });
 
-// READ ALL
+// ── READ ALL with pagination ─────────────────────────────────
 router.get("/", async (req, res) => {
   try {
-    const products = await Product.find().populate("category");
-    res.status(200).json(products);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
-  }
-});
+    const query = {};
+    if (req.query.category) query.category = req.query.category;
+    if (req.query.subcategory) query.subcategory = req.query.subcategory;
 
-// READ SINGLE
-router.get("/:productId", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.productId).populate(
-      "category"
-    );
-    if (!product) {
-      return res.status(404).json({ error: "Product not found." });
-    }
-    res.status(200).json(product);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 20, 1);
+    const total = await Product.countDocuments(query);
+
+    const products = await Product.find(query)
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name")
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    res.json({
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      products,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Ürünler alınamadı." });
   }
 });
+// ── READ ONE ────────────────────────────────────────────────
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name")
+      .lean();
+
+    if (!product) return res.status(404).json({ error: "Ürün bulunamadı." });
+    res.json(product);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Sunucu hatası." });
+  }
+});
+// CREATE
+router.post(
+  "/",
+  upload.fields([
+    { name: "mainImages" },
+    { name: "childImages1" },
+    { name: "childImages2" },
+  ]),
+  async (req, res) => {
+    try {
+      const {
+        name,
+        category,
+        subcategory,
+        opt1,
+        opt2,
+        price,
+        mainDescription,
+        childDescription1,
+        childDescription2,
+        buyLink,
+      } = req.body;
+
+      const mapImages = (files) =>
+        (files || []).map((file) => ({
+          data: file.buffer,
+          contentType: file.mimetype,
+        }));
+
+      const product = new Product({
+        name,
+        category,
+        subcategory,
+        opt1: JSON.parse(opt1 || "[]"),
+        opt2: JSON.parse(opt2 || "[]"),
+        price: JSON.parse(price || "{}"),
+        mainDescription,
+        childDescription1,
+        childDescription2,
+        buyLink,
+        mainImages: mapImages(req.files?.mainImages),
+        childImages1: mapImages(req.files?.childImages1),
+        childImages2: mapImages(req.files?.childImages2),
+      });
+
+      await product.save();
+      res.status(201).json(product);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Ürün oluşturulamadı." });
+    }
+  }
+);
+
+// routes/products.js
 
 // UPDATE
-router.put("/:productId", upload.array("img", 5), async (req, res) => {
+router.put(
+  "/:id",
+  upload.fields([
+    { name: "mainImages" },
+    { name: "childImages1" },
+    { name: "childImages2" },
+  ]),
+  async (req, res) => {
+    try {
+      const {
+        name,
+        category,
+        subcategory,
+        opt1,
+        opt2,
+        price,
+        mainDescription,
+        childDescription1,
+        childDescription2,
+        buyLink,
+      } = req.body;
+
+      const updates = {
+        name,
+        category,
+        subcategory,
+        opt1: JSON.parse(opt1 || "[]"),
+        opt2: JSON.parse(opt2 || "[]"),
+        price: JSON.parse(price || "{}"),
+        mainDescription,
+        childDescription1,
+        childDescription2,
+        buyLink,
+      };
+
+      const mapImages = (files) =>
+        (files || []).map((file) => ({
+          data: file.buffer,
+          contentType: file.mimetype,
+        }));
+
+      if (req.files?.mainImages) {
+        updates.mainImages = mapImages(req.files.mainImages);
+      }
+      if (req.files?.childImages1) {
+        updates.childImages1 = mapImages(req.files.childImages1);
+      }
+      if (req.files?.childImages2) {
+        updates.childImages2 = mapImages(req.files.childImages2);
+      }
+
+      const updated = await Product.findByIdAndUpdate(req.params.id, updates, {
+        new: true,
+      }).populate("category");
+
+      if (!updated) return res.status(404).json({ error: "Ürün bulunamadı." });
+      res.json(updated);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Güncelleme hatası." });
+    }
+  }
+);
+
+// DELETE
+router.delete("/:id", async (req, res) => {
   try {
-    const updates = {};
-    if (req.body.name) updates.name = req.body.name;
-    if (req.body.description) updates.description = req.body.description;
-    if (req.body.category) updates.category = req.body.category;
-    if (req.body.colors) updates.colors = JSON.parse(req.body.colors);
-    if (req.body.sizes) updates.sizes = JSON.parse(req.body.sizes);
-    if (req.body.price) updates.price = JSON.parse(req.body.price);
-
-    if (req.files && req.files.length > 0) {
-      updates.img = req.files.map((file) => ({
-        data: file.buffer,
-        contentType: file.mimetype,
-      }));
-    }
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.productId,
-      updates,
-      { new: true }
-    ).populate("category");
-
-    if (!updatedProduct) {
-      return res.status(404).json({ error: "Product not found." });
-    }
-
-    res.status(200).json(updatedProduct);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
+    const deleted = await Product.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Ürün bulunamadı." });
+    res.json(deleted);
+  } catch (err) {
+    res.status(500).json({ error: "Silme hatası." });
   }
 });
 
-// GET PRODUCT IMAGE
-router.get("/:productId/image/:index", async (req, res) => {
+// GET IMAGE by type/index
+router.get("/:id/image/:type/:index", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).select("img");
+    const { id, type, index } = req.params;
+    const product = await Product.findById(id).select(type);
 
-    const index = parseInt(req.params.index);
-    const image = product?.img?.[index];
+    const imageList = product?.[type];
+    const image = imageList?.[index];
     if (!image) return res.status(404).end();
 
     res.set("Content-Type", image.contentType);
     res.send(image.data);
   } catch (err) {
-    res.status(500).json({ error: "Görsel yüklenemedi." });
+    res.status(500).json({ error: "Resim alınamadı." });
   }
 });
-// DELETE
-router.delete("/:productId", async (req, res) => {
+// routes/products.js içinde → GET /:id
+router.get("/:id", async (req, res) => {
   try {
-    const deleted = await Product.findByIdAndDelete(req.params.productId);
-    if (!deleted) {
-      return res.status(404).json({ error: "Product not found." });
-    }
-    res.status(200).json(deleted);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
+    const product = await Product.findById(req.params.id)
+      .select("-mainImages.data -childImages1.data -childImages2.data")
+      .populate("category", "name")
+      .lean();
+
+    if (!product) return res.status(404).json({ error: "Ürün bulunamadı." });
+
+    // ⭐ Favori sayısını getir
+    const favoritedByCount = await mongoose.model("User").countDocuments({
+      favorites: product._id,
+    });
+
+    res.json({ ...product, favoritedByCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
-
-// SEARCH BY NAME
-router.get("/search/:productName", async (req, res) => {
-  try {
-    const products = await Product.find({
-      name: { $regex: req.params.productName, $options: "i" },
-    }).populate("category");
-    res.status(200).json(products);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
-  }
-});
-
 module.exports = router;

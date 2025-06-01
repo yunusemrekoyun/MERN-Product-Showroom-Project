@@ -1,0 +1,98 @@
+:root {
+  --accent-color: #d4a017;
+  --accent-light: #fef6e5;
+}
+
+.header-bottom {
+  position: sticky;
+  top: 100px;
+  z-index: 999;
+  background-color: #fff;
+  border-bottom: 1px solid #eee4c6;
+  padding: 10px 0;
+}
+
+.header-menu-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0; /* Scroll dışı boşluk kaldırıldı */
+  box-sizing: border-box;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.header-menu-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.header-menu {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 32px;
+  min-width: max-content;
+  padding: 0; /* eski vw paddingleri kaldırılıyor */
+}
+
+.menu-item {
+  position: relative;
+  padding: 6px 0;
+  flex-shrink: 0;
+}
+.menu-item:first-of-type {
+  margin-left: 48px;
+}
+.menu-item:last-of-type {
+  margin-right: 48px;
+}
+
+.menu-item.last-item {
+  margin-right: 24px;
+}
+.menu-link {
+  font-size: 14px;
+  color: #222;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.menu-link:hover,
+.menu-link.active {
+  color: var(--accent-color);
+}
+
+.menu-link.active::after {
+  content: "";
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent-color);
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+}
+
+/* ✅ Scroll alanı içinde sol/sağ boşluk */
+.menu-spacer {
+  width: 24px;
+  flex-shrink: 0;
+}
+
+/* 🔧 Responsive: Mobilde boşluğu azalt */
+@media (max-width: 768px) {
+  .menu-spacer {
+    width: 24px;
+  }
+
+  .header-menu {
+    gap: 20px;
+  }
+
+  .menu-link {
+    font-size: 13px;
+  }
+}

@@ -1,4 +1,3 @@
-// CreateCampaignPage.jsx
 import { Button, Form, Input, Select, Spin, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -15,11 +14,18 @@ const CreateCampaignPage = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${apiUrl}/api/products`);
-        const data = await response.json();
-        setProducts(data);
+        const response = await fetch(`${apiUrl}/api/products?page=1&limit=100`);
+        if (!response.ok) throw new Error("Ürünler yüklenemedi.");
+        const result = await response.json();
+        // result ya doğrudan dizi, ya { products: [...] }
+        const list = Array.isArray(result)
+          ? result
+          : Array.isArray(result.products)
+          ? result.products
+          : [];
+        setProducts(list);
       } catch (error) {
-        message.error("Ürünler yüklenemedi.");
+        message.error(error.message || "Ürünler yüklenemedi.");
       } finally {
         setLoading(false);
       }
@@ -41,14 +47,9 @@ const CreateCampaignPage = () => {
       formData.append("products", JSON.stringify(values.products));
 
       if (fileList[0]?.originFileObj) {
-        // Görseli sıkıştır
         const compressedFile = await imageCompression(
           fileList[0].originFileObj,
-          {
-            maxSizeMB: 0.5,
-            maxWidthOrHeight: 1024,
-            useWebWorker: true,
-          }
+          { maxSizeMB: 0.5, maxWidthOrHeight: 1024, useWebWorker: true }
         );
         formData.append("background", compressedFile);
       }
@@ -63,10 +64,11 @@ const CreateCampaignPage = () => {
         form.resetFields();
         setFileList([]);
       } else {
-        message.error("Kampanya oluşturulamadı.");
+        const err = await response.json();
+        message.error(err.error || "Kampanya oluşturulamadı.");
       }
     } catch (error) {
-      console.error("Hata:", error);
+      console.error(error);
       message.error("Sunucu hatası oluştu.");
     } finally {
       setLoading(false);

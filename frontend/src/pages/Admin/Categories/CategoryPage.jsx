@@ -15,9 +15,7 @@ const CategoryPage = () => {
       key: "img",
       render: (id) => (
         <img
-          src={`${
-            import.meta.env.VITE_API_BASE_URL
-          }/api/categories/${id}/image`}
+          src={`${apiUrl}/api/categories/${id}/image`}
           alt="Kategori"
           width={100}
           loading="lazy"
@@ -25,13 +23,20 @@ const CategoryPage = () => {
       ),
     },
     {
-      title: "Name",
+      title: "Kategori Adı",
       dataIndex: "name",
       key: "name",
       render: (text) => <b>{text}</b>,
     },
     {
-      title: "Actions",
+      title: "Alt Kategoriler",
+      dataIndex: "subcategories",
+      key: "subcategories",
+      render: (subs) =>
+        subs && subs.length > 0 ? subs.join(", ") : <span>—</span>,
+    },
+    {
+      title: "İşlemler",
       key: "actions",
       render: (_, record) => (
         <Space>

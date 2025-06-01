@@ -1,158 +1,144 @@
-/* Redesigned Footer - Clean, aligned, and elegant */
-
 .footer {
   background-color: #f4f1ea;
   color: #2e2c28;
   font-family: "Jost", sans-serif;
   font-size: 14px;
+  padding: 60px 0;
 }
 
-.footer .subscribe-row {
-  padding: 80px 0;
-  border-bottom: 1px solid #e0dccc;
-}
-
-.footer .footer-row-wrapper {
+.footer-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 60px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
   align-items: start;
 }
 
-/* SOL BLOK */
-.footer-subscribe-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.footer .subscribe-title {
-  font-size: 24px;
+/* --- Subscribe Bölümü --- */
+.subscribe-title {
+  font-size: 20px;
+  margin-bottom: 12px;
   font-weight: 600;
-  line-height: 1.4;
-  color: #2e2c28;
 }
 
-.footer .subscribe-desc {
-  color: #6a6762;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.footer .footer-subscribe-bottom form {
+.subscribe-form {
   display: flex;
+  gap: 8px;
   flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
+  margin-bottom: 8px;
 }
 
-.footer .footer-subscribe-bottom form > input {
+.subscribe-form input {
   flex: 1;
-  height: 48px;
-  padding: 0 15px;
+  min-width: 160px;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 14px;
-  color: #2e2c28;
-  background-color: #fff;
 }
 
-.footer .footer-subscribe-bottom form > button {
+.subscribe-btn {
   background-color: #4e3b1f;
   color: #fff;
   border: none;
-  padding: 0 24px;
-  height: 48px;
-  font-weight: 500;
-  border-radius: 4px;
+  padding: 0 16px;
+  height: 40px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
-.footer .footer-subscribe-bottom form > button:hover {
+.subscribe-btn:hover {
   background-color: #6c522f;
 }
 
-.footer .privacy-text {
+.privacy-text {
   font-size: 12px;
   color: #928d86;
-  margin-top: 8px;
-  line-height: 1.5;
+  margin: 0;
 }
 
-.footer .privacy-text a {
+.footer-link {
   color: #6c522f;
+  text-decoration: none;
+}
+
+.footer-link:hover {
   text-decoration: underline;
 }
-.footer-contact-info {
+
+/* --- Site Haritası --- */
+.sitemap-title {
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.sitemap-list {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* İlk 5 maddeyi dikey, kalanlar yeni sütuna akacak */
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  row-gap: 4px;
+  column-gap: 12px;
+}
+
+.sitemap-list li {
+  margin: 0;
+}
+
+.sitemap-list a {
+  color: #2e2c28;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.sitemap-list a:hover {
+  text-decoration: underline;
+}
+
+/* --- İletişim --- */
+.contact-info {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
-/* SAĞ BLOK */
-.footer-contact-wrapper {
+
+.contact-title {
+  font-size: 18px;
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.contact-phone,
+.contact-hours,
+.contact-email,
+.contact-fax {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 14px;
+}
+
+.footer-logo {
+  margin-left: auto;
+}
+.footer-section.contact {
   display: flex;
-  flex-direction: row; /* ✅ logo ve içerik yanyana */
-  justify-content: space-between;
-  align-items: center;
-  gap: 40px;
-  text-align: left; /* metin sola dayalı */
+  justify-content: space-between; /* info solda, logo sağda */
+  align-items: flex-start;
 }
-.footer .footer-contact-logo img {
-  width: 200px;
+.footer-logo img {
+  width: 80px; /* istersen 60–100 arası bir değer dene */
   height: auto;
-  display: block;
 }
 
-.footer .footer-contact-top {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.footer .footer-contact-top p strong,
-.footer .footer-contact-top strong {
-  display: inline-block;
-  margin-right: 6px;
-}
-
-.footer .footer-contact-top br {
-  margin-bottom: 4px;
-}
-
-/* RESPONSIVE */
+/* --- Responsive --- */
 @media (max-width: 768px) {
-  .footer .subscribe-title,
-  .footer .contact-title {
-    font-size: 20px;
+  .footer-content {
+    grid-template-columns: 1fr;
   }
-
-  .footer .footer-subscribe-bottom form {
+  .subscribe-form {
     flex-direction: column;
-  }
-
-  .footer .footer-subscribe-bottom form > button,
-  .footer .footer-subscribe-bottom form > input {
-    width: 100%;
-  }
-
-  .footer-contact-wrapper {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-  .footer-contact-logo img {
-    max-width: 120px;
-  }
-  .footer .footer-contact-logo img {
-    max-width: 120px;
-  }
-
-  .footer-contact-info {
-    align-items: flex-start;
-  }
-  .footer .footer-contact-top {
-    align-items: flex-end;
   }
 }

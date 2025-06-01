@@ -1,28 +1,14 @@
-import { useState, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
-import "./Header.css";
+// src/components/Layout/Header.jsx
+import { Link } from "react-router-dom";
 import Search from "../../Modals/Search/Search";
+import "./Header.css";
 
 const Header = () => {
-  const user = JSON.parse(localStorage.getItem("user")); // ✅ parse edildi
-  const { pathname } = useLocation();
-
-  const [activeMenu, setActiveMenu] = useState(null);
-  const timeoutRef = useRef(null);
-
-  const handleMouseEnter = (key) => {
-    clearTimeout(timeoutRef.current);
-    setActiveMenu(key);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setActiveMenu(null);
-    }, 200);
-  };
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
     <header>
+      {/* Üst kısım: logo, arama, giriş/çıkış */}
       <div className="header-top">
         <div className="container header-wrapper">
           <div className="header-left">
@@ -30,9 +16,11 @@ const Header = () => {
               <img src="/logo/logo.png" alt="Site Logo" className="site-logo" />
             </Link>
           </div>
+
           <div className="header-center">
             <Search />
           </div>
+
           <div className="header-right">
             {!user ? (
               <>
@@ -71,96 +59,7 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="header-bottom">
-        <div className="container header-menu">
-          <div className="menu-item">
-            <Link
-              to="/"
-              className={`menu-link icon-link ${pathname === "/" && "active"}`}
-            >
-              <i className="bi bi-house"></i>
-            </Link>
-          </div>
-
-          {/* Alt Menü Kategorileri */}
-          {[
-            {
-              key: "3d",
-              name: "3D TASARIMLAR",
-              links: [
-                ["/3d/masaustu", "Masaüstü Objeler"],
-                ["/3d/dekoratif", "Dekoratif Tasarımlar"],
-              ],
-            },
-            {
-              key: "el",
-              name: "EL YAPIMI",
-              links: [
-                ["/el-yapimi/ahsap", "Ahşap Ürünler"],
-                ["/el-yapimi/kumas", "Kumaş Ürünler"],
-              ],
-            },
-            {
-              key: "seramik",
-              name: "SERAMİK KOLEKSİYONU",
-              links: [
-                ["/seramik/tabak", "Tabaklar"],
-                ["/seramik/kupa", "Kupalar"],
-              ],
-            },
-            {
-              key: "cam",
-              name: "CAM KOLEKSİYONU",
-              links: [
-                ["/cam/vazo", "Vazolar"],
-                ["/cam/sus", "Süs Eşyaları"],
-              ],
-            },
-            {
-              key: "pet",
-              name: "PET ÜRÜNLERİ",
-              links: [
-                ["/pet/oyuncak", "Oyuncaklar"],
-                ["/pet/mama", "Mama Kapları"],
-              ],
-            },
-            {
-              key: "aksesuar",
-              name: "AKSESUAR & YAŞAM",
-              links: [
-                ["/aksesuar/taki", "Takı & Aksesuar"],
-                ["/aksesuar/ev", "Ev Dekoru"],
-              ],
-            },
-            {
-              key: "anneler",
-              name: "ANNELER GÜNÜ HEDİYESİ",
-              links: [
-                ["/anneler-gunu/kisiye-ozel", "Kişiye Özel"],
-                ["/anneler-gunu/hazir-set", "Hazır Setler"],
-              ],
-            },
-          ].map(({ key, name, links }) => (
-            <div
-              key={key}
-              className="menu-item"
-              onMouseEnter={() => handleMouseEnter(key)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link to={`/${key}`} className="menu-link">
-                {name}
-              </Link>
-              <div className={`submenu ${activeMenu === key ? "show" : ""}`}>
-                {links.map(([url, label]) => (
-                  <Link to={url} key={url}>
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+     
     </header>
   );
 };
