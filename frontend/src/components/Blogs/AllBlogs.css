@@ -1,68 +1,103 @@
-.all-blogs {
-  padding: 50px 0;
-  background-color: #fefbf6;
-  color: #3f362c;
-  font-family: "Segoe UI", sans-serif;
-}
-
-.page-title {
-  text-align: center;
-  font-size: 32px;
-  margin-bottom: 40px;
-}
-
-.blog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 30px;
-  justify-content: center;
-}
-
 .blog-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100vw;
   background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  max-height: 480px;
+  transition: background-color 0.2s;
+  padding: 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ddd;
+}
+
+.blog-image2 {
+  width: 25% !important;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background-color: #f5f5f5;
+  display: block;
+}
+
+.blog-content {
+  width: 80%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
+  padding-right: 20px;
+  box-sizing: border-box;
 }
 
-.blog-card:hover {
-  transform: translateY(-4px);
-}
-
-.blog-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.blog-date {
-  font-size: 14px;
-  color: rgba(63, 54, 44, 0.6);
-  padding: 10px 16px 0;
+.blog-content {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Başlık ve içerik üstten başlasın */
+  padding-left: 20px; /* Fotoğraf ile içerik arasında boşluk */
+  box-sizing: border-box;
 }
 
 .blog-title {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 12px 16px 8px;
+  font-size: 1.5rem;
+  margin: 0 0 5px 0;
+  align-self: center; /* Başlığı yatayda ortalar */
+}
+
+.blog-date {
+  font-size: 0.9rem;
+  color: gray;
+  margin-bottom: 10px;
+  align-self: center; /* Tarihi de başlıkla aynı hizada ortala */
 }
 
 .blog-preview {
-  padding: 0 16px 20px;
-  color: #555;
-  font-size: 15px;
-  line-height: 1.5;
-  height: 72px; /* ~3 satır */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 1rem;
+  color: #333;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;          /* 4 satır */
   -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;            /* mutlaka normal olmalı */
+  width: 100%;                   /* genişliği tam ver */
+  /* text-overflow: ellipsis; */  /* Çok satırlıda kaldır */
+}
+@media screen and (max-width: 768px) {
+  .blog-card {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .blog-image2 {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+  }
+
+  .blog-content {
+    width: 100%;
+    padding: 10px 5px 0 5px;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .blog-title,
+  .blog-date {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .blog-title {
+    font-size: 1.2rem;
+  }
+
+  .blog-date {
+    font-size: 0.8rem;
+  }
+
+  .blog-preview {
+    font-size: 0.95rem;
+    -webkit-line-clamp: 5;
+  }
 }

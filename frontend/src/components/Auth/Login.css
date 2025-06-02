@@ -139,19 +139,33 @@
   line-height: 1.6;
 }
 
-/* Mobil Uyum */
 @media (max-width: 768px) {
   .login-page {
     flex-direction: column;
   }
 
+  .login-left,
+  .login-right {
+    flex: none;
+    width: 100%;
+  }
+
   .login-visual {
-    height: 200px;
+    height: 300px; /* biraz daha yüksek yapıldı */
     background-position: center;
+    border-radius: 20px; /* yuvarlama azaltıldı */
+    padding: 20px;
+    margin-bottom: 20px; /* araya boşluk eklendi */
   }
 
   .right-content {
-    padding: 10px;
-    font-size: 12px;
+    padding: 15px 10px;
+    font-size: 14px; /* biraz daha okunaklı */
+    max-width: 100%;
+  }
+
+  .login-box {
+    max-width: 100%;
+    padding: 0 20px;
   }
 }

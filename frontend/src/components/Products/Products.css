@@ -1,15 +1,15 @@
 /*! products start  */
 
 .products {
-    margin-bottom: 40px;
-  }
-  
-  .products .product-list {
-    display: flex;
-    gap: 20px;
-    
-  }
-  .product-slider-wrapper {
+  margin-bottom: 40px;
+}
+
+.products .product-list {
+  display: flex;
+  gap: 20px;
+}
+
+.product-slider-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -18,13 +18,7 @@
   margin-top: 30px;
 }
 
-.product-slider {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  flex: 1;
-}
-
+/* Ok butonları */
 .custom-arrow {
   width: 40px;
   height: 40px;
@@ -35,44 +29,53 @@
   font-size: 24px;
   cursor: pointer;
   transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  z-index: 10;
 }
 
 .custom-arrow:hover {
   background-color: #f2f2f2;
 }
 
-@media (max-width: 992px) {
-  .product-slider {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 520px) {
-  .product-slider {
-    grid-template-columns: repeat(1, 1fr);
-  }
-}
-.product-slider {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 20px;
-  flex: 1;
-  transition: transform 0.5s ease; /* ✨ KAYMA EFEKTİ */
-}
+/* Slider görünüm alanı */
 .product-slider-window {
   overflow: hidden;
   width: 100%;
+  touch-action: pan-y; /* yatay kaydırmaya izin ver */
 }
 
+/* Kaydırma alanı - flex ile yan yana kaydırma */
 .product-slider-track {
   display: flex;
   transition: transform 0.5s ease-in-out;
+  /* Kaydırma sırasında yumuşak hareket */
 }
 
+/* Her bir ürün */
 .product-slide {
-  flex: 0 0 calc(100% / 5); /* 5 ürün aynı anda */
+  flex: 0 0 calc(100% / 5); /* Desktop için 5 ürün göster */
   box-sizing: border-box;
   padding: 0 10px;
 }
 
-  /*! products end  */
+/* Responsive ayarlar */
+
+/* Tablet ve altı: 3 ürün göster */
+@media (max-width: 992px) {
+  .product-slide {
+    flex: 0 0 calc(100% / 3);
+  }
+}
+
+/* Mobil: 1.5 ürün göster ve kaydırma daha rahat */
+@media (max-width: 520px) {
+  .product-slide {
+    flex: 0 0 65%; /* Yaklaşık 1.5 ürün genişliği */
+    padding: 0 10px;
+  }
+}
+
+/*! products end  */

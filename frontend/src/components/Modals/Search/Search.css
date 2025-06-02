@@ -90,13 +90,20 @@
   font-weight: 600;
   margin-top: 4px;
 }
-
 @media (max-width: 768px) {
-  .search-input {
+  .search-input,
+  .search-form-inline.open .search-input {
+    display: none;
+  }
+
+  .search-form-inline.open .search-input {
+    display: block;
     width: 100%;
   }
 
-  .search-results-inline {
-    grid-template-columns: 1fr;
+  .search-form-inline {
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 10px;
   }
 }
