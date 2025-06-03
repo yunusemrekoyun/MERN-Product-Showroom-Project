@@ -145,3 +145,25 @@
 .load-more-button:hover {
   background-color: #b22222;
 }
+
+/* 🔽🔽🔽 Satın alma logoları için özel stil (eklenen kısım) 🔽🔽🔽 */
+.buy-link-logo-wrapper {
+  display: inline-block;
+  margin: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  background-color: white;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.buy-link-logo-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.buy-link-logo {
+  width: 140px;
+  height: auto;
+  display: block;
+}

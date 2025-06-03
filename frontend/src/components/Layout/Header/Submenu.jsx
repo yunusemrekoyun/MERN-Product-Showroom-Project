@@ -1,11 +1,11 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import "./Submenu.css";
 
 const Submenu = ({
   subcategories,
   position,
-  parentCategory,
+  parentCategoryId,
   onMouseEnter,
   onMouseLeave,
 }) => {
@@ -22,22 +22,27 @@ const Submenu = ({
       onMouseLeave={onMouseLeave}
     >
       {subcategories.map((sub, i) => (
-        <Link key={i} to={`/${parentCategory}/${sub}`} className="submenu-item">
+        <Link
+          key={i}
+          to={`/shop?category=${parentCategoryId}&subcategory=${sub}`}
+          className="submenu-item"
+        >
           {sub}
         </Link>
       ))}
     </div>
   );
 };
+
 Submenu.propTypes = {
   subcategories: PropTypes.arrayOf(PropTypes.string),
   position: PropTypes.shape({
     top: PropTypes.number,
-    left: PropTypes.number
+    left: PropTypes.number,
   }),
-  parentCategory: PropTypes.string.isRequired,
+  parentCategoryId: PropTypes.string.isRequired,
   onMouseEnter: PropTypes.func,
-  onMouseLeave: PropTypes.func
+  onMouseLeave: PropTypes.func,
 };
 
 export default Submenu;

@@ -108,7 +108,7 @@ const UpdateProductPage = () => {
       formData.append("name", values.name);
       formData.append("category", values.category);
       formData.append("subcategory", values.subcategory || "");
-      formData.append("buyLink", values.buyLink || "");
+      formData.append("buyLink", JSON.stringify(values.buyLink || []));
       formData.append(
         "price",
         JSON.stringify({ current: values.current, discount: values.discount })
@@ -186,8 +186,12 @@ const UpdateProductPage = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Satın Alma Linki" name="buyLink">
-          <Input placeholder="https://..." />
+        <Form.Item label="Satın Alma Linkleri" name="buyLink">
+          <Select
+            mode="tags"
+            tokenSeparators={[",", "\n"]}
+            placeholder="Her linkten sonra Enter'a basın"
+          />
         </Form.Item>
 
         <Form.Item label="Fiyat">
@@ -205,7 +209,7 @@ const UpdateProductPage = () => {
             </Form.Item>
           </Space.Compact>
         </Form.Item>
-{/* 
+        {/* 
         <Form.Item label="Opsiyon 1" name="opt1">
           <Input.TextArea />
         </Form.Item>

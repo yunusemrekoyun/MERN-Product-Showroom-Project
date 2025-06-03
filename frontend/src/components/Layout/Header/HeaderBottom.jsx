@@ -44,7 +44,7 @@ const HeaderBottom = () => {
     const rect = event.currentTarget.getBoundingClientRect();
     setSubmenuData({
       items: cat.subcategories,
-      parent: cat.name,
+      parentCategoryId: cat._id,
       position: {
         top: rect.bottom + 2,
         left: rect.left,
@@ -77,10 +77,8 @@ const HeaderBottom = () => {
     <div className="header-bottom">
       <div className="header-menu-scroll">
         <div className="header-menu">
-          {/* Sol boşluk */}
           <div className="menu-spacer" />
 
-          {/* Ana Sayfa */}
           <div className="menu-item">
             <Link
               to="/"
@@ -92,7 +90,6 @@ const HeaderBottom = () => {
             </Link>
           </div>
 
-          {/* Kategoriler */}
           {categories.map((cat, index) => (
             <div
               key={cat._id}
@@ -103,7 +100,7 @@ const HeaderBottom = () => {
               onMouseLeave={handleMouseLeave}
             >
               <Link
-                to={`/${cat.name}`}
+                to={`/shop?category=${cat._id}`}
                 className={`menu-link ${
                   pathname.includes(cat.name) ? "active" : ""
                 }`}
@@ -113,18 +110,16 @@ const HeaderBottom = () => {
             </div>
           ))}
 
-          {/* Sağ boşluk */}
           <div className="menu-spacer" />
         </div>
       </div>
 
-      {/* Alt Menü */}
       {submenuData && (
         <div className="submenu-wrapper">
           <Submenu
             subcategories={submenuData.items}
             position={submenuData.position}
-            parentCategory={submenuData.parent}
+            parentCategoryId={submenuData.parentCategoryId}
             onMouseEnter={handleSubmenuEnter}
             onMouseLeave={handleSubmenuLeave}
           />

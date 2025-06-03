@@ -107,7 +107,7 @@ router.post(
         mainDescription,
         childDescription1,
         childDescription2,
-        buyLink,
+        buyLink: JSON.parse(buyLink || "[]"),
         mainImages: mapImages(req.files?.mainImages),
         childImages1: mapImages(req.files?.childImages1),
         childImages2: mapImages(req.files?.childImages2),
@@ -157,7 +157,7 @@ router.put(
         mainDescription,
         childDescription1,
         childDescription2,
-        buyLink,
+        buyLink: JSON.parse(buyLink || "[]"), 
       };
 
       const mapImages = (files) =>

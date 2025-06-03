@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import "./PurchaseAndReviews.css";
 
 const PurchaseAndReviews = ({ product }) => {
+  console.log("BUY LINK →", product?.buyLink); // 👈 bunu ekle
+
   const [activeTab, setActiveTab] = useState("buy");
   const [comments, setComments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -25,7 +27,8 @@ const PurchaseAndReviews = ({ product }) => {
           );
           if (!res.ok) throw new Error();
           const data = await res.json();
-          setComments(data.reviews);
+          const filtered = data.reviews.filter((item) => item.user !== null);
+          setComments(filtered);
         } catch {
           message.error("Yorumlar yüklenemedi");
         }
@@ -56,12 +59,13 @@ const PurchaseAndReviews = ({ product }) => {
 
       setValue("");
       setRating(0);
-      // Yorumları yeniden çek
+
       const updated = await fetch(
         `${apiUrl}/api/product-reviews/${product._id}`
       );
       const updatedData = await updated.json();
-      setComments(updatedData.reviews);
+      const filtered = updatedData.reviews.filter((item) => item.user !== null);
+      setComments(filtered);
     } catch {
       message.error("Yorum eklenemedi");
     } finally {
@@ -90,25 +94,51 @@ const PurchaseAndReviews = ({ product }) => {
 
       {activeTab === "buy" && (
         <div className="purchase-links">
-          {product?.buyLink?.length > 0 ? (
-            product.buyLink.map((link, index) => (
-              <a
-                key={index}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <button className="buy-btn">
-                  {new URL(link).hostname.replace("www.", "")}&#39;da Satın Al
-                </button>
-              </a>
-            ))
+          {Array.isArray(product?.buyLink) && product.buyLink.length > 0 ? (
+            product.buyLink.map((link, index) => {
+              let logoSrc = null;
+              let altText = "";
+              let hostname = "";
+
+              try {
+                const url = new URL(link);
+                hostname = url.hostname.replace("www.", "");
+
+                if (hostname.includes("trendyol")) {
+                  logoSrc = "/img/shop/trendyol-logo.png";
+                  altText = "Trendyol'da Satın Al";
+                } else if (hostname.includes("ciceksepeti")) {
+                  logoSrc = "/img/shop/ciceksepeti-logo.png";
+                  altText = "ÇiçekSepeti'nde Satın Al";
+                }
+              } catch {
+                return null; // Geçersiz bağlantı varsa hiçbir şey gösterme
+              }
+
+              if (!logoSrc) return null;
+
+              return (
+                <a
+                  key={index}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="buy-link-logo-wrapper"
+                >
+                  <img
+                    src={logoSrc}
+                    alt={altText}
+                    className="buy-link-logo"
+                    title={altText}
+                  />
+                </a>
+              );
+            })
           ) : (
             <div className="no-buy-link">Satın alma bağlantısı bulunamadı.</div>
           )}
         </div>
       )}
-
       {activeTab === "reviews" && (
         <div className="comments-section">
           <h3>Yorumlar ({comments.length})</h3>

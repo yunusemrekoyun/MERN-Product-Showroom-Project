@@ -7,7 +7,7 @@ import {
   Spin,
   Upload,
   message,
-  Space
+  Space,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -71,7 +71,7 @@ const CreateProductPage = () => {
       formData.append("name", values.name);
       formData.append("category", values.category);
       formData.append("subcategory", values.subcategory || "");
-      formData.append("buyLink", values.buyLink || "");
+      formData.append("buyLink", JSON.stringify(values.buyLink || []));
       formData.append(
         "price",
         JSON.stringify({ current: values.current, discount: values.discount })
@@ -157,8 +157,12 @@ const CreateProductPage = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Satın Alma Linki" name="buyLink">
-          <Input placeholder="https://..." />
+        <Form.Item label="Satın Alma Linkleri" name="buyLink">
+          <Select
+            mode="tags"
+            tokenSeparators={[",", "\n"]}
+            placeholder="Her linkten sonra Enter'a basın"
+          />
         </Form.Item>
 
         <Form.Item label="Fiyat">
@@ -176,14 +180,6 @@ const CreateProductPage = () => {
             </Form.Item>
           </Space.Compact>
         </Form.Item>
-
-        {/* <Form.Item label="Opsiyon 1 (renk vs)" name="opt1">
-          <Input.TextArea placeholder="Her satıra bir seçenek" />
-        </Form.Item>
-
-        <Form.Item label="Opsiyon 2 (beden vs)" name="opt2">
-          <Input.TextArea placeholder="Her satıra bir seçenek" />
-        </Form.Item> */}
 
         <Form.Item label="Ana Açıklama" name="mainDescription">
           <Input.TextArea autoSize={{ minRows: 2 }} />
