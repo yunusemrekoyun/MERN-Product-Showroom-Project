@@ -74,7 +74,7 @@ const Search = () => {
                 />
                 <div className="search-info">
                   <div className="search-name">{item.name}</div>
-                  {item.price?.current != null && (
+                  {/* {item.price?.current != null && (
                     <div className="search-price">
                       ₺
                       {item.price.current.toLocaleString("tr-TR", {
@@ -82,7 +82,7 @@ const Search = () => {
                         maximumFractionDigits: 2,
                       })}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </Link>
             ))

@@ -12,26 +12,29 @@
   padding: 10px 0;
 }
 
-.header-menu-scroll {
+/* Yeni scroll sistemi */
+.header-menu-outer {
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0; /* Scroll dışı boşluk kaldırıldı */
-  box-sizing: border-box;
-  width: 100%;
   -webkit-overflow-scrolling: touch;
+  padding: 0 0;
 }
 
-.header-menu-scroll::-webkit-scrollbar {
+.header-menu-outer::-webkit-scrollbar {
   display: none;
 }
-
-.header-menu {
+.menu-link.icon-link i {
+  font-size: 18px; /* 🔼 Default muhtemelen 16px civarındaydı */
+}
+.header-menu-inner {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   gap: 32px;
   min-width: max-content;
-  padding: 0; /* eski vw paddingleri kaldırılıyor */
+  margin: 0 auto; /* ✅ Ortalamayı sağlar */
+  padding: 0 24px;
+  max-width: 1200px; /* ✅ Genişlik sınırlanır */
 }
 
 .menu-item {
@@ -39,16 +42,7 @@
   padding: 6px 0;
   flex-shrink: 0;
 }
-.menu-item:first-of-type {
-  margin-left: 48px;
-}
-.menu-item:last-of-type {
-  margin-right: 48px;
-}
 
-.menu-item.last-item {
-  margin-right: 24px;
-}
 .menu-link {
   font-size: 14px;
   color: #222;
@@ -76,19 +70,8 @@
   left: 0;
 }
 
-/* ✅ Scroll alanı içinde sol/sağ boşluk */
-.menu-spacer {
-  width: 24px;
-  flex-shrink: 0;
-}
-
-/* 🔧 Responsive: Mobilde boşluğu azalt */
 @media (max-width: 768px) {
-  .menu-spacer {
-    width: 24px;
-  }
-
-  .header-menu {
+  .header-menu-inner {
     gap: 20px;
   }
 

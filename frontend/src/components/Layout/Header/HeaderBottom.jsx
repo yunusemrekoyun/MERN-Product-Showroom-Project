@@ -61,7 +61,6 @@ const HeaderBottom = () => {
     }, 150);
   };
 
-  
   const handleSubmenuEnter = () => {
     clearTimeout(timeoutRef.current);
     setSubmenuVisible(true);
@@ -76,10 +75,8 @@ const HeaderBottom = () => {
 
   return (
     <div className="header-bottom">
-      <div className="header-menu-scroll">
-        <div className="header-menu">
-          <div className="menu-spacer" />
-
+      <div className="header-menu-outer">
+        <div className="header-menu-inner">
           <div className="menu-item">
             <Link
               to="/"
@@ -91,12 +88,10 @@ const HeaderBottom = () => {
             </Link>
           </div>
 
-          {categories.map((cat, index) => (
+          {categories.map((cat) => (
             <div
               key={cat._id}
-              className={`menu-item ${
-                index === categories.length - 1 ? "last-item" : ""
-              }`}
+              className="menu-item"
               onMouseEnter={(e) => handleMouseEnter(e, cat)}
               onMouseLeave={handleMouseLeave}
             >
@@ -110,8 +105,6 @@ const HeaderBottom = () => {
               </Link>
             </div>
           ))}
-
-          <div className="menu-spacer" />
         </div>
       </div>
 

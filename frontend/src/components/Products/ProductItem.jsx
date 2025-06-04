@@ -85,16 +85,27 @@ const ProductItem = ({ productItem }) => {
     </div>
   );
 };
+/*BU ALAN DAHA SONRA EKLENECEK E-COMMERCE ÜRÜN DETAYLARI İÇİN
+// ProductItem.propTypes = {
+//   productItem: PropTypes.shape({
+//     _id: PropTypes.string.isRequired,
+//     name: PropTypes.string.isRequired,
+//     price: PropTypes.shape({
+//       current: PropTypes.number.isRequired,
+//       discount: PropTypes.number,
+//     }).isRequired,
+//   }).isRequired,
+// };
+*/
 
 ProductItem.propTypes = {
   productItem: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     price: PropTypes.shape({
-      current: PropTypes.number.isRequired,
+      current: PropTypes.number,
       discount: PropTypes.number,
-    }).isRequired,
+    }),
   }).isRequired,
 };
-
 export default ProductItem;
