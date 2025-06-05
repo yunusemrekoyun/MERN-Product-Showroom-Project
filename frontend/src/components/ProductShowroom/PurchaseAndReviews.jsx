@@ -6,8 +6,6 @@ import dayjs from "dayjs";
 import "./PurchaseAndReviews.css";
 
 const PurchaseAndReviews = ({ product }) => {
-  console.log("BUY LINK →", product?.buyLink); // 👈 bunu ekle
-
   const [activeTab, setActiveTab] = useState("buy");
   const [comments, setComments] = useState([]);
   const [submitting, setSubmitting] = useState(false);

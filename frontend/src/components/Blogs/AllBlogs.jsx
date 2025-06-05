@@ -18,9 +18,7 @@ const AllBlogs = () => {
         setBlogs(data);
       } catch {
         message.error("Bloglar yüklenemedi");
-        console.log("Çekilen Bloglar:", blogs);
       }
-      console.log("API URL:", apiUrl);
     };
     fetchBlogs();
   }, [apiUrl]);
@@ -47,9 +45,7 @@ const AllBlogs = () => {
                 <p className="blog-date">
                   {dayjs(blog.createdAt).format("DD MMM YYYY")}
                 </p>
-                <p className="blog-preview">
-                  {blog.content}
-                </p>
+                <p className="blog-preview">{blog.content}</p>
               </div>
             </div>
           ))}

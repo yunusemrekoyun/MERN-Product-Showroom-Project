@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { List, Avatar, Form, Button, Input, message } from "antd";
 import { Comment } from "@ant-design/compatible";
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ const BlogComments = ({ blogId, user }) => {
   const [visibleCount, setVisibleCount] = useState(5); // ✅ yeni
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const res = await fetch(`${apiUrl}/api/blogs/${blogId}/comments`);
       if (!res.ok) throw new Error();
@@ -21,11 +21,11 @@ const BlogComments = ({ blogId, user }) => {
     } catch {
       message.error("Yorumlar yüklenemedi");
     }
-  };
+  }, [apiUrl, blogId]);
 
   useEffect(() => {
     fetchComments();
-  }, [apiUrl, blogId]);
+  }, [fetchComments]);
 
   const handleSubmit = async () => {
     if (!user) return message.warning("Yorum yapmak için giriş yapın");

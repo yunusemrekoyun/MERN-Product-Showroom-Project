@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { message } from "antd";
 import dayjs from "dayjs";
 import BlogComments from "../BlogComments/BlogComments";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 
@@ -22,7 +21,6 @@ const BlogDetails = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  // Blog detaylarını çek
   useEffect(() => {
     const fetchBlog = async () => {
       try {
@@ -37,11 +35,9 @@ const BlogDetails = () => {
         message.error("Blog yüklenemedi");
       }
     };
-
     fetchBlog();
   }, [apiUrl, blogId, storedUser]);
 
-  // Beğeni işlemi
   const handleLike = async () => {
     if (!storedUser) return message.warning("Beğenmek için giriş yapın!");
 
@@ -62,15 +58,13 @@ const BlogDetails = () => {
     }
   };
 
-  // Yüklenme durumu
   if (!blog) return <div className="loading">Yükleniyor...</div>;
 
   return (
     <section className="single-blog">
       <div className="container">
         <article>
-          {/* Çoklu görsel varsa Swiper, yoksa tek görsel */}
-          {blog.images?.length > 1 ? (
+          {blog.imagesCount > 1 ? (
             <Swiper
               modules={[Navigation, Pagination, Autoplay]}
               spaceBetween={20}
@@ -80,33 +74,30 @@ const BlogDetails = () => {
               autoplay={{ delay: 3500 }}
               className="blog-slider"
             >
-              {blog.images.map((_, idx) => (
+              {Array.from({ length: blog.imagesCount }).map((_, idx) => (
                 <SwiperSlide key={idx}>
                   <img
                     src={`${apiUrl}/api/blogs/${blogId}/image/${idx}`}
                     alt={blog.title}
-                    className="blog-image limited-image"
+                    className="blog-image"
                     onError={(e) => (e.target.src = "/img/fallback.jpg")}
                   />
                 </SwiperSlide>
               ))}
             </Swiper>
-          ) : (
-            blog.images?.[0] && (
-              <img
-                src={`data:image/png;base64,${blog.images[0]}`}
-                alt={blog.title}
-                className="blog-image limited-image"
-              />
-            )
-          )}
+          ) : blog.imagesCount === 1 ? (
+            <img
+              src={`${apiUrl}/api/blogs/${blogId}/image/0`}
+              alt={blog.title}
+              className="blog-image"
+              onError={(e) => (e.target.src = "/img/fallback.jpg")}
+            />
+          ) : null}
 
           <div className="blog-wrapper">
             <div className="blog-meta">
-              <span className="blog-date">
-                {dayjs(blog.createdAt).format("DD MMM, YYYY")}
-              </span>
-              <span className="blog-id">#{blog.blogId}</span>
+              <span>{dayjs(blog.createdAt).format("DD MMM, YYYY")}</span>
+              <span>#{blog.blogId}</span>
               <button
                 className={`blog-like-button ${liked ? "liked" : ""}`}
                 onClick={handleLike}
@@ -130,7 +121,6 @@ const BlogDetails = () => {
           </div>
         </article>
 
-        {/* Yorumlar sadece açıkken gösterilir */}
         {showComments && (
           <div className="comment-section">
             <BlogComments blogId={blogId} user={storedUser} />

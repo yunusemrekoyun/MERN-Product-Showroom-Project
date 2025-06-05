@@ -30,13 +30,20 @@ router.get("/", async (req, res) => {
   res.json(blogs);
 });
 
-// GET single blog by blogId (images hariç)
+// GET single blog by blogId (images hariç, ama count dahil)
 router.get("/:blogId", async (req, res) => {
-  const blog = await Blog.findOne({ blogId: req.params.blogId }).select(
-    "-images"
-  );
-  if (!blog) return res.status(404).json({ error: "Blog bulunamadı." });
-  res.json(blog);
+  try {
+    const blog = await Blog.findOne({ blogId: req.params.blogId });
+    if (!blog) return res.status(404).json({ error: "Blog bulunamadı." });
+
+    const blogObj = blog.toObject();
+    blogObj.imagesCount = blog.images.length;
+    delete blogObj.images; // görselleri JSON'dan çıkar
+
+    res.json(blogObj);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ✅ GET specific image by index

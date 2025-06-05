@@ -1,7 +1,9 @@
 /* CampaignSingle.css */
 .campaign-single {
   background-image: url(../../img/single-campaign.png);
-  background-attachment: fixed;
+  background-size: cover; /* Görsel alanı kaplasın */
+  background-repeat: no-repeat; /* Görsel tekrar etmesin */
+  background-position: center center; /* Ortalanmış şekilde hizalansın */
   padding: 140px 15px;
   display: flex;
   align-items: center;

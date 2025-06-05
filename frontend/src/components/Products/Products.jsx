@@ -6,21 +6,35 @@ import { message } from "antd";
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleProducts, setVisibleProducts] = useState(5);
 
-  const visibleProducts = 5;
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  useEffect(() => {
+    const updateVisibleCount = () => {
+      const width = window.innerWidth;
+      if (width <= 520) {
+        setVisibleProducts(1.5);
+      } else if (width <= 992) {
+        setVisibleProducts(3);
+      } else {
+        setVisibleProducts(5);
+      }
+    };
+    updateVisibleCount();
+    window.addEventListener("resize", updateVisibleCount);
+    return () => window.removeEventListener("resize", updateVisibleCount);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // sayfalama parametreleri ekledik, ilk 20 ürünü alıyoruz
         const response = await fetch(`${apiUrl}/api/products?page=1&limit=20`);
         if (!response.ok) {
           message.error("Veri getirme başarısız.");
           return;
         }
         const result = await response.json();
-        // result = { total, page, totalPages, products: [ … ] }
         setProducts(result.products);
       } catch (error) {
         console.error("Veri hatası:", error);
@@ -30,7 +44,21 @@ const Products = () => {
     fetchProducts();
   }, [apiUrl]);
 
-  const maxIndex = Math.max(0, products.length - visibleProducts);
+  const maxIndex = Math.max(0, products.length - Math.floor(visibleProducts));
+
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 520;
+    if (!isMobile) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
+        return nextIndex > maxIndex ? 0 : nextIndex;
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [maxIndex]);
 
   const next = () => {
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));

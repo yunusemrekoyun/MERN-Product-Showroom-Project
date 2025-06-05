@@ -51,9 +51,9 @@
 
 /* 🎯 Yorum butonu: pastel turuncu */
 .comments-section .ant-btn-primary {
-  background-color: #eaa44d;
-  border-color: #eaa44d;
-  color: #fff;
+  background-color: #8c5b3f !important;
+  border-color: #8c5b3f !important;
+  color: #fff !important;
   font-weight: 500;
   padding: 6px 18px;
   border-radius: 8px;
@@ -62,6 +62,9 @@
 .comments-section .ant-btn-primary:hover {
   background-color: #d98f37;
   border-color: #d98f37;
+}
+.ant-btn-variant-solid {
+  background: #eaa44d;
 }
 .load-more-button {
   padding: 10px 20px;
@@ -76,4 +79,11 @@
 
 .load-more-button:hover {
   background-color: #b22222;
+}
+.comments-section .ant-btn-primary:hover,
+.comments-section .ant-btn-primary:focus,
+.comments-section .ant-btn-primary:active {
+  background-color: #6f4432 !important;
+  border-color: #6f4432 !important;
+  color: #fff !important;
 }
