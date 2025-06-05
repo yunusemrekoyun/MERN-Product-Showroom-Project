@@ -11,13 +11,21 @@ const Submenu = ({
 }) => {
   if (!subcategories || subcategories.length === 0) return null;
 
+  const isTouchDevice =
+    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+  const style = position
+    ? {
+        top: position.top,
+        left: position.left,
+        position: "fixed",
+      }
+    : undefined;
+
   return (
     <div
-      className="submenu-container"
-      style={{
-        top: position?.top || 0,
-        left: position?.left || 0,
-      }}
+      className={`submenu-container ${isTouchDevice ? "submenu-mobile" : ""}`}
+      style={style}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

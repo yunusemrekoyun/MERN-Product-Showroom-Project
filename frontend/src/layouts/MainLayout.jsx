@@ -2,7 +2,7 @@
 import Footer from "../components/Layout/Footer/Footer";
 import Header from "../components/Layout/Header/Header";
 import HeaderBottom from "../components/Layout/Header/HeaderBottom";
-
+import "./MainLayout.css";
 import Proptypes from "prop-types";
 // import Search from "../components/Modals/Search/Search";
 // import Dialog from "../components/Modals/Dialog/Dialog";

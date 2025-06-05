@@ -1,0 +1,6 @@
+/*  🔽  SADECE DESKTOP (Header sabit)  🔽  */
+@media (min-width: 769px) {
+  .main-layout {
+    padding-top: 100px; /* Header yüksekliği kadar */
+  }
+}

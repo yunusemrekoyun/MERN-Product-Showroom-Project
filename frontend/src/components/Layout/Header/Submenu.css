@@ -4,23 +4,32 @@
   border: 1px solid #eee4c6;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
   border-left: 3px solid #d4a017;
-  border-radius: 4px;
-  min-width: 220px;
+  border-radius: 6px;
   z-index: 9999;
-  padding: 12px 0;
-  display: flex;
-  flex-direction: column;
   animation: fadeIn 0.2s ease-in-out;
+  display: flex;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 6px;
+  padding: 10px;
+  min-width: 220px;
+  max-width: 90vw;
+  width: fit-content;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
 }
 
 .submenu-item {
-  padding: 10px 18px;
   text-decoration: none;
   color: #333;
-  font-size: 14px;
-  border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease, color 0.2s ease;
   white-space: nowrap;
+  padding: 12px 18px;
+  font-size: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .submenu-item:last-child {
@@ -28,8 +37,9 @@
 }
 
 .submenu-item:hover {
-  background-color: #fef6e5;
-  color: #d4a017;
+  background-color: var(--accent-light);
+  color: var(--accent-color);
+  transform: translateX(4px);
 }
 
 @keyframes fadeIn {
@@ -40,5 +50,30 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@media (max-width: 768px) {
+  .submenu-container.submenu-mobile {
+    position: static;
+    border: none;
+    border-left: none;
+    box-shadow: none;
+    padding: 6px 0;
+    animation: none;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    margin-top: 6px;
+    min-width: unset;
+    max-width: 90vw;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .submenu-container.submenu-mobile .submenu-item {
+    font-size: 14px;
+    padding: 8px 16px;
+    border-bottom: 1px solid #eaeaea;
   }
 }

@@ -1,8 +1,10 @@
+/* src/components/Modals/Search/Search.css */
 .search-inline-wrapper {
   position: relative;
   width: 100%;
 }
 
+/* ---------- FORM ---------- */
 .search-form-inline {
   display: flex;
   align-items: center;
@@ -12,61 +14,59 @@
   border-radius: 8px;
   font-size: 16px;
 }
-
 .search-input {
-  width: 650px;
-  padding: 10px 16px;
+  flex: 1;
+  width: 100%;
+  padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
-  background-color: #f9f9f9;
+  background: #f9f9f9;
 }
 
 .search-form-inline button {
-  background-color: transparent;
+  background: transparent;
   border: none;
   cursor: pointer;
   padding: 8px;
 }
-
 .search-form-inline button i {
   font-size: 18px;
   color: #555;
 }
 
+/* ---------- SONUÇ KUTUSU ---------- */
 .search-results-inline {
   position: absolute;
-  z-index: 2000;
   top: 100%;
   left: 0;
   margin-top: 8px;
   width: 100%;
-  background: white;
+  background: #fff;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  z-index: 99;
   padding: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
+  z-index: 99;
 }
 
+/* tek sonuç kartı */
 .result-item {
   display: flex;
   gap: 12px;
   align-items: center;
   padding: 8px;
   border: 1px solid #eee;
+  background: #fff;
   text-decoration: none;
   color: #333;
-  background-color: #fff;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
-
 .result-item:hover {
-  background-color: #f5f5f5;
+  background: #f5f5f5;
 }
-
 .result-item.empty {
   justify-content: center;
   font-weight: 500;
@@ -78,32 +78,35 @@
   height: 50px;
   object-fit: contain;
 }
-
 .search-info {
   display: flex;
   flex-direction: column;
   font-size: 14px;
 }
-
 .search-price {
   color: #dc3545;
   font-weight: 600;
   margin-top: 4px;
 }
-@media (max-width: 768px) {
-  .search-input,
-  .search-form-inline.open .search-input {
-    display: none;
-  }
 
-  .search-form-inline.open .search-input {
+/* ---------- MOBİL  (<768 px) ---------- */
+@media (max-width: 768px) {
+  /* 1) Input HER ZAMAN görünür, 100 % genişlik */
+  .search-input {
     display: block;
     width: 100%;
   }
 
+  /* 2) Form hizası */
   .search-form-inline {
-    flex-direction: row;
-    justify-content: flex-end;
     padding: 10px;
+  }
+
+  /* 3) Sonuç kutusu tek sütun */
+  .search-results-inline {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    grid-template-columns: 1fr;
   }
 }
