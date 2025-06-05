@@ -13,7 +13,18 @@
 .blog-item:hover {
   transform: translateY(-4px);
 }
+.blog-title-link {
+  display: inline-block;
+  text-align: left;
+  color: #333;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 600;
+}
 
+.blog-title-link:hover {
+  color: #e63b51;
+}
 /* ✅ Görsel wrapper */
 .blog-image-wrapper {
   display: block;

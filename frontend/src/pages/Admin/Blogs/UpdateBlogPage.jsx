@@ -1,4 +1,5 @@
-import { Button, Form, Spin, Upload, message, Space, Input } from "antd";
+// src/pages/Admin/Blogs/UpdateBlogPage.jsx
+import { Button, Form, Input, Spin, Upload, message, Space } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,7 +10,9 @@ import imageCompression from "browser-image-compression";
 const UpdateBlogPage = () => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [removedIndexes, setRemovedIndexes] = useState([]);
   const [form] = Form.useForm();
+
   const navigate = useNavigate();
   const { blogId } = useParams();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -18,22 +21,25 @@ const UpdateBlogPage = () => {
     const fetchBlog = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
+        const res = await fetch(
+          `${apiUrl}/api/blogs/${blogId}?withImages=true`
+        );
         if (!res.ok) throw new Error("Blog bulunamadı");
-        const blog = await res.json();
 
-        form.setFieldsValue({
-          title: blog.title,
-          content: blog.content,
-        });
+        const blog = await res.json();
+        const { title, content, images = [] } = blog;
+
+        form.setFieldsValue({ title, content });
 
         setFileList(
-          blog.images.map((_, i) => ({
+          images.map((img, i) => ({
             uid: `${blog.blogId}-${i}`,
             name: `Görsel ${i + 1}`,
             status: "done",
             url: `${apiUrl}/api/blogs/${blog.blogId}/image/${i}`,
             thumbUrl: `${apiUrl}/api/blogs/${blog.blogId}/image/${i}`,
+            type: img.contentType || "image/jpeg",
+            index: i,
           }))
         );
       } catch (err) {
@@ -43,48 +49,61 @@ const UpdateBlogPage = () => {
         setLoading(false);
       }
     };
+
     fetchBlog();
   }, [apiUrl, blogId, form]);
 
-  const handleUploadChange = ({ fileList }) => {
-    setFileList(fileList.slice(-3));
+  const handleUploadChange = ({ fileList: newFileList }) => {
+    const updatedList = newFileList.slice(-3);
+
+    const removed = fileList.filter(
+      (prevFile) => !updatedList.find((f) => f.uid === prevFile.uid)
+    );
+
+    removed.forEach((f) => {
+      if (typeof f.index === "number") {
+        setRemovedIndexes((prev) => [...prev, f.index]);
+      }
+    });
+
+    setFileList(updatedList);
   };
 
   const onFinish = async (values) => {
     setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("content", values.content);
 
-      for (const file of fileList) {
-        if (file.originFileObj) {
-          const compressed = await imageCompression(file.originFileObj, {
-            maxSizeMB: 0.5,
-            maxWidthOrHeight: 1024,
-            useWebWorker: true,
-          });
-          formData.append("images", compressed);
-        }
-      }
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("content", values.content);
 
-      const res = await fetch(`${apiUrl}/api/blogs/${blogId}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (res.ok) {
-        message.success("Blog başarıyla güncellendi");
-        navigate("/admin/blogs");
-      } else {
-        message.error("Blog güncellenemedi");
-      }
-    } catch (err) {
-      console.error(err);
-      message.error("Sunucu hatası oluştu");
-    } finally {
-      setLoading(false);
+    if (removedIndexes.length > 0) {
+      formData.append("toDeleteIndexes", JSON.stringify(removedIndexes));
     }
+
+    for (const f of fileList) {
+      if (f.originFileObj) {
+        const compressed = await imageCompression(f.originFileObj, {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
+        });
+        formData.append("images", compressed);
+      }
+    }
+
+    const res = await fetch(`${apiUrl}/api/blogs/${blogId}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (res.ok) {
+      message.success("Blog başarıyla güncellendi");
+      navigate("/admin/blogs");
+    } else {
+      message.error("Blog güncellenemedi");
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -106,6 +125,8 @@ const UpdateBlogPage = () => {
         <Form.Item
           label="İçerik"
           name="content"
+          valuePropName="value"
+          getValueFromEvent={(content) => content}
           rules={[{ required: true, message: "Lütfen içerik girin" }]}
         >
           <ReactQuill theme="snow" style={{ background: "#fff" }} />

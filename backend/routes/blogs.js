@@ -38,8 +38,9 @@ router.get("/:blogId", async (req, res) => {
 
     const blogObj = blog.toObject();
     blogObj.imagesCount = blog.images.length;
-    delete blogObj.images; // görselleri JSON'dan çıkar
-
+    if (!req.query.withImages) {
+      delete blogObj.images;
+    }
     res.json(blogObj);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -62,24 +63,44 @@ router.get("/:blogId/image/:index", async (req, res) => {
   }
 });
 
-// UPDATE (text & görsel linkleri)
-router.put("/:blogId", upload.none(), async (req, res) => {
+//  PUT /api/blogs/:blogId route
+router.put("/:blogId", upload.array("images", 3), async (req, res) => {
   try {
-    const { title, content, images } = req.body;
-    const parsedImages = JSON.parse(images); // sadece { data, contentType } içeren array
+    const blog = await Blog.findOne({ blogId: req.params.blogId });
+    if (!blog) return res.status(404).json({ error: "Blog bulunamadı." });
 
-    const blog = await Blog.findOneAndUpdate(
-      { blogId: req.params.blogId },
-      {
-        title,
-        content,
-        images: parsedImages,
-      },
-      { new: true }
-    );
+    if (req.body.title) blog.title = req.body.title;
+    if (req.body.content) blog.content = req.body.content;
 
-    res.json(blog);
+    // 🔍 Silinecek eski görsellerin indexlerini al
+    const toDeleteIndexes = req.body.toDeleteIndexes
+      ? JSON.parse(req.body.toDeleteIndexes)
+      : [];
+
+    // Sırayla sil
+    toDeleteIndexes
+      .sort((a, b) => b - a)
+      .forEach((i) => blog.images.splice(i, 1));
+
+    // Yeni görseller varsa ekle
+    if (req.files?.length) {
+      blog.images.push(
+        ...req.files.map((f) => ({ data: f.buffer, contentType: f.mimetype }))
+      );
+    }
+
+    // Toplam en fazla 3 görsel
+    blog.images = blog.images.slice(0, 3);
+
+    await blog.save();
+
+    const obj = blog.toObject();
+    obj.imagesCount = blog.images.length;
+    delete obj.images;
+
+    res.json(obj);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

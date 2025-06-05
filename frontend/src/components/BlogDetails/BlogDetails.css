@@ -55,7 +55,6 @@
   color: #8c5b3f;
   margin-bottom: 24px;
 }
-
 .blog-content {
   font-size: 17px;
   line-height: 1.8;
@@ -63,6 +62,9 @@
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: normal;
+  margin: 0 auto;
+  text-align: center; /* yazılar ortalı kalsın */
+  max-width: 700px; /* içerik fazla yayılmasın ama boğmasın da */
 }
 
 .blog-content p {

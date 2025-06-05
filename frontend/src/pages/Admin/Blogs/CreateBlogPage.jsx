@@ -12,7 +12,7 @@ const CreateBlogPage = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleUploadChange = ({ fileList }) => {
-    setFileList(fileList.slice(-3)); // En fazla 3 görsel
+    setFileList(fileList.slice(-3));
   };
 
   const onFinish = async (values) => {
@@ -78,6 +78,8 @@ const CreateBlogPage = () => {
         <Form.Item
           label="İçerik"
           name="content"
+          valuePropName="value"
+          getValueFromEvent={(content) => content}
           rules={[{ required: true, message: "Lütfen içerik girin" }]}
         >
           <ReactQuill theme="snow" style={{ background: "#fff" }} />

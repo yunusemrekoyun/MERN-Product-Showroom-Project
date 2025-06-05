@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import "./BlogItem.css";
 
+// HTML etiketleri varsa temizler
+const stripHtml = (html) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
+
 const BlogItem = ({ blogId, title, date, comments, likes }) => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,18 +17,20 @@ const BlogItem = ({ blogId, title, date, comments, likes }) => {
       <Link to={`/blogs/${blogId}`} className="blog-image-wrapper">
         <img
           src={`${apiUrl}/api/blogs/${blogId}/image/0`}
-          alt={title}
+          alt={stripHtml(title)}
           className="blog-image"
           onError={(e) => (e.target.src = "/img/fallback.jpg")}
         />
       </Link>
       <div className="blog-info">
         <div className="blog-info-top">
-          <span>{dayjs(date).format("DD MMM, YYYY")}</span> -
+          <span>{dayjs(date).format("DD MMM, YYYY")}</span> -{" "}
           <span>{comments} Yorum</span>
         </div>
         <div className="blog-info-center">
-          <Link to={`/blogs/${blogId}`}>{title}</Link>
+          <Link to={`/blogs/${blogId}`} className="blog-title-link">
+            {stripHtml(title)}
+          </Link>
         </div>
         <div className="blog-info-bottom">
           <Link to={`/blogs/${blogId}`}>Daha Fazla</Link>
