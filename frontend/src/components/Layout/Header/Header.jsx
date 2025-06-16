@@ -1,7 +1,10 @@
 // src/components/Layout/Header.jsx
 import { Link } from "react-router-dom";
+import { Modal } from "antd"; // ← EKLENDİ
 import Search from "../../Modals/Search/Search";
 import "./Header.css";
+
+const { confirm } = Modal;
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -44,10 +47,16 @@ const Header = () => {
                   className="header-icon"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (window.confirm("Çıkış yapmak istiyor musunuz?")) {
-                      localStorage.removeItem("user");
-                      window.location.href = "/";
-                    }
+                    confirm({
+                      title: "Çıkış Yap",
+                      content: "Çıkış yapmak istediğinize emin misiniz?",
+                      okText: "Evet",
+                      cancelText: "Hayır",
+                      onOk() {
+                        localStorage.removeItem("user");
+                        window.location.href = "/";
+                      },
+                    });
                   }}
                 >
                   <i className="bi bi-box-arrow-right"></i>
@@ -58,8 +67,6 @@ const Header = () => {
           </div>
         </div>
       </div>
-
-     
     </header>
   );
 };

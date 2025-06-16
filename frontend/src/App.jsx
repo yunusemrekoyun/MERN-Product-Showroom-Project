@@ -3,15 +3,15 @@ import HomePage from "./pages/HomePage";
 import ShopPage from "./pages/ShopPage";
 import BlogPage from "./pages/BlogPage";
 import ContactPage from "./pages/ContactPage";
-import CartPage from "./pages/CartPage";
+// import CartPage from "./pages/CartPage";
 //import AuthPage from "./pages/AuthPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-
+import NotFoundPage from "./pages/NotFoundPage";
 
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import BlogDetailsPage from "./pages/BlogDetailsPage";
-import DashboardPage from "./pages/Admin/DashBoardPage";
+import DashboardPage from "./pages/Admin/DashboardPage";
 import CreateBlogPage from "./pages/Admin/Blogs/CreateBlogPage";
 import UpdateBlogPage from "./pages/Admin/Blogs/UpdateBlogPage.jsx";
 import "./App.css";
@@ -25,14 +25,13 @@ import UpdateProductPage from "./pages/Admin/Products/UpdateProductPage";
 import CouponPage from "./pages/Admin/Coupons/CouponPage";
 import CreateCouponPage from "./pages/Admin/Coupons/CreateCouponPage";
 import UpdateCouponPage from "./pages/Admin/Coupons/UpdateCouponPage";
-import Success from "./pages/Success";
+// import Success from "./pages/Success";
 import OrderPage from "./pages/Admin/OrderPage";
 import CampaignPage from "./pages/Admin/Campaigns/CampaignPage";
 import CreateCampaignPage from "./pages/Admin/Campaigns/CreateCampaignPage";
 import UpdateCampaignPage from "./pages/Admin/Campaigns/UpdateCampaignPage";
 import AdminBlogsPage from "./pages/Admin/Blogs/AdminBlogsPage";
 import UserAccountPage from "./pages/UserAccountPage";
-
 
 function App() {
   return (
@@ -41,13 +40,13 @@ function App() {
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/contact" element={<ContactPage />} />
-      <Route path="/cart" element={<CartPage />} />
+      {/* <Route path="/cart" element={<CartPage />} /> */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/account" element={<UserAccountPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />
-      <Route path="/success" element={<Success />} />
+      {/* <Route path="/success" element={<Success />} /> */}
       <Route path="/admin/*">
         <Route index element={<DashboardPage />} />
         <Route path="blogs" element={<AdminBlogsPage />} />
@@ -68,6 +67,7 @@ function App() {
         <Route path="coupons/update/:id" element={<UpdateCouponPage />} />
         <Route path="orders" element={<OrderPage />} />
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { message } from "antd";
 import ShareModal from "../Modals/Share/ShareModal";
 import "./ShopProductItem.css";
 
@@ -19,7 +20,10 @@ const ShopProductItem = ({ product }) => {
   }, [storedUser, product._id, userId]);
 
   const toggleFavorite = async () => {
-    if (!userId) return alert("Favorilere eklemek için giriş yapmalısınız.");
+    if (!userId) {
+      message.warning("Favorilere eklemek için giriş yapmalısınız.");
+      return;
+    }
 
     try {
       const res = await fetch(

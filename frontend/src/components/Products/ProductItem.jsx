@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ShareModal from "../Modals/Share/ShareModal";
 import "./ProductItem.css";
-
+import { message } from "antd";
 const ProductItem = ({ productItem }) => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -19,7 +19,10 @@ const ProductItem = ({ productItem }) => {
   }, [storedUser, productItem._id, userId]);
 
   const toggleFavorite = async () => {
-    if (!userId) return alert("Favorilere eklemek için giriş yapmalısınız.");
+    if (!userId) {
+      message.warning("Favorilere eklemek için giriş yapmalısınız.");
+      return;
+    }
 
     try {
       const res = await fetch(

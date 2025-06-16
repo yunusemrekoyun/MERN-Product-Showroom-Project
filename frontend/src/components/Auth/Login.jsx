@@ -34,6 +34,7 @@ const Login = () => {
           window.location.href = "/admin";
         } else {
           navigate("/");
+          window.location.reload();
         }
       } else {
         message.error("Giriş başarısız.");

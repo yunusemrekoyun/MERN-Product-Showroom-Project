@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import "./HeroImage.css";
-
+import { message } from "antd";
 const HeroImage = ({ product, onFavoriteChange }) => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const imageUrl = `${apiUrl}/api/products/${product._id}/image/mainImages/0`;
@@ -19,7 +19,10 @@ const HeroImage = ({ product, onFavoriteChange }) => {
   };
 
   const toggleFavorite = async () => {
-    if (!userId) return alert("Favorilere eklemek için giriş yapmalısınız.");
+    if (!userId) {
+      message.warning("Favorilere eklemek için giriş yapmalısınız.");
+      return;
+    }
 
     try {
       const res = await fetch(

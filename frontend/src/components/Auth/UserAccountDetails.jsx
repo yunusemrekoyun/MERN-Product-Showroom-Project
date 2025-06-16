@@ -226,9 +226,9 @@ const UserAccountDetails = () => {
       label: "Beğenilen İçerikler",
       children: (
         <ul className="static-list">
-          <li>Samsung Galaxy Watch</li>
-          <li>Logitech MX Master 3</li>
-          <li>Amazon Kindle Paperwhite</li>
+          <li>BLOG1</li>
+          <li>BLOG2</li>
+          <li>BLOG3</li>
         </ul>
       ),
     },
