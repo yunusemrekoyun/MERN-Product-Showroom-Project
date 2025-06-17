@@ -21,22 +21,22 @@ const BlogDetails = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
-        if (!res.ok) throw new Error("Sunucu hatası");
-        const data = await res.json();
-        setBlog(data);
-        setLikesCount(data.likedBy.length);
-        setLiked(data.likedBy.includes(storedUser?._id));
-      } catch (err) {
-        console.error(err);
-        message.error("Blog yüklenemedi");
-      }
-    };
-    fetchBlog();
-  }, [apiUrl, blogId, storedUser]);
+   useEffect(() => {
+  const fetchBlog = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
+      if (!res.ok) throw new Error("Sunucu hatası");
+      const data = await res.json();
+      setBlog(data);
+      setLikesCount(data.likedBy.length);
+      setLiked(data.likedBy.includes(storedUser?._id));
+    } catch (err) {
+      console.error(err);
+      message.error("Blog yüklenemedi");
+    }
+  };
+  fetchBlog();
+}, [apiUrl, blogId]); 
 
   const handleLike = async () => {
     if (!storedUser) return message.warning("Beğenmek için giriş yapın!");
