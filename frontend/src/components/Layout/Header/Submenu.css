@@ -1,39 +1,48 @@
+/* src/components/Layout/Header/Submenu.css */
+:root {
+  --accent-color: #d4a017;
+  --accent-light: #fef6e5;
+  --glass-color: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-text: #111;
+}
+
 .submenu-container {
   position: fixed;
-  background-color: white;
-  border: 1px solid #eee4c6;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-  border-left: 3px solid #d4a017;
-  border-radius: 6px;
-  z-index: 9999;
-  animation: fadeIn 0.2s ease-in-out;
   display: flex;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 6px;
-  padding: 10px;
-  min-width: 220px;
-  max-width: 90vw;
-  width: fit-content;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+
+  /* Liquid glass efektini buraya alın */
+  backdrop-filter: blur(20px);
+  background: var(--glass-color);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+
+  /* Ölçüleri net kısıtlayın */
+  width: auto; /* içerik kadar */
+  min-width: 120px; /* en dar */
+  max-width: 160px; /* en geniş */
   box-sizing: border-box;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: stretch;
+  z-index: 9999;
+
+  /* Açılma animasyonu */
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInSubmenu 0.2s forwards ease-in-out;
 }
 
 .submenu-item {
   text-decoration: none;
-  color: #333;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  color: var(--glass-text);
+  padding: 8px 12px;
+  font-size: 14px;
+  transform: none;
   white-space: nowrap;
-  padding: 12px 18px;
-  font-size: 15px;
-  border-bottom: 1px solid #f0f0f0;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.submenu-item:last-child {
-  border-bottom: none;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .submenu-item:hover {
@@ -42,38 +51,30 @@
   transform: translateX(4px);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
+@keyframes fadeInSubmenu {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 @media (max-width: 768px) {
   .submenu-container.submenu-mobile {
     position: static;
-    border: none;
-    border-left: none;
-    box-shadow: none;
-    padding: 6px 0;
-    animation: none;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-    margin-top: 6px;
-    min-width: unset;
-    max-width: 90vw;
-    width: max-content;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    padding: 8px 0;
+    background: var(--glass-color);
+    box-shadow: none;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    margin-top: 6px;
+    max-width: 90vw;
+    animation: none;
   }
 
   .submenu-container.submenu-mobile .submenu-item {
-    font-size: 14px;
     padding: 8px 16px;
-    border-bottom: 1px solid #eaeaea;
+    font-size: 13px;
   }
 }

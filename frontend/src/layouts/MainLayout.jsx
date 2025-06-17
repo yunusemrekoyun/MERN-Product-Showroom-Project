@@ -1,40 +1,49 @@
-// import { useEffect, useState } from "react";
-import Footer from "../components/Layout/Footer/Footer";
+// src/layouts/MainLayout.jsx
+import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+
 import Header from "../components/Layout/Header/Header";
 import HeaderBottom from "../components/Layout/Header/HeaderBottom";
+import Footer from "../components/Layout/Footer/Footer";
+
 import "./MainLayout.css";
-import Proptypes from "prop-types";
-// import Search from "../components/Modals/Search/Search";
-// import Dialog from "../components/Modals/Dialog/Dialog";
 
 const MainLayout = ({ children }) => {
-  // const [isSearchShow, setIsSearchShow] = useState(false);
-  // const [isDialogShow, setIsDialogShow] = useState(false);
+  const [hideHeader, setHideHeader] = useState(false);
+  const lastScrollY = useRef(0);
 
-  // useEffect(() => {
-  //   const dialogStatus = localStorage.getItem("dialog")
-  //     ? JSON.parse(localStorage.getItem("dialog"))
-  //     : localStorage.setItem("dialog", JSON.stringify(true));
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.pageYOffset;
 
-  //   setTimeout(() => {
-  //     setIsDialogShow(dialogStatus);
-  //   }, 2000);
-  // }, []);
+      // Aşağı kaydırıyorsa gizle, yukarı kaydırıyorsa göster
+      if (currentY > lastScrollY.current && currentY > 50) {
+        setHideHeader(true);
+      } else {
+        setHideHeader(false);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="main-layout">
-      {/* <Dialog isDialogShow={isDialogShow} setIsDialogShow={setIsDialogShow} /> */}
-      {/* <Search isSearchShow={isSearchShow} setIsSearchShow={setIsSearchShow} /> */}
-      <Header />
+    <div className={`main-layout ${hideHeader ? "header-hidden" : ""}`}>
+      <div className={`header-wrapper ${hideHeader ? "hidden" : ""}`}>
+        <Header />
+      </div>
       <HeaderBottom />
-      {children}
+      <main className="content">{children}</main>
       <Footer />
     </div>
   );
 };
 
-export default MainLayout;
-
 MainLayout.propTypes = {
-  children: Proptypes.node,
+  children: PropTypes.node,
 };
+
+export default MainLayout;
