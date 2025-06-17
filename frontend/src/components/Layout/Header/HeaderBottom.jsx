@@ -1,98 +1,94 @@
-// src/components/Layout/Header/HeaderBottom.jsx
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  FaChevronDown,
   FaHome,
   FaThLarge,
   FaRegNewspaper,
+  FaChevronDown,
 } from "react-icons/fa";
 import Submenu from "./Submenu";
+import MobileDrawer from "./MobileDrawer";
 import "./HeaderBottom.css";
 
+const TRANSFORM_DURATION = 600;
+const WIDTH_DURATION = 900;
+
 const HeaderBottom = () => {
+  const mobileNavRef = useRef(null);
   const [categories, setCategories] = useState([]);
   const [submenuData, setSubmenuData] = useState(null);
-  const [submenuVisible, setSubmenuVisible] = useState(false);
   const [openSubmenuId, setOpenSubmenuId] = useState(null);
-  const [isTouch, setIsTouch] = useState(false);
+  const [submenuVisible, setSubmenuVisible] = useState(false);
   const [mode, setMode] = useState("default");
   const [isAnimating, setIsAnimating] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isTouch, setIsTouch] = useState(false);
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Touch detection
+  // Touch & resize
   useEffect(() => {
     setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Fetch categories once
+  // Fetch categories
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/api/categories`);
-        const data = await res.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Kategoriler alınamadı:", error);
-      }
-    };
-    fetchCategories();
+    fetch(`${apiUrl}/api/categories`)
+      .then((res) => res.json())
+      .then(setCategories)
+      .catch(console.error);
   }, [apiUrl]);
-
-  // Hide submenu on outside hover
+  // ——> Dinamik olarak tab-bar yüksekliğini ölç ve CSS değişkenine yaz
   useEffect(() => {
-    const handler = (e) => {
-      const el = document.querySelector(".header-bottom");
-      if (!el?.contains(e.target)) {
-        setSubmenuVisible(false);
-        setSubmenuData(null);
-        setOpenSubmenuId(null);
+    if (!isMobile) return;
+    const updateBottomNavHeight = () => {
+      const navEl = mobileNavRef.current;
+      if (navEl) {
+        const h = navEl.getBoundingClientRect().height;
+        document.documentElement.style.setProperty("--bottom-nav-h", `${h}px`);
       }
     };
-    document.addEventListener("mousemove", handler);
-    return () => document.removeEventListener("mousemove", handler);
-  }, []);
-
+    // İlk mount ve her resize sonrası
+    updateBottomNavHeight();
+    window.addEventListener("resize", updateBottomNavHeight);
+    return () => window.removeEventListener("resize", updateBottomNavHeight);
+  }, [isMobile]);
+  // Desktop submenu handlers
   const handleMouseEnter = (e, cat) => {
-    if (isTouch) return;
+    if (isMobile) return;
     clearTimeout(timeoutRef.current);
     const rect = e.currentTarget.getBoundingClientRect();
     const left = Math.max(rect.left + rect.width / 2 - 110, 12);
     setSubmenuData({
       items: cat.subcategories,
       parentCategoryId: cat._id,
-      position: {
-        top: rect.bottom + 4, // scrollY kaldırıldı
-        left,
-      },
+      position: { top: rect.bottom + 4, left },
     });
     setSubmenuVisible(true);
   };
-
   const handleMouseLeave = () => {
-    if (isTouch) return;
+    if (isMobile) return;
     timeoutRef.current = setTimeout(() => {
       if (!submenuVisible) setSubmenuData(null);
     }, 150);
   };
-
   const handleToggleSubmenu = (e, cat) => {
+    if (isMobile) return;
     e.preventDefault();
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
-    const top = rect.bottom + 12; // sadece rect.bottom
-    const submenuWidth = 220;
-    const left = Math.max(
-      rect.left + rect.width / 2 - submenuWidth / 2 + 12,
-      12
-    );
-    const isSame = openSubmenuId === cat._id;
-    setOpenSubmenuId(isSame ? null : cat._id);
+    const left = Math.max(rect.left + rect.width / 2 - 110, 12);
+    const top = rect.bottom + 12;
+    const same = openSubmenuId === cat._id;
+    setOpenSubmenuId(same ? null : cat._id);
     setSubmenuData(
-      isSame
+      same
         ? null
         : {
             items: cat.subcategories,
@@ -102,30 +98,20 @@ const HeaderBottom = () => {
     );
   };
 
-  const TRANSFORM_DURATION = 600;
-  const WIDTH_DURATION = 900;
+  // Mode change
   const handleModeChange = (newMode) => {
-    // KAPANIŞ
     if (newMode === "default") {
       if (isAnimating) return;
-      setIsAnimating(true); // transform animasyonu başlasın
-      setIsReady(false); // içerik hemen kaybolsun
+      setIsAnimating(true);
+      setIsReady(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
-      // 1) 600ms sonra .expanded sınıfı kalksın (width transition tetiklensin)
-      setTimeout(() => {
-        setMode("default");
-      }, TRANSFORM_DURATION);
-
-      // 2) 600 + 900 = 1500ms sonra anim bitir ve navigate et
+      setTimeout(() => setMode("default"), TRANSFORM_DURATION);
       setTimeout(() => {
         setIsAnimating(false);
         navigate("/");
       }, TRANSFORM_DURATION + WIDTH_DURATION);
-
       return;
     }
-
-    // AÇILIŞ (aynı kaldı)
     if (mode === newMode || isAnimating) return;
     setMode(newMode);
     setIsAnimating(true);
@@ -136,6 +122,46 @@ const HeaderBottom = () => {
     );
   };
 
+  // Mobile drawer
+  const handleMobileIcon = (type) =>
+    setDrawerOpen((prev) => (prev === type ? null : type));
+
+  // **MOBİL** alt nav
+  if (isMobile) {
+    return (
+      <>
+        <div
+          className="mobile-bottom-nav liquid-glass-panel"
+          ref={mobileNavRef} // <-- ref ekledik
+        >
+          <button
+            onClick={() => {
+              setDrawerOpen(null);
+              handleModeChange("default");
+            }}
+          >
+            {" "}
+            <FaHome size={20} />
+            <span>Ana Sayfa</span>
+          </button>
+          <button onClick={() => handleMobileIcon("shop")}>
+            <FaThLarge size={20} />
+            <span>Ürünler</span>
+          </button>
+          <button onClick={() => handleMobileIcon("blog")}>
+            <FaRegNewspaper size={20} />
+            <span>Blog</span>
+          </button>
+        </div>
+        <MobileDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(null)}
+          categories={categories}
+        />
+      </>
+    );
+  }
+  // Desktop view
   return (
     <div className="header-bottom">
       <div
@@ -170,7 +196,6 @@ const HeaderBottom = () => {
             <span>Blog</span>
           </button>
         </div>
-
         {mode !== "default" && isReady && (
           <div className="liquid-content-area active">
             {mode === "shop" &&
@@ -221,7 +246,6 @@ const HeaderBottom = () => {
           </div>
         )}
       </div>
-
       {submenuData && (
         <div className="submenu-wrapper">
           <Submenu

@@ -6,6 +6,7 @@
   --glass-border: rgba(255, 255, 255, 0.3);
   --glass-text: #111;
   --content-padding: 24px;
+  /* --bottom-nav-h: 72px; */
 }
 
 /* Genel Header Yapısı */
@@ -169,9 +170,42 @@
     transform: translateY(0);
   }
 }
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 12px; /* sayfanın en altından biraz yukarı */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 360px;
+    padding: 14px 28px; /* liquid-glass-panel ile uyumlu */
+    display: flex;
+    justify-content: space-around;
+    backdrop-filter: blur(20px);
+    background: var(--glass-color);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 32px;
+    gap: 32px;
+    color: var(--glass-text);
+    z-index: 1502; /* overlay’ın üstünde */
+  }
+  .mobile-bottom-nav button {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--glass-text);
+    font-size: 12px;
+  }
+  .mobile-bottom-nav button span {
+    margin-top: 4px;
+  }
+}
 
 /* Mobil */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .liquid-glass-panel {
     flex-direction: column;
     gap: 16px;
@@ -188,4 +222,5 @@
     flex-direction: column;
     gap: 16px;
   }
-}
+  
+} */
