@@ -1,3 +1,4 @@
+// src/components/Layout/Header/HeaderBottom.jsx
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -15,21 +16,26 @@ const WIDTH_DURATION = 900;
 
 const HeaderBottom = () => {
   const mobileNavRef = useRef(null);
+  const navigate = useNavigate();
+  const timeoutRef = useRef(null);
+
   const [categories, setCategories] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [submenuData, setSubmenuData] = useState(null);
   const [openSubmenuId, setOpenSubmenuId] = useState(null);
   const [submenuVisible, setSubmenuVisible] = useState(false);
+
   const [mode, setMode] = useState("default");
   const [isAnimating, setIsAnimating] = useState(false);
   const [isReady, setIsReady] = useState(false);
+
   const [drawerOpen, setDrawerOpen] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isTouch, setIsTouch] = useState(false);
-  const timeoutRef = useRef(null);
-  const navigate = useNavigate();
+
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Touch & resize
+  // Touch & resize detector
   useEffect(() => {
     setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
     const onResize = () => setIsMobile(window.innerWidth <= 768);
@@ -37,32 +43,45 @@ const HeaderBottom = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Fetch categories
+  // Fetch categories & blogs
   useEffect(() => {
     fetch(`${apiUrl}/api/categories`)
-      .then((res) => res.json())
+      .then((r) => r.json())
       .then(setCategories)
       .catch(console.error);
+    fetch(`${apiUrl}/api/blogs`)
+      .then((r) => r.json())
+      .then(setBlogs)
+      .catch(console.error);
   }, [apiUrl]);
-  // ——> Dinamik olarak tab-bar yüksekliğini ölç ve CSS değişkenine yaz
+
+  // Compute bottom‐nav height for mobile drawer
   useEffect(() => {
     if (!isMobile) return;
-    const updateBottomNavHeight = () => {
-      const navEl = mobileNavRef.current;
-      if (navEl) {
-        const h = navEl.getBoundingClientRect().height;
-        document.documentElement.style.setProperty("--bottom-nav-h", `${h}px`);
-      }
+    const update = () => {
+      const h = mobileNavRef.current?.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty("--bottom-nav-h", `${h}px`);
     };
-    // İlk mount ve her resize sonrası
-    updateBottomNavHeight();
-    window.addEventListener("resize", updateBottomNavHeight);
-    return () => window.removeEventListener("resize", updateBottomNavHeight);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, [isMobile]);
-  // Desktop submenu handlers
+
+  // Helpers to show/hide submenu
+  const hideSubmenu = () => {
+    setSubmenuVisible(false);
+    setOpenSubmenuId(null);
+    setSubmenuData(null);
+  };
+  const showSubmenu = () => {
+    clearTimeout(timeoutRef.current);
+    setSubmenuVisible(true);
+  };
+
+  // Desktop submenu-item hover
   const handleMouseEnter = (e, cat) => {
     if (isMobile) return;
-    clearTimeout(timeoutRef.current);
+    showSubmenu();
     const rect = e.currentTarget.getBoundingClientRect();
     const left = Math.max(rect.left + rect.width / 2 - 110, 12);
     setSubmenuData({
@@ -70,14 +89,9 @@ const HeaderBottom = () => {
       parentCategoryId: cat._id,
       position: { top: rect.bottom + 4, left },
     });
-    setSubmenuVisible(true);
   };
-  const handleMouseLeave = () => {
-    if (isMobile) return;
-    timeoutRef.current = setTimeout(() => {
-      if (!submenuVisible) setSubmenuData(null);
-    }, 150);
-  };
+
+  // Desktop click‐toggle for touch devices
   const handleToggleSubmenu = (e, cat) => {
     if (isMobile) return;
     e.preventDefault();
@@ -96,20 +110,22 @@ const HeaderBottom = () => {
             position: { top, left },
           }
     );
+    setSubmenuVisible(!same);
   };
 
-  // Mode change
+  // Desktop panel mode
   const handleModeChange = (newMode) => {
     if (newMode === "default") {
+      navigate("/");
       if (isAnimating) return;
       setIsAnimating(true);
       setIsReady(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(() => setMode("default"), TRANSFORM_DURATION);
-      setTimeout(() => {
-        setIsAnimating(false);
-        navigate("/");
-      }, TRANSFORM_DURATION + WIDTH_DURATION);
+      setTimeout(
+        () => setIsAnimating(false),
+        TRANSFORM_DURATION + WIDTH_DURATION
+      );
       return;
     }
     if (mode === newMode || isAnimating) return;
@@ -122,25 +138,24 @@ const HeaderBottom = () => {
     );
   };
 
-  // Mobile drawer
+  // Mobile drawer toggle
   const handleMobileIcon = (type) =>
     setDrawerOpen((prev) => (prev === type ? null : type));
 
-  // **MOBİL** alt nav
+  // ---- MOBILE VIEW ----
   if (isMobile) {
     return (
       <>
         <div
           className="mobile-bottom-nav liquid-glass-panel"
-          ref={mobileNavRef} // <-- ref ekledik
+          ref={mobileNavRef}
         >
           <button
             onClick={() => {
               setDrawerOpen(null);
-              handleModeChange("default");
+              navigate("/");
             }}
           >
-            {" "}
             <FaHome size={20} />
             <span>Ana Sayfa</span>
           </button>
@@ -157,13 +172,21 @@ const HeaderBottom = () => {
           open={drawerOpen}
           onClose={() => setDrawerOpen(null)}
           categories={categories}
+          blogs={blogs}
         />
       </>
     );
   }
-  // Desktop view
+
+  // ---- DESKTOP VIEW ----
   return (
-    <div className="header-bottom">
+    <div
+      className="header-bottom"
+      onMouseEnter={showSubmenu}
+      onMouseLeave={() => {
+        timeoutRef.current = setTimeout(hideSubmenu, 150);
+      }}
+    >
       <div
         className={[
           "liquid-glass-panel",
@@ -196,6 +219,7 @@ const HeaderBottom = () => {
             <span>Blog</span>
           </button>
         </div>
+
         {mode !== "default" && isReady && (
           <div className="liquid-content-area active">
             {mode === "shop" &&
@@ -204,7 +228,7 @@ const HeaderBottom = () => {
                   key={cat._id}
                   className="menu-item"
                   onMouseEnter={(e) => handleMouseEnter(e, cat)}
-                  onMouseLeave={handleMouseLeave}
+                  onClick={(e) => isTouch && handleToggleSubmenu(e, cat)}
                 >
                   <div className="menu-link-wrapper">
                     <Link
@@ -214,46 +238,34 @@ const HeaderBottom = () => {
                       {cat.name.toUpperCase()}
                     </Link>
                     {isTouch && (
-                      <button
-                        className="submenu-toggle"
+                      <FaChevronDown
+                        className={openSubmenuId === cat._id ? "rotated" : ""}
+                        size={12}
                         onClick={(e) => handleToggleSubmenu(e, cat)}
-                      >
-                        <FaChevronDown size={12} />
-                      </button>
+                      />
                     )}
                   </div>
                 </div>
               ))}
-            {mode === "blog" && (
-              <>
-                <div className="blog-link">
-                  <Link to="/blog/1" className="menu-link">
-                    Yeni Ürünler
+
+            {mode === "blog" &&
+              blogs.map((b) => (
+                <div key={b.blogId} className="blog-link">
+                  <Link to={`/blogs/${b.blogId}`} className="menu-link">
+                    {b.title}
                   </Link>
                 </div>
-                <div className="blog-link">
-                  <Link to="/blog/2" className="menu-link">
-                    Kampanyalar
-                  </Link>
-                </div>
-                <div className="blog-link">
-                  <Link to="/blog/3" className="menu-link">
-                    S.S.S.
-                  </Link>
-                </div>
-              </>
-            )}
+              ))}
           </div>
         )}
       </div>
-      {submenuData && (
+
+      {submenuData && submenuVisible && (
         <div className="submenu-wrapper">
           <Submenu
             subcategories={submenuData.items}
             position={submenuData.position}
             parentCategoryId={submenuData.parentCategoryId}
-            onMouseEnter={() => setSubmenuVisible(true)}
-            onMouseLeave={handleMouseLeave}
           />
         </div>
       )}

@@ -1,15 +1,13 @@
-// src/components/Layout/Header/MobileDrawer.jsx
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaTimes, FaChevronRight, FaChevronDown } from "react-icons/fa";
 import "./MobileDrawer.css";
 
-const MobileDrawer = ({ open, onClose, categories }) => {
+const MobileDrawer = ({ open, onClose, categories, blogs }) => {
   const [expandedId, setExpandedId] = useState(null);
   const navigate = useNavigate();
 
-  // drawer tipine göre liste
   const items =
     open === "shop"
       ? categories.map((cat) => ({
@@ -18,37 +16,34 @@ const MobileDrawer = ({ open, onClose, categories }) => {
           to: `/shop?category=${cat._id}`,
           sub: cat.subcategories || [],
         }))
-      : [
-          { id: "blog-new", label: "Yeni Ürünler", to: "/blog/1", sub: [] },
-          { id: "blog-camp", label: "Kampanyalar", to: "/blog/2", sub: [] },
-          { id: "blog-faq", label: "S.S.S.", to: "/blog/3", sub: [] },
-        ];
+      : blogs.map((b) => ({
+          id: b.blogId,
+          label: b.title,
+          to: `/blogs/${b.blogId}`,
+          sub: [],
+        }));
 
   const toggleSection = (id, to, hasSub) => {
     if (!hasSub) {
       onClose();
       navigate(to);
     } else {
-      setExpandedId(expandedId === id ? null : id);
+      setExpandedId((prev) => (prev === id ? null : id));
     }
   };
 
   return (
     <>
-      {/* overlay her zaman DOM’da, .open ile fade-in/out */}
       <div
         className={`drawer-overlay ${open ? "open" : ""}`}
         onClick={onClose}
       />
-
-      {/* panel her zaman DOM’da, .open ile slide-in/out; bottom nav’ın üstünde kalması için bottom: var(--bottom-nav-h) */}
       <aside className={`drawer-panel ${open ? "open" : ""}`}>
         <header className="drawer-header">
           <button className="drawer-close" onClick={onClose}>
             <FaTimes size={20} />
           </button>
         </header>
-
         <nav className="drawer-nav">
           {items.map(({ id, label, to, sub }) => (
             <div
@@ -72,8 +67,6 @@ const MobileDrawer = ({ open, onClose, categories }) => {
                   </span>
                 )}
               </div>
-
-              {/* accordion container */}
               <div className="drawer-subcontainer">
                 {expandedId === id && sub.length > 0 && (
                   <div className="drawer-subgrid">
@@ -102,6 +95,7 @@ MobileDrawer.propTypes = {
   open: PropTypes.oneOf(["shop", "blog", null]),
   onClose: PropTypes.func.isRequired,
   categories: PropTypes.array.isRequired,
+  blogs: PropTypes.array.isRequired,
 };
 
 export default MobileDrawer;
