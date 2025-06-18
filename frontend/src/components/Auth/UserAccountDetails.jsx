@@ -19,21 +19,28 @@ const UserAccountDetails = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  // Yeni eklenen state’ler
+  const [likedBlogs, setLikedBlogs] = useState([]);
+  const [loadingLikes, setLoadingLikes] = useState(true);
+
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId =
     storedUser?._id || storedUser?.id || storedUser?._userId || null;
 
+  // Eğer giriş yoksa login sayfasına yönlendir
   useEffect(() => {
     if (!userId) {
       navigate("/login", { replace: true });
     }
   }, [userId, navigate]);
 
+  // Kullanıcı verisi ve beğenilen blogları çek
   useEffect(() => {
     if (!userId) return;
 
-    const fetchUser = async () => {
+    // Kullanıcı bilgilerini al
+    (async () => {
       try {
         const res = await fetch(`${apiUrl}/api/users/${userId}`);
         if (!res.ok) throw new Error("Fetch failed");
@@ -50,9 +57,22 @@ const UserAccountDetails = () => {
         console.error("❌ Kullanıcı bilgisi alınamadı:", err);
         message.error("Kullanıcı bilgileri alınamadı");
       }
-    };
+    })();
 
-    fetchUser();
+    // Beğenilen blogları al
+    (async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/users/${userId}/likedBlogs`);
+        if (!res.ok) throw new Error("Likes fetch failed");
+        const list = await res.json();
+        setLikedBlogs(list);
+      } catch (err) {
+        console.error("❌ Beğenilen bloglar alınamadı:", err);
+        message.error("Beğenilen içerikler yüklenemedi");
+      } finally {
+        setLoadingLikes(false);
+      }
+    })();
   }, [apiUrl, userId]);
 
   const handleChange = (e) => {
@@ -109,9 +129,7 @@ const UserAccountDetails = () => {
     try {
       const res = await fetch(
         `${apiUrl}/api/users/${userId}/favorites/${productId}`,
-        {
-          method: "POST",
-        }
+        { method: "POST" }
       );
       const data = await res.json();
       const updatedUser = {
@@ -125,6 +143,27 @@ const UserAccountDetails = () => {
       );
     } catch (err) {
       message.error("Favoriden kaldırılamadı.");
+    }
+  };
+
+  // Beğeniden çıkarma handler
+  const handleUnlike = async (blogIdToRemove) => {
+    try {
+      const res = await fetch(
+        `${apiUrl}/api/users/${userId}/likedBlogs/${blogIdToRemove}`,
+        { method: "POST" }
+      );
+      if (!res.ok) throw new Error("Unlike failed");
+
+      const { likedBlogs: newList } = await res.json();
+      setLikedBlogs(newList);
+
+      // veya sadece front’ta filtrele
+      setLikedBlogs((prev) => prev.filter((b) => b.blogId !== blogIdToRemove));
+      message.success("Beğeniden çıkarıldı");
+    } catch (err) {
+      console.error("❌ Beğeni kaldırma hatası:", err);
+      message.error("Beğeniden çıkarılamadı");
     }
   };
 
@@ -211,7 +250,7 @@ const UserAccountDetails = () => {
       label: "Favori Ürünler",
       children: (
         <div className="fav-products-grid">
-          {userData?.favorites?.map((product) => (
+          {userData.favorites.map((product) => (
             <UserAccountFavProductItem
               key={product._id}
               product={product}
@@ -225,11 +264,42 @@ const UserAccountDetails = () => {
       key: "3",
       label: "Beğenilen İçerikler",
       children: (
-        <ul className="static-list">
-          <li>BLOG1</li>
-          <li>BLOG2</li>
-          <li>BLOG3</li>
-        </ul>
+        <div className="liked-blogs-section">
+          {loadingLikes ? (
+            <p>Yükleniyor...</p>
+          ) : likedBlogs.length > 0 ? (
+            <div className="liked-blogs-section">
+              {likedBlogs.map((b) => (
+                <div key={b.blogId} className="liked-blog-card">
+                  <div
+                    className="liked-blog-image"
+                    style={{
+                      backgroundImage: `url(${
+                        b.coverImage || "/img/default-blog.jpg"
+                      })`,
+                    }}
+                  />
+                  <div className="liked-blog-content">
+                    <div
+                      className="liked-blog-title"
+                      onClick={() => navigate(`/blogs/${b.blogId}`)}
+                    >
+                      {b.title}
+                    </div>
+                  </div>
+                  <button
+                    className="liked-blog-button"
+                    onClick={() => handleUnlike(b.blogId)}
+                  >
+                    Beğeniden Çıkar
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>Henüz beğendiğin bir blog yok.</p>
+          )}
+        </div>
       ),
     },
   ];

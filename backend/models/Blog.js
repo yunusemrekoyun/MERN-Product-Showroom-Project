@@ -1,3 +1,4 @@
+// models/Blog.js
 const mongoose = require("mongoose");
 const Counter = require("./Counter");
 
@@ -6,7 +7,6 @@ const BlogSchema = new mongoose.Schema(
     blogId: { type: String, unique: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     images: [
       {
         data: Buffer,

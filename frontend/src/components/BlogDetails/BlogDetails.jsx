@@ -1,3 +1,4 @@
+// src/components/BlogDetails/BlogDetails.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { message } from "antd";
@@ -5,7 +6,7 @@ import dayjs from "dayjs";
 import BlogComments from "../BlogComments/BlogComments";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import useVisitTracker from "../../hooks/useVisitTracker"; // 🔧 doğru import
+import useVisitTracker from "../../hooks/useVisitTracker";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -20,41 +21,46 @@ const BlogDetails = () => {
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId =
+    storedUser?._id || storedUser?.id || storedUser?._userId || null;
 
-  // 🔹 blog geldiğinde ziyaret takibini başlat
-  useVisitTracker("blog", blog?._id);
+  // tracker için blogId kullanıyoruz
+  useVisitTracker("blog", blogId);
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await fetch(`${apiUrl}/api/blogs/${blogId}`);
+        const url = userId
+          ? `${apiUrl}/api/blogs/${blogId}?userId=${userId}`
+          : `${apiUrl}/api/blogs/${blogId}`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Sunucu hatası");
         const data = await res.json();
         setBlog(data);
-        setLikesCount(data.likedBy.length);
-        setLiked(data.likedBy.includes(storedUser?._id));
+        setLikesCount(data.likesCount);
+        setLiked(!!data.likedByCurrentUser);
       } catch (err) {
         console.error(err);
         message.error("Blog yüklenemedi");
       }
     };
     fetchBlog();
-  }, [apiUrl, blogId, storedUser?._id]);
+  }, [apiUrl, blogId, userId]);
 
   const handleLike = async () => {
-    if (!storedUser) return message.warning("Beğenmek için giriş yapın!");
-
+    if (!userId) {
+      message.warning("Beğenmek için giriş yapın!");
+      return;
+    }
     try {
-      const res = await fetch(`${apiUrl}/api/blogs/${blogId}/like`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: storedUser._id }),
-      });
-
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setLikesCount(data.likesCount);
+      const res = await fetch(
+        `${apiUrl}/api/users/${userId}/likedBlogs/${blogId}`,
+        { method: "POST" }
+      );
+      if (!res.ok) throw new Error("Beğeni güncellenemedi");
+      // toggle liked state and adjust count
       setLiked((prev) => !prev);
+      setLikesCount((prev) => prev + (liked ? -1 : 1));
     } catch (err) {
       console.error(err);
       message.error("Beğeni güncellenemedi");

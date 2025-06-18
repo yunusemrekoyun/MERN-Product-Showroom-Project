@@ -3,7 +3,7 @@
 /* ----------------- Sabit Yükseklik Değişkenleri ----------------- */
 :root {
   --header-height: 100px; /* Gerçek Header yüksekliği */
-  --header-bottom-height: 60px; /* Gerçek HeaderBottom yüksekliği */
+  --header-bottom-height: 80px; /* Gerçek HeaderBottom yüksekliği */
 }
 
 /* ----------------- Desktop (≥769px) ----------------- */

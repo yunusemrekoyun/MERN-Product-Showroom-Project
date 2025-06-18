@@ -1,6 +1,7 @@
+// models/User.js
 const mongoose = require("mongoose");
 
-const UserSchema = mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
@@ -11,6 +12,7 @@ const UserSchema = mongoose.Schema(
       contentType: String,
     },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    likedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }], // ← Beğenilen bloglar burada tutulacak
   },
   { timestamps: true }
 );

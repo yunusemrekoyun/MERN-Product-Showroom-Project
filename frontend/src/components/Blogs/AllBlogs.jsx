@@ -51,6 +51,8 @@ const AllBlogs = () => {
                 <p className="blog-date">
                   {dayjs(blog.createdAt).format("DD MMM YYYY")}
                 </p>
+                <p className="blog-likes">❤️ {blog.likesCount} Beğeni</p>
+                <p className="blog-comments">💬 {blog.commentsCount} Yorum</p>
                 <p className="blog-preview">{stripHtml(blog.content)}</p>
               </div>
             </div>

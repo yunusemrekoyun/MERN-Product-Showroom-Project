@@ -35,7 +35,7 @@ const MainLayout = ({ children }) => {
       <div className={`header-wrapper ${hideHeader ? "hidden" : ""}`}>
         <Header />
       </div>
-      <HeaderBottom />
+      <HeaderBottom className="header-bottom" />
       <main className="content">{children}</main>
       <Footer />
     </div>

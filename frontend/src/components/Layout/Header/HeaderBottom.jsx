@@ -1,6 +1,6 @@
-// src/components/Layout/Header/HeaderBottom.jsx
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import {
   FaHome,
   FaThLarge,
@@ -14,7 +14,7 @@ import "./HeaderBottom.css";
 const TRANSFORM_DURATION = 600;
 const WIDTH_DURATION = 900;
 
-const HeaderBottom = () => {
+const HeaderBottom = ({ className = "" }) => {
   const mobileNavRef = useRef(null);
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
@@ -24,18 +24,15 @@ const HeaderBottom = () => {
   const [submenuData, setSubmenuData] = useState(null);
   const [openSubmenuId, setOpenSubmenuId] = useState(null);
   const [submenuVisible, setSubmenuVisible] = useState(false);
-
   const [mode, setMode] = useState("default");
   const [isAnimating, setIsAnimating] = useState(false);
   const [isReady, setIsReady] = useState(false);
-
   const [drawerOpen, setDrawerOpen] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isTouch, setIsTouch] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Touch & resize detector
   useEffect(() => {
     setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
     const onResize = () => setIsMobile(window.innerWidth <= 768);
@@ -43,7 +40,6 @@ const HeaderBottom = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Fetch categories & blogs
   useEffect(() => {
     fetch(`${apiUrl}/api/categories`)
       .then((r) => r.json())
@@ -55,7 +51,6 @@ const HeaderBottom = () => {
       .catch(console.error);
   }, [apiUrl]);
 
-  // Compute bottom‐nav height for mobile drawer
   useEffect(() => {
     if (!isMobile) return;
     const update = () => {
@@ -67,18 +62,17 @@ const HeaderBottom = () => {
     return () => window.removeEventListener("resize", update);
   }, [isMobile]);
 
-  // Helpers to show/hide submenu
   const hideSubmenu = () => {
     setSubmenuVisible(false);
     setOpenSubmenuId(null);
     setSubmenuData(null);
   };
+
   const showSubmenu = () => {
     clearTimeout(timeoutRef.current);
     setSubmenuVisible(true);
   };
 
-  // Desktop submenu-item hover
   const handleMouseEnter = (e, cat) => {
     if (isMobile) return;
     showSubmenu();
@@ -91,7 +85,6 @@ const HeaderBottom = () => {
     });
   };
 
-  // Desktop click‐toggle for touch devices
   const handleToggleSubmenu = (e, cat) => {
     if (isMobile) return;
     e.preventDefault();
@@ -113,7 +106,6 @@ const HeaderBottom = () => {
     setSubmenuVisible(!same);
   };
 
-  // Desktop panel mode
   const handleModeChange = (newMode) => {
     if (newMode === "default") {
       navigate("/");
@@ -138,11 +130,9 @@ const HeaderBottom = () => {
     );
   };
 
-  // Mobile drawer toggle
   const handleMobileIcon = (type) =>
     setDrawerOpen((prev) => (prev === type ? null : type));
 
-  // ---- MOBILE VIEW ----
   if (isMobile) {
     return (
       <>
@@ -178,10 +168,9 @@ const HeaderBottom = () => {
     );
   }
 
-  // ---- DESKTOP VIEW ----
   return (
     <div
-      className="header-bottom"
+      className={`header-bottom ${className}`}
       onMouseEnter={showSubmenu}
       onMouseLeave={() => {
         timeoutRef.current = setTimeout(hideSubmenu, 150);
@@ -272,5 +261,7 @@ const HeaderBottom = () => {
     </div>
   );
 };
-
+HeaderBottom.propTypes = {
+  className: PropTypes.string,
+};
 export default HeaderBottom;

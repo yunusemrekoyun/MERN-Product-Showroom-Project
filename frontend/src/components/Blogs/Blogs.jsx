@@ -59,8 +59,8 @@ const Blogs = () => {
                     blogId={blog.blogId}
                     title={blog.title}
                     date={blog.createdAt}
-                    comments={0}
-                    likes={blog.likedBy.length}
+                    comments={blog.commentsCount}
+                    likes={blog.likesCount}
                   />
                 </SwiperSlide>
               ))}
@@ -76,8 +76,8 @@ const Blogs = () => {
                 blogId={blog.blogId}
                 title={blog.title}
                 date={blog.createdAt}
-                comments={0}
-                likes={blog.likedBy.length}
+                comments={blog.commentsCount}
+                likes={blog.likesCount}
               />
             ))}
           </ul>

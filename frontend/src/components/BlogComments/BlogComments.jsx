@@ -7,12 +7,14 @@ import "./BlogComments.css";
 
 const BlogComments = ({ blogId, user }) => {
   const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [value, setValue] = useState("");
-  const [visibleCount, setVisibleCount] = useState(5); // ✅ yeni
+  const [visibleCount, setVisibleCount] = useState(5);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const fetchComments = useCallback(async () => {
+    setLoadingComments(true);
     try {
       const res = await fetch(`${apiUrl}/api/blogs/${blogId}/comments`);
       if (!res.ok) throw new Error();
@@ -20,6 +22,8 @@ const BlogComments = ({ blogId, user }) => {
       setComments(data);
     } catch {
       message.error("Yorumlar yüklenemedi");
+    } finally {
+      setLoadingComments(false);
     }
   }, [apiUrl, blogId]);
 
@@ -55,7 +59,9 @@ const BlogComments = ({ blogId, user }) => {
     <div className="comments-section">
       <h3>Yorumlar ({comments.length})</h3>
 
-      {comments.length === 0 ? (
+      {loadingComments ? (
+        <p>Yorumlar yükleniyor...</p>
+      ) : comments.length === 0 ? (
         <div className="no-comments">Henüz yorum yapılmamış. İlk sen ol!</div>
       ) : (
         <>
