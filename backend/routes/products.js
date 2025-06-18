@@ -157,7 +157,7 @@ router.put(
         mainDescription,
         childDescription1,
         childDescription2,
-        buyLink: JSON.parse(buyLink || "[]"), 
+        buyLink: JSON.parse(buyLink || "[]"),
       };
 
       const mapImages = (files) =>
@@ -214,6 +214,23 @@ router.get("/:id/image/:type/:index", async (req, res) => {
     res.send(image.data);
   } catch (err) {
     res.status(500).json({ error: "Resim alınamadı." });
+  }
+});
+// Tüm ürünlerin toplam favorilenme sayısı
+router.get("/favorites/total-count", async (req, res) => {
+  try {
+    const count = await mongoose
+      .model("User")
+      .aggregate([
+        { $unwind: "$favorites" },
+        { $group: { _id: "$favorites" } },
+        { $count: "total" },
+      ]);
+
+    res.json({ total: count[0]?.total || 0 });
+  } catch (err) {
+    console.error("Favori sayısı alınamadı:", err);
+    res.status(500).json({ error: "Sunucu hatası" });
   }
 });
 // routes/products.js içinde → GET /:id

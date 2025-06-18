@@ -3,13 +3,40 @@ const express = require("express");
 const multer = require("multer");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 const router = express.Router();
 
-// 1) Multer memory storage setup
+// Multer memory storage setup
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// 2) READ all users (unchanged)
+// ✅ GET total user count (önce bu gelmeli)
+router.get("/count", async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    res.json({ total: count });
+  } catch (err) {
+    console.error("Kullanıcı sayısı hatası:", err);
+    res.status(500).json({ error: "Sunucu hatası" });
+  }
+});
+
+// ✅ GET total favorite product count
+router.get("/favorites/total-count", async (req, res) => {
+  try {
+    const count = await User.aggregate([
+      { $unwind: "$favorites" },
+      { $group: { _id: "$favorites" } },
+      { $count: "total" },
+    ]);
+    res.json({ total: count[0]?.total || 0 });
+  } catch (err) {
+    console.error("Favori sayısı alınamadı:", err.message, err.stack);
+    res.status(500).json({ error: "Sunucu hatası" });
+  }
+});
+
+// ✅ GET all users
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
@@ -20,12 +47,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 3) READ single user by ID
+// ✅ GET single user by ID
 router.get("/:userId", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId)
       .select("-avatar.data")
-      .populate("favorites", "name") // sadece name alanı yeterli (isteğe göre genişletirsin)
+      .populate("favorites", "name")
       .lean();
 
     if (!user) return res.status(404).json({ error: "User not found." });
@@ -36,7 +63,20 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// 4) UPDATE user (including avatar upload)
+// ✅ GET user avatar image
+router.get("/:userId/image", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("avatar");
+    if (!user || !user.avatar?.data) return res.status(404).end();
+
+    res.set("Content-Type", user.avatar.contentType);
+    res.send(user.avatar.data);
+  } catch (err) {
+    res.status(500).json({ error: "Avatar yüklenemedi." });
+  }
+});
+
+// ✅ UPDATE user (with optional avatar + password)
 router.put("/:userId", upload.single("avatar"), async (req, res) => {
   try {
     const updates = { ...req.body };
@@ -68,7 +108,7 @@ router.put("/:userId", upload.single("avatar"), async (req, res) => {
   }
 });
 
-// 5) DELETE user
+// ✅ DELETE user
 router.delete("/:userId", async (req, res) => {
   try {
     const deleted = await User.findByIdAndDelete(req.params.userId);
@@ -81,19 +121,8 @@ router.delete("/:userId", async (req, res) => {
     res.status(500).json({ error: "Server error." });
   }
 });
-router.get("/:userId/image", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId).select("avatar");
-    if (!user || !user.avatar?.data) return res.status(404).end();
 
-    res.set("Content-Type", user.avatar.contentType);
-    res.send(user.avatar.data);
-  } catch (err) {
-    res.status(500).json({ error: "Avatar yüklenemedi." });
-  }
-});
-
-// 🔁 Toggle favorite product
+// ✅ TOGGLE favorite product
 router.post("/:userId/favorites/:productId", async (req, res) => {
   const { userId, productId } = req.params;
 
@@ -115,4 +144,5 @@ router.post("/:userId/favorites/:productId", async (req, res) => {
     res.status(500).json({ error: "Sunucu hatası" });
   }
 });
+
 module.exports = router;

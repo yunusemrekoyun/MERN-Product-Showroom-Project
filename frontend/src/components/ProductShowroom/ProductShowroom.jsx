@@ -4,13 +4,14 @@ import HeroImage from "./HeroImage";
 import DescriptionBlocks from "./DescriptionBlocks";
 import PurchaseAndReviews from "./PurchaseAndReviews";
 import ProductMainDescriptions from "./ProductMainDescriptions";
+import useVisitTracker from "../../hooks/useVisitTracker";
 import "./ProductShowroom.css";
 
 const ProductShowroom = () => {
   const { id: productId } = useParams();
   const [product, setProduct] = useState(null);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
+  useVisitTracker("product", product?._id);
   useEffect(() => {
     const fetchProduct = async () => {
       try {

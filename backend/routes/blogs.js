@@ -145,5 +145,17 @@ router.post("/:blogId/like", async (req, res) => {
   await blog.save();
   res.json({ likesCount: blog.likedBy.length });
 });
-
+// GET /api/blogs/likes/total-count
+router.get("/likes/total-count", async (req, res) => {
+  try {
+    const result = await Blog.aggregate([
+      { $project: { likedCount: { $size: "$likedBy" } } },
+      { $group: { _id: null, total: { $sum: "$likedCount" } } },
+    ]);
+    res.json({ total: result[0]?.total || 0 });
+  } catch (err) {
+    console.error("Blog beğeni toplam hatası:", err);
+    res.status(500).json({ error: "Sunucu hatası" });
+  }
+});
 module.exports = router;

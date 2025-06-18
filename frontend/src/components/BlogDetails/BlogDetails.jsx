@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import BlogComments from "../BlogComments/BlogComments";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-
+import useVisitTracker from "../../hooks/useVisitTracker"; // 🔧 doğru import
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -20,6 +20,9 @@ const BlogDetails = () => {
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  // 🔹 blog geldiğinde ziyaret takibini başlat
+  useVisitTracker("blog", blog?._id);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -36,7 +39,7 @@ const BlogDetails = () => {
       }
     };
     fetchBlog();
-  }, [apiUrl, blogId, storedUser]);
+  }, [apiUrl, blogId, storedUser?._id]);
 
   const handleLike = async () => {
     if (!storedUser) return message.warning("Beğenmek için giriş yapın!");
