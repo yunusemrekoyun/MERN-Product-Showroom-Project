@@ -9,6 +9,7 @@ const PurchaseAndReviews = ({ product }) => {
   const [activeTab, setActiveTab] = useState("buy");
   const [comments, setComments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [value, setValue] = useState("");
   const [rating, setRating] = useState(0);
   const [visibleCount, setVisibleCount] = useState(5);
@@ -19,6 +20,7 @@ const PurchaseAndReviews = ({ product }) => {
   useEffect(() => {
     if (activeTab === "reviews" && product?._id) {
       const fetchComments = async () => {
+        setIsLoadingComments(true);
         try {
           const res = await fetch(
             `${apiUrl}/api/product-reviews/${product._id}`
@@ -29,6 +31,8 @@ const PurchaseAndReviews = ({ product }) => {
           setComments(filtered);
         } catch {
           message.error("Yorumlar yüklenemedi");
+        } finally {
+          setIsLoadingComments(false);
         }
       };
 
@@ -54,6 +58,10 @@ const PurchaseAndReviews = ({ product }) => {
       });
 
       if (!res.ok) throw new Error();
+
+      message.success(
+        "Yorumunuz başarıyla gönderildi. Onay sonrası yayınlanacaktır."
+      );
 
       setValue("");
       setRating(0);
@@ -110,7 +118,7 @@ const PurchaseAndReviews = ({ product }) => {
                   altText = "ÇiçekSepeti'nde Satın Al";
                 }
               } catch {
-                return null; // Geçersiz bağlantı varsa hiçbir şey gösterme
+                return null;
               }
 
               if (!logoSrc) return null;
@@ -137,11 +145,14 @@ const PurchaseAndReviews = ({ product }) => {
           )}
         </div>
       )}
+
       {activeTab === "reviews" && (
         <div className="comments-section">
           <h3>Yorumlar ({comments.length})</h3>
 
-          {comments.length === 0 ? (
+          {isLoadingComments ? (
+            <div className="comments-loading">Yorumlar yükleniyor...</div>
+          ) : comments.length === 0 ? (
             <div className="no-comments">
               Henüz yorum yapılmamış. İlk sen ol!
             </div>

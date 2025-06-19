@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Row, Col, Card, Statistic } from "antd";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -38,8 +38,8 @@ const DashboardPage = () => {
             harcananSure: Math.round(item.totalDuration / 1000 / 60), // dakika
           }));
 
-        setProductTimeData(formatData(productData));
-        setBlogTimeData(formatData(blogData));
+        setProductTimeData(formatData(productData).slice(0, 10)); // ilk 10 ürün
+        setBlogTimeData(formatData(blogData).slice(0, 10)); // ilk 10 blog
       } catch (err) {
         console.error("Ziyaret süresi verisi alınamadı:", err);
       }
@@ -103,46 +103,36 @@ const DashboardPage = () => {
 
       <Card style={{ marginTop: 20 }}>
         <h2>Hangi Üründe Ne Kadar Vakit Harcandı (Dakika)</h2>
-        <LineChart
-          width={600}
-          height={300}
-          data={productTimeData}
-          margin={{ top: 5, right: 30, bottom: 5 }}
-        >
-          <XAxis dataKey="name" />
-          <YAxis />
+        <BarChart width={800} height={300} data={productTimeData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="harcananSure"
-            stroke="#8884d8"
-            activeDot={{ r: 8 }}
+          <XAxis
+            dataKey="name"
+            tickFormatter={(val) =>
+              val.length > 10 ? val.slice(0, 10) + "…" : val
+            }
           />
-        </LineChart>
+          <YAxis />
+          <Tooltip formatter={(v) => `${v} dakika`} />
+          <Legend />
+          <Bar dataKey="harcananSure" fill="#8884d8" />
+        </BarChart>
       </Card>
 
       <Card style={{ marginTop: 20 }}>
         <h2>Hangi Blogda Ne Kadar Vakit Harcandı (Dakika)</h2>
-        <LineChart
-          width={600}
-          height={300}
-          data={blogTimeData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <XAxis dataKey="name" />
-          <YAxis />
+        <BarChart width={800} height={300} data={blogTimeData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="harcananSure"
-            stroke="#82ca9d"
-            activeDot={{ r: 8 }}
+          <XAxis
+            dataKey="name"
+            tickFormatter={(val) =>
+              val.length > 10 ? val.slice(0, 10) + "…" : val
+            }
           />
-        </LineChart>
+          <YAxis />
+          <Tooltip formatter={(v) => `${v} dakika`} />
+          <Legend />
+          <Bar dataKey="harcananSure" fill="#82ca9d" />
+        </BarChart>
       </Card>
     </div>
   );

@@ -1,9 +1,20 @@
-import { Button, Popconfirm, Space, Table, message } from "antd";
+import {
+  Button,
+  Popconfirm,
+  Space,
+  Table,
+  message,
+  Input,
+  Row,
+  Col,
+} from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CategoryPage = () => {
   const [dataSource, setDataSource] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -26,12 +37,19 @@ const CategoryPage = () => {
       title: "Kategori Adı",
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortDirections: ["ascend", "descend"],
       render: (text) => <b>{text}</b>,
     },
     {
       title: "Alt Kategoriler",
       dataIndex: "subcategories",
       key: "subcategories",
+      sorter: (a, b) =>
+        (a.subcategories?.join(" ") || "").localeCompare(
+          b.subcategories?.join(" ") || ""
+        ),
+      sortDirections: ["ascend", "descend"],
       render: (subs) =>
         subs && subs.length > 0 ? subs.join(", ") : <span>—</span>,
     },
@@ -69,6 +87,7 @@ const CategoryPage = () => {
       if (response.ok) {
         const data = await response.json();
         setDataSource(data);
+        setFilteredData(data);
       } else {
         message.error("Veri getirme başarısız.");
       }
@@ -99,13 +118,39 @@ const CategoryPage = () => {
     fetchCategories();
   }, [fetchCategories]);
 
+  useEffect(() => {
+    const filtered = dataSource.filter((item) => {
+      const name = item.name?.toLowerCase() || "";
+      const subcats = item.subcategories?.join(", ")?.toLowerCase() || "";
+      return (
+        name.includes(search.toLowerCase()) ||
+        subcats.includes(search.toLowerCase())
+      );
+    });
+    setFilteredData(filtered);
+  }, [search, dataSource]);
+
   return (
-    <Table
-      dataSource={dataSource}
-      columns={columns}
-      rowKey={(record) => record._id}
-      loading={loading}
-    />
+    <>
+      <Row gutter={[0, 16]} style={{ marginBottom: "1rem" }}>
+        <Col span={8}>
+          <Input
+            placeholder="Kategori veya alt kategori ara..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+          />
+        </Col>
+      </Row>
+
+      <Table
+        dataSource={filteredData}
+        columns={columns}
+        rowKey={(record) => record._id}
+        loading={loading}
+        pagination={{ pageSize: 10 }}
+      />
+    </>
   );
 };
 

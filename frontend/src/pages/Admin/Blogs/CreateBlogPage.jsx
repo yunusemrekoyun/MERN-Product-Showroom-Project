@@ -9,6 +9,7 @@ const CreateBlogPage = () => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
+  const [quillContent, setQuillContent] = useState(""); // 👈 içerik burada tutulur
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleUploadChange = ({ fileList }) => {
@@ -20,11 +21,15 @@ const CreateBlogPage = () => {
       return message.error("En az 1 görsel seçmelisiniz.");
     }
 
+    if (!quillContent || quillContent === "<p><br></p>") {
+      return message.error("İçerik boş olamaz.");
+    }
+
     setLoading(true);
     try {
       const formData = new FormData();
       formData.append("title", values.title);
-      formData.append("content", values.content);
+      formData.append("content", quillContent); // 👈 içeriği elle ekle
 
       for (const fileWrapper of fileList) {
         const file = fileWrapper.originFileObj;
@@ -48,6 +53,7 @@ const CreateBlogPage = () => {
         message.success("Blog başarıyla oluşturuldu.");
         form.resetFields();
         setFileList([]);
+        setQuillContent(""); // 👈 editor içeriğini sıfırla
       } else {
         message.error("Blog oluşturulamadı.");
       }
@@ -75,14 +81,13 @@ const CreateBlogPage = () => {
           <Input placeholder="Blog başlığınızı yazın" />
         </Form.Item>
 
-        <Form.Item
-          label="İçerik"
-          name="content"
-          valuePropName="value"
-          getValueFromEvent={(content) => content}
-          rules={[{ required: true, message: "Lütfen içerik girin" }]}
-        >
-          <ReactQuill theme="snow" style={{ background: "#fff" }} />
+        <Form.Item label="İçerik" required>
+          <ReactQuill
+            theme="snow"
+            value={quillContent}
+            onChange={setQuillContent}
+            style={{ background: "#fff" }}
+          />
         </Form.Item>
 
         <Form.Item label="Kapak Görselleri" required>

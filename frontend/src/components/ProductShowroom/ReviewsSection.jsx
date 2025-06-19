@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import "./ReviewsSection.css"; // 👈 yeni CSS import
+import { message } from "antd";
+import "./ReviewsSection.css";
 
 const ReviewsSection = ({ productId }) => {
   const [reviews, setReviews] = useState([]);
@@ -20,7 +21,11 @@ const ReviewsSection = ({ productId }) => {
         const data = await res.json();
         if (!data.reviews || !Array.isArray(data.reviews))
           throw new Error("Hatalı veri");
-        setReviews(data.reviews);
+
+        const sortedReviews = data.reviews.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setReviews(sortedReviews);
       } catch (err) {
         setError("Yorumlar alınamadı.");
         console.error(err.message);
@@ -31,8 +36,20 @@ const ReviewsSection = ({ productId }) => {
   }, [productId, apiUrl]);
 
   const handleSubmit = async () => {
-    if (!user) return alert("Yorum yapmak için giriş yapmalısınız.");
-    if (!newReview.trim()) return;
+    if (!user)
+      return message.warning(
+        "Yorum yapmak için giriş yapmalısınız.",
+        3,
+        () => {},
+        {
+          getContainer: () => document.body,
+        }
+      );
+
+    if (!newReview.trim())
+      return message.warning("Yorum alanı boş olamaz.", 3, () => {}, {
+        getContainer: () => document.body,
+      });
 
     setSubmitting(true);
 
@@ -49,12 +66,24 @@ const ReviewsSection = ({ productId }) => {
 
       if (!res.ok) throw new Error("Gönderim hatası");
 
-      const updated = await res.json();
-      setReviews(updated.reviews || []);
       setNewReview("");
       setNewRating(5);
+
+      // ✅ Başarı mesajını garantili şekilde tüm sayfada göster
+      message.open({
+        type: "success",
+        content:
+          "Yorumunuz başarıyla gönderildi. Onay sonrası yayınlanacaktır.",
+        duration: 3,
+        getContainer: () => document.body,
+      });
     } catch (err) {
-      alert("Yorum gönderilemedi.");
+      message.open({
+        type: "error",
+        content: "Yorum gönderilemedi.",
+        duration: 3,
+        getContainer: () => document.body,
+      });
       console.error(err.message);
     } finally {
       setSubmitting(false);

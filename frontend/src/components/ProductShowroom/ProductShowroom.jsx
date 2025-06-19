@@ -11,7 +11,10 @@ const ProductShowroom = () => {
   const { id: productId } = useParams();
   const [product, setProduct] = useState(null);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-  useVisitTracker("product", product?._id);
+
+  // ✅ Sadece product verisi geldiyse çağrılır
+  useVisitTracker("product", product?._id && product._id);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {

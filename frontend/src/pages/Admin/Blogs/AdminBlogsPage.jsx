@@ -76,7 +76,7 @@ const AdminBlogsPage = () => {
       title: "Beğeni",
       dataIndex: "likedBy",
       key: "likes",
-      render: (arr) => arr.length,
+      render: (arr) => (Array.isArray(arr) ? arr.length : 0),
     },
     {
       title: "Actions",

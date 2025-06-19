@@ -141,7 +141,20 @@ router.delete("/:blogId", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+//  Toplam blog beğenisi sayısı
+router.get("/likes/total-count", async (req, res) => {
+  try {
+    const count = await User.aggregate([
+      { $unwind: "$likedBlogs" },
+      { $group: { _id: "$likedBlogs" } },
+      { $count: "total" },
+    ]);
+    res.json({ total: count[0]?.total || 0 });
+  } catch (err) {
+    console.error("Blog beğeni sayısı alınamadı:", err);
+    res.status(500).json({ error: "Sunucu hatası" });
+  }
+});
 // COMMENTS – list
 router.get("/:blogId/comments", async (req, res) => {
   try {

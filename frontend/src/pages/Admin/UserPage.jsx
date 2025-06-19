@@ -48,7 +48,7 @@ const UserPage = () => {
           description="Kullanıcıyı silmek istediğinizden emin misiniz?"
           okText="Yes"
           cancelText="No"
-          onConfirm={() => deleteUser(record.email)}
+          onConfirm={() => deleteUser(record._id)} // 🔁 email yerine _id gönderildi
         >
           <Button type="primary" danger>
             Sil
@@ -77,9 +77,9 @@ const UserPage = () => {
     }
   }, [apiUrl]);
 
-  const deleteUser = async (userEmail) => {
+  const deleteUser = async (userId) => {
     try {
-      const response = await fetch(`${apiUrl}/api/users/${userEmail}`, {
+      const response = await fetch(`${apiUrl}/api/users/${userId}`, {
         method: "DELETE",
       });
 
