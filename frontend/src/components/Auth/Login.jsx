@@ -105,7 +105,7 @@ const Login = () => {
               GİRİŞ YAP
             </button>
 
-            <a href="#" className="forgot-link">
+            <a href="/forgot-password" className="forgot-link">
               Şifrenizi mi unuttunuz?
             </a>
           </form>

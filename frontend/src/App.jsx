@@ -35,6 +35,8 @@ import CreateCampaignPage from "./pages/Admin/Campaigns/CreateCampaignPage";
 import UpdateCampaignPage from "./pages/Admin/Campaigns/UpdateCampaignPage";
 import AdminBlogsPage from "./pages/Admin/Blogs/AdminBlogsPage";
 import UserAccountPage from "./pages/UserAccountPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />
       <Route path="/verify-email/:token" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       {/* <Route path="/success" element={<Success />} /> */}
       <Route path="/admin/*">
         <Route index element={<DashboardPage />} />
