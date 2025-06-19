@@ -1,6 +1,6 @@
-// src/components/Layout/Header.jsx
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Modal } from "antd"; // ← EKLENDİ
+import { Modal } from "antd";
 import Search from "../../Modals/Search/Search";
 import "./Header.css";
 
@@ -8,10 +8,17 @@ const { confirm } = Modal;
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("user"));
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <header>
-      {/* Üst kısım: logo, arama, giriş/çıkış */}
       <div className="header-top">
         <div className="container header-wrapper">
           <div className="header-left">
@@ -20,11 +27,22 @@ const Header = () => {
             </Link>
           </div>
 
-          <div className="header-center">
-            <Search />
-          </div>
+          {!isMobile && (
+            <div className="header-center">
+              <Search />
+            </div>
+          )}
 
           <div className="header-right">
+            {isMobile && (
+              <div
+                className="mobile-search-icon"
+                onClick={() => setShowMobileSearch((prev) => !prev)}
+              >
+                <i className="bi bi-search"></i>
+              </div>
+            )}
+
             {!user ? (
               <>
                 <Link to="/login" className="header-icon">
@@ -66,6 +84,15 @@ const Header = () => {
             )}
           </div>
         </div>
+
+        {/* Mobil arama kutusu: geçişli şekilde */}
+        {isMobile && (
+          <div
+            className={`mobile-search-area ${showMobileSearch ? "show" : ""}`}
+          >
+            <Search />
+          </div>
+        )}
       </div>
     </header>
   );
