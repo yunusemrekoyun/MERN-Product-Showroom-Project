@@ -2,13 +2,14 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import ShopPage from "./pages/ShopPage";
 import BlogPage from "./pages/BlogPage";
+import "antd/dist/reset.css";
 import ContactPage from "./pages/ContactPage";
 // import CartPage from "./pages/CartPage";
 //import AuthPage from "./pages/AuthPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
-
+import VerifyEmail from "./components/Auth/VerifyEmail";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import BlogDetailsPage from "./pages/BlogDetailsPage";
 import DashboardPage from "./pages/Admin/DashboardPage";
@@ -48,6 +49,7 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />
+      <Route path="/verify-email/:token" element={<VerifyEmail />} />
       {/* <Route path="/success" element={<Success />} /> */}
       <Route path="/admin/*">
         <Route index element={<DashboardPage />} />

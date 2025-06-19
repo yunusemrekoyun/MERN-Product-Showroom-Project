@@ -13,6 +13,27 @@
   gap: 16px;
   margin-top: 20px;
 }
+.password-toggle-button {
+  padding: 10px 16px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.password-toggle-button:hover {
+  background-color: #e6e6e6;
+  border-color: #aaa;
+}
+
+.user-form-section .form-group input[type="password"] {
+  background-color: #fefbf6;
+}
 .user-account-header {
   display: flex;
   flex-wrap: wrap;

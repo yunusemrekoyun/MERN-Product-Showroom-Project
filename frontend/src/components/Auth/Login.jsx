@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { message } from "antd";
+import { message, Modal } from "antd";
 import "./login.css";
 
 const Login = () => {
@@ -26,18 +26,42 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         localStorage.setItem("user", JSON.stringify(data));
-        message.success("Giriş başarılı.");
-        if (data.role === "admin") {
-          window.location.href = "/admin";
+
+        // E-posta onaylı değilse modal göster
+        if (!data.emailVerified) {
+          Modal.warning({
+            title: "E-posta Doğrulaması Gerekli",
+            content:
+              "E-posta adresiniz henüz doğrulanmamış. Lütfen e-postanızı kontrol edin.",
+            okText: "Tamam",
+            onOk: () => {
+              if (data.role === "admin") {
+                window.location.href = "/admin";
+              } else {
+                navigate("/");
+                window.location.reload();
+              }
+            },
+          });
         } else {
-          navigate("/");
-          window.location.reload();
+          // Doğrulanmışsa direkt giriş
+          message.success("Giriş başarılı.").then(() => {
+            if (data.role === "admin") {
+              window.location.href = "/admin";
+            } else {
+              navigate("/");
+              window.location.reload();
+            }
+          });
         }
       } else {
-        message.error("Giriş başarısız.");
+        message.error(
+          data.error || "Giriş başarısız. Lütfen bilgilerinizi kontrol edin."
+        );
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -52,8 +76,6 @@ const Login = () => {
         <div className="login-box">
           <div className="text-center">
             <img src="/logo/logo.png" alt="Logo" className="auth-logo" />
-           
-         
           </div>
 
           <form onSubmit={handleLogin}>
@@ -106,7 +128,8 @@ const Login = () => {
         <div className="right-content">
           <h2>Sizi yeniden görmek harika!</h2>
           <p>
-            Sizi burada tekrar görmek çok güzel. Kişisel hesap deneyiminize devam etmek için giriş yapın.
+            Sizi burada tekrar görmek çok güzel. Kişisel hesap deneyiminize
+            devam etmek için giriş yapın.
           </p>
         </div>
       </div>

@@ -7,39 +7,51 @@ import UserAccountFavProductItem from "../Products/UserAccountFavProductItem";
 
 import "./UserAccountDetails.css";
 
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // ↰ en az 8 karakter, harf + rakam
+
 const UserAccountDetails = () => {
   const navigate = useNavigate();
+
+  /* ---------------- STATE ---------------- */
   const [userData, setUserData] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: "",
     avatar: null,
   });
+
+  // şifre değiştirme alanı
+  const [showPwdFields, setShowPwdFields] = useState(false);
+  const [pwdData, setPwdData] = useState({
+    current: "",
+    next: "",
+    confirm: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
-  // Yeni eklenen state’ler
+  // Beğenilen bloglar
   const [likedBlogs, setLikedBlogs] = useState([]);
   const [loadingLikes, setLoadingLikes] = useState(true);
 
+  /* ---------------- ENV ---------------- */
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId =
     storedUser?._id || storedUser?.id || storedUser?._userId || null;
 
-  // Eğer giriş yoksa login sayfasına yönlendir
+  /* ---------------- EFFECTS ---------------- */
+  // Giriş kontrolü
   useEffect(() => {
-    if (!userId) {
-      navigate("/login", { replace: true });
-    }
+    if (!userId) navigate("/login", { replace: true });
   }, [userId, navigate]);
 
-  // Kullanıcı verisi ve beğenilen blogları çek
+  // Kullanıcı + Beğenilen bloglar
   useEffect(() => {
     if (!userId) return;
 
-    // Kullanıcı bilgilerini al
+    // user
     (async () => {
       try {
         const res = await fetch(`${apiUrl}/api/users/${userId}`);
@@ -49,7 +61,6 @@ const UserAccountDetails = () => {
         setFormData({
           username: data.username || "",
           email: data.email || "",
-          password: "",
           avatar: null,
         });
         setEditMode(false);
@@ -59,7 +70,7 @@ const UserAccountDetails = () => {
       }
     })();
 
-    // Beğenilen blogları al
+    // liked blogs
     (async () => {
       try {
         const res = await fetch(`${apiUrl}/api/users/${userId}/likedBlogs`);
@@ -75,6 +86,7 @@ const UserAccountDetails = () => {
     })();
   }, [apiUrl, userId]);
 
+  /* ---------------- HANDLERS ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -89,14 +101,41 @@ const UserAccountDetails = () => {
     setEditMode(true);
   };
 
+  const handlePwdField = (e) => {
+    const { name, value } = e.target;
+    setPwdData((prev) => ({ ...prev, [name]: value }));
+    setEditMode(true);
+  };
+
   const handleUpdate = async () => {
+    // --- parola doğrulama ---
+    if (showPwdFields) {
+      if (!pwdData.current || !pwdData.next || !pwdData.confirm) {
+        return message.error("Lütfen tüm şifre alanlarını doldur.");
+      }
+      if (!passwordRegex.test(pwdData.next)) {
+        return message.error(
+          "Yeni şifre en az 8 karakter olmalı ve harf + rakam içermelidir."
+        );
+      }
+      if (pwdData.next !== pwdData.confirm) {
+        return message.error("Yeni şifreler eşleşmiyor.");
+      }
+    }
+
     setLoading(true);
     try {
       const form = new FormData();
       form.append("username", formData.username);
       form.append("email", formData.email);
-      if (formData.password) form.append("password", formData.password);
 
+      // şifre alanları
+      if (showPwdFields) {
+        form.append("currentPassword", pwdData.current);
+        form.append("password", pwdData.next); // backend yeni şifreyi `password` alanından okuyor
+      }
+
+      // avatar
       if (formData.avatar) {
         const compressed = await imageCompression(formData.avatar, {
           maxSizeMB: 0.5,
@@ -116,6 +155,8 @@ const UserAccountDetails = () => {
       localStorage.setItem("user", JSON.stringify(updated));
       setUserData(updated);
       setEditMode(false);
+      setShowPwdFields(false);
+      setPwdData({ current: "", next: "", confirm: "" });
       message.success("Bilgiler güncellendi");
     } catch (err) {
       console.error("❌ Güncelleme hatası:", err);
@@ -132,21 +173,19 @@ const UserAccountDetails = () => {
         { method: "POST" }
       );
       const data = await res.json();
-      const updatedUser = {
-        ...userData,
-        favorites: userData.favorites.filter((p) => p._id !== productId),
-      };
-      setUserData(updatedUser);
+      setUserData((prev) => ({
+        ...prev,
+        favorites: prev.favorites.filter((p) => p._id !== productId),
+      }));
       localStorage.setItem(
         "user",
         JSON.stringify({ ...storedUser, favorites: data.favorites })
       );
-    } catch (err) {
+    } catch {
       message.error("Favoriden kaldırılamadı.");
     }
   };
 
-  // Beğeniden çıkarma handler
   const handleUnlike = async (blogIdToRemove) => {
     try {
       const res = await fetch(
@@ -154,12 +193,8 @@ const UserAccountDetails = () => {
         { method: "POST" }
       );
       if (!res.ok) throw new Error("Unlike failed");
-
       const { likedBlogs: newList } = await res.json();
       setLikedBlogs(newList);
-
-      // veya sadece front’ta filtrele
-      setLikedBlogs((prev) => prev.filter((b) => b.blogId !== blogIdToRemove));
       message.success("Beğeniden çıkarıldı");
     } catch (err) {
       console.error("❌ Beğeni kaldırma hatası:", err);
@@ -167,6 +202,7 @@ const UserAccountDetails = () => {
     }
   };
 
+  /* ---------------- RENDER ---------------- */
   if (!userId) return null;
   if (!userData) return <p>Yükleniyor...</p>;
 
@@ -177,16 +213,20 @@ const UserAccountDetails = () => {
       children: (
         <div className="user-account-details">
           <div className="user-account-header">
+            {/* AVATAR */}
             <div className="user-avatar-large">
               <img
                 src={`${apiUrl}/api/users/${userId}/image`}
                 alt="Avatar"
-                onError={(e) => {
-                  e.currentTarget.src = "/img/avatars/avatar1.jpg";
-                }}
+                onError={(e) =>
+                  (e.currentTarget.src = "/img/avatars/avatar1.jpg")
+                }
               />
             </div>
+
+            {/* FORM */}
             <div className="user-form-section">
+              {/* KULLANICI ADI */}
               <div className="form-group">
                 <label>Kullanıcı Adı</label>
                 <input
@@ -197,6 +237,7 @@ const UserAccountDetails = () => {
                 />
               </div>
 
+              {/* EMAIL */}
               <div className="form-group">
                 <label>Email Adresi</label>
                 <input
@@ -207,17 +248,48 @@ const UserAccountDetails = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Yeni Şifre</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Boş bırakırsan şifre değişmez"
-                />
-              </div>
+              {/* ŞİFRE DEĞİŞTİR BUTONU / ALANLARI */}
+              {!showPwdFields ? (
+                <button
+                  className="password-toggle-button"
+                  onClick={() => setShowPwdFields(true)}
+                >
+                  Şifre Değiştir
+                </button>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>Mevcut Şifre</label>
+                    <input
+                      type="password"
+                      name="current"
+                      value={pwdData.current}
+                      onChange={handlePwdField}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Yeni Şifre</label>
+                    <input
+                      type="password"
+                      name="next"
+                      value={pwdData.next}
+                      onChange={handlePwdField}
+                      placeholder="En az 8 karakter, harf + rakam"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Yeni Şifre (Tekrar)</label>
+                    <input
+                      type="password"
+                      name="confirm"
+                      value={pwdData.confirm}
+                      onChange={handlePwdField}
+                    />
+                  </div>
+                </>
+              )}
 
+              {/* AVATAR */}
               <div className="form-group">
                 <label>Profil Fotoğrafı</label>
                 <input
@@ -227,12 +299,14 @@ const UserAccountDetails = () => {
                 />
               </div>
 
+              {/* UYARI */}
               {editMode && (
                 <p className="edit-warning">
                   Değişiklik yapıldı. Lütfen kaydedin.
                 </p>
               )}
 
+              {/* KAYDET */}
               <button
                 className="update-button"
                 onClick={handleUpdate}
@@ -250,10 +324,10 @@ const UserAccountDetails = () => {
       label: "Favori Ürünler",
       children: (
         <div className="fav-products-grid">
-          {userData.favorites.map((product) => (
+          {userData.favorites.map((p) => (
             <UserAccountFavProductItem
-              key={product._id}
-              product={product}
+              key={p._id}
+              product={p}
               onRemove={removeFromFavorites}
             />
           ))}
@@ -267,35 +341,33 @@ const UserAccountDetails = () => {
         <div className="liked-blogs-section">
           {loadingLikes ? (
             <p>Yükleniyor...</p>
-          ) : likedBlogs.length > 0 ? (
-            <div className="liked-blogs-section">
-              {likedBlogs.map((b) => (
-                <div key={b.blogId} className="liked-blog-card">
+          ) : likedBlogs.length ? (
+            likedBlogs.map((b) => (
+              <div key={b.blogId} className="liked-blog-card">
+                <div
+                  className="liked-blog-image"
+                  style={{
+                    backgroundImage: `url(${
+                      b.coverImage || "/img/default-blog.jpg"
+                    })`,
+                  }}
+                />
+                <div className="liked-blog-content">
                   <div
-                    className="liked-blog-image"
-                    style={{
-                      backgroundImage: `url(${
-                        b.coverImage || "/img/default-blog.jpg"
-                      })`,
-                    }}
-                  />
-                  <div className="liked-blog-content">
-                    <div
-                      className="liked-blog-title"
-                      onClick={() => navigate(`/blogs/${b.blogId}`)}
-                    >
-                      {b.title}
-                    </div>
-                  </div>
-                  <button
-                    className="liked-blog-button"
-                    onClick={() => handleUnlike(b.blogId)}
+                    className="liked-blog-title"
+                    onClick={() => navigate(`/blogs/${b.blogId}`)}
                   >
-                    Beğeniden Çıkar
-                  </button>
+                    {b.title}
+                  </div>
                 </div>
-              ))}
-            </div>
+                <button
+                  className="liked-blog-button"
+                  onClick={() => handleUnlike(b.blogId)}
+                >
+                  Beğeniden Çıkar
+                </button>
+              </div>
+            ))
           ) : (
             <p>Henüz beğendiğin bir blog yok.</p>
           )}
