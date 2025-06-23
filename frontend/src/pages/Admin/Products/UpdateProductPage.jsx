@@ -1,3 +1,4 @@
+// src/pages/UpdateProductPage.jsx
 import {
   Button,
   Form,
@@ -15,7 +16,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 
 const UpdateProductPage = () => {
+  /* ---------------- STATE ---------------- */
   const [loading, setLoading] = useState(false);
+  const [priceLoading, setPriceLoading] = useState(false); // ◀︎ yeni
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [mainImages, setMainImages] = useState([]);
@@ -26,6 +29,7 @@ const UpdateProductPage = () => {
   const { id: productId } = useParams();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
+  /* ---------------- DATA FETCH ---------------- */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -77,12 +81,56 @@ const UpdateProductPage = () => {
     fetchData();
   }, [apiUrl, productId, form]);
 
+  /* ---------------- KATEGORİ DEĞİŞİMİ ---------------- */
   const handleCategoryChange = (categoryId) => {
     const selected = categories.find((cat) => cat._id === categoryId);
     setSubcategories(selected?.subcategories || []);
     form.setFieldsValue({ subcategory: undefined });
   };
 
+  /* ---------------- TRENDYOL FİYATI ÇEK ---------------- */
+  const handleFetchPrice = async () => {
+    // 1) Formdaki link(ler)i al
+    const buyLinks = form.getFieldValue("buyLink") || [];
+    const url =
+      buyLinks
+        .map((l) => l && l.trim())
+        .find((l) => /^https?:\/\/.*trendyol\.com/.test(l)) || null;
+
+    if (!url) {
+      return message.warning("Önce geçerli bir Trendyol linki girin.");
+    }
+
+    try {
+      setPriceLoading(true);
+      const res = await fetch(`${apiUrl}/api/product-price/fetch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      let errMsg = "Fiyat alınamadı";
+      if (!res.ok) {
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch (_) {
+          // intentionally ignored
+        }
+        throw new Error(errMsg);
+      }
+
+      const { price } = await res.json(); // { price: ... }
+      form.setFieldsValue({ current: price });
+      message.success(`Fiyat alındı: ₺${price}`);
+    } catch (err) {
+      message.error(err.message);
+    } finally {
+      setPriceLoading(false);
+    }
+  };
+
+  /* ---------------- UPLOAD HELPERS ---------------- */
   const handleUploadChange =
     (setter) =>
     ({ fileList }) =>
@@ -101,6 +149,7 @@ const UpdateProductPage = () => {
     }
   };
 
+  /* ---------------- SUBMIT ---------------- */
   const onFinish = async (values) => {
     setLoading(true);
     try {
@@ -143,6 +192,7 @@ const UpdateProductPage = () => {
     }
   };
 
+  /* ---------------- UI ---------------- */
   return (
     <Spin spinning={loading}>
       <Form
@@ -186,6 +236,7 @@ const UpdateProductPage = () => {
           </Select>
         </Form.Item>
 
+        {/* Satın alma linkleri */}
         <Form.Item label="Satın Alma Linkleri" name="buyLink">
           <Select
             mode="tags"
@@ -194,28 +245,31 @@ const UpdateProductPage = () => {
           />
         </Form.Item>
 
+        {/* Fiyat + buton */}
         <Form.Item label="Fiyat">
-          <Space.Compact style={{ width: "100%" }}>
+          <Space align="baseline" wrap>
             <Form.Item name="current" noStyle>
-              <InputNumber placeholder="₺" style={{ width: "50%" }} />
+              <InputNumber placeholder="₺" style={{ width: 140 }} />
             </Form.Item>
             <Form.Item name="discount" noStyle>
               <InputNumber
                 placeholder="%"
-                formatter={(v) => `${v}%`}
+                formatter={(v) => (v ? `${v}%` : "")}
                 parser={(v) => v.replace("%", "")}
-                style={{ width: "50%" }}
+                style={{ width: 120 }}
               />
             </Form.Item>
-          </Space.Compact>
+            <Button
+              loading={priceLoading}
+              onClick={handleFetchPrice}
+              type="dashed"
+            >
+              Fiyatı Çek
+            </Button>
+          </Space>
         </Form.Item>
-        {/* 
-        <Form.Item label="Opsiyon 1" name="opt1">
-          <Input.TextArea />
-        </Form.Item>
-        <Form.Item label="Opsiyon 2" name="opt2">
-          <Input.TextArea />
-        </Form.Item> */}
+
+        {/* Açıklamalar */}
         <Form.Item label="Açıklama" name="mainDescription">
           <Input.TextArea />
         </Form.Item>
@@ -226,6 +280,7 @@ const UpdateProductPage = () => {
           <Input.TextArea />
         </Form.Item>
 
+        {/* Görseller */}
         <Form.Item label="Ana Görseller">
           <Upload
             listType="picture-card"
@@ -260,6 +315,7 @@ const UpdateProductPage = () => {
           </Upload>
         </Form.Item>
 
+        {/* Actions */}
         <Form.Item>
           <Space>
             <Button type="primary" htmlType="submit">

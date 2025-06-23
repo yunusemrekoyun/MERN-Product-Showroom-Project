@@ -15,6 +15,7 @@ import imageCompression from "browser-image-compression";
 
 const CreateProductPage = () => {
   const [loading, setLoading] = useState(false);
+  const [priceLoading, setPriceLoading] = useState(false); // ◀︎ yeni
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [mainImages, setMainImages] = useState([]);
@@ -23,6 +24,7 @@ const CreateProductPage = () => {
   const [form] = Form.useForm();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
+  /* ---------------- KATEGORİLER ---------------- */
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -48,6 +50,37 @@ const CreateProductPage = () => {
     form.setFieldsValue({ subcategory: undefined });
   };
 
+  /* ---------------- TRENDYOL FİYATI ÇEK ---------------- */
+  const handleFetchPrice = async () => {
+    const buyLinks = form.getFieldValue("buyLink") || [];
+    if (buyLinks.length === 0) {
+      return message.warning("Önce Trendyol linki girin.");
+    }
+    const url = buyLinks.find((l) => l.includes("trendyol.com")) || buyLinks[0];
+
+    try {
+      setPriceLoading(true);
+      const res = await fetch(`${apiUrl}/api/product-price/fetch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Fiyat alınamadı");
+      }
+      const { price } = await res.json();
+      form.setFieldsValue({ current: price });
+      message.success(`Fiyat alındı: ₺${price}`);
+    } catch (err) {
+      console.error(err);
+      message.error(err.message || "Fiyat alınamadı.");
+    } finally {
+      setPriceLoading(false);
+    }
+  };
+
+  /* ---------------- GÖRSEL SIKIŞTIRMA ---------------- */
   const compressAndAppend = async (images, fieldName, formData) => {
     for (const fileWrapper of images) {
       const file = fileWrapper.originFileObj;
@@ -60,11 +93,11 @@ const CreateProductPage = () => {
     }
   };
 
+  /* ---------------- SUBMIT ---------------- */
   const onFinish = async (values) => {
     if (mainImages.length === 0) {
       return message.error("En az 1 ana görsel gereklidir.");
     }
-
     setLoading(true);
     try {
       const formData = new FormData();
@@ -110,6 +143,7 @@ const CreateProductPage = () => {
     }
   };
 
+  /* ---------------- UI ---------------- */
   return (
     <Spin spinning={loading}>
       <Form
@@ -118,6 +152,7 @@ const CreateProductPage = () => {
         onFinish={onFinish}
         style={{ maxWidth: 600 }}
       >
+        {/* Ürün adı ––– */}
         <Form.Item
           label="Ürün İsmi"
           name="name"
@@ -126,6 +161,7 @@ const CreateProductPage = () => {
           <Input />
         </Form.Item>
 
+        {/* Kategori ––– */}
         <Form.Item
           label="Kategori"
           name="category"
@@ -140,6 +176,7 @@ const CreateProductPage = () => {
           </Select>
         </Form.Item>
 
+        {/* Alt kategori ––– */}
         <Form.Item label="Alt Kategori" name="subcategory">
           <Select
             placeholder={
@@ -157,6 +194,7 @@ const CreateProductPage = () => {
           </Select>
         </Form.Item>
 
+        {/* Satın alma linkleri ––– */}
         <Form.Item label="Satın Alma Linkleri" name="buyLink">
           <Select
             mode="tags"
@@ -165,22 +203,42 @@ const CreateProductPage = () => {
           />
         </Form.Item>
 
+        {/* Fiyat + Fiyatı Çek Butonu ––– */}
         <Form.Item label="Fiyat">
-          <Space.Compact style={{ width: "100%" }}>
-            <Form.Item name="current" noStyle>
-              <InputNumber placeholder="₺" style={{ width: "50%" }} />
+          <Space align="baseline" wrap>
+            <Form.Item
+              name="current"
+              noStyle
+              rules={[
+                {
+                  required: true,
+                  message: "Fiyat zorunlu",
+                  type: "number",
+                  transform: (v) => (v === "" ? undefined : v),
+                },
+              ]}
+            >
+              <InputNumber placeholder="₺" style={{ width: 140 }} />
             </Form.Item>
             <Form.Item name="discount" noStyle>
               <InputNumber
                 placeholder="%"
-                formatter={(v) => `${v}%`}
+                style={{ width: 120 }}
+                formatter={(v) => (v ? `${v}%` : "")}
                 parser={(v) => v.replace("%", "")}
-                style={{ width: "50%" }}
               />
             </Form.Item>
-          </Space.Compact>
+            <Button
+              loading={priceLoading}
+              onClick={handleFetchPrice}
+              type="dashed"
+            >
+              Fiyatı Çek
+            </Button>
+          </Space>
         </Form.Item>
 
+        {/* Açıklamalar ––– */}
         <Form.Item label="Ana Açıklama" name="mainDescription">
           <Input.TextArea autoSize={{ minRows: 2 }} />
         </Form.Item>
@@ -191,6 +249,7 @@ const CreateProductPage = () => {
           <Input.TextArea autoSize={{ minRows: 2 }} />
         </Form.Item>
 
+        {/* Görseller ––– */}
         <Form.Item label="Ana Görseller">
           <Upload
             listType="picture-card"
@@ -245,8 +304,9 @@ const CreateProductPage = () => {
           </Upload>
         </Form.Item>
 
+        {/* Submit ––– */}
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Oluştur
           </Button>
         </Form.Item>

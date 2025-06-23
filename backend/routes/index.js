@@ -12,6 +12,8 @@ const campaignRoute = require("./campaign.js");
 const blogRoute = require("./blogs.js");
 const productReviewsRoute = require("./product-reviews.js");
 const visitRoute = require("./visits.js");
+const productPriceRoute = require("./productPrice");
+
 // Her rotayı ilgili yol altında kullanıyoruz
 router.use("/visits", visitRoute);
 router.use("/blogs", blogRoute);
@@ -23,5 +25,6 @@ router.use("/products", productRoute);
 router.use("/coupons", couponRoute);
 router.use("/users", userRoute);
 router.use("/payment", paymentRoute);
+router.use("/product-price", productPriceRoute);
 
 module.exports = router;

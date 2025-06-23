@@ -124,20 +124,42 @@ const PurchaseAndReviews = ({ product }) => {
               if (!logoSrc) return null;
 
               return (
-                <a
-                  key={index}
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="buy-link-logo-wrapper"
-                >
-                  <img
-                    src={logoSrc}
-                    alt={altText}
-                    className="buy-link-logo"
-                    title={altText}
-                  />
-                </a>
+                <div key={index} className="buy-link-card">
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="buy-link-logo-wrapper"
+                  >
+                    <img
+                      src={logoSrc}
+                      alt={altText}
+                      className="buy-link-logo"
+                      title={altText}
+                    />
+                  </a>
+                  <div className="buy-link-price">
+                    {product.price?.current != null ? (
+                      <>
+                        <span className="price-amount">
+                          {product.price.current.toLocaleString("tr-TR", {
+                            style: "currency",
+                            currency: "TRY",
+                          })}
+                        </span>
+                        {product.price?.discount > 0 && (
+                          <span className="price-discount">
+                            %{product.price.discount} indirim
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="price-not-available">
+                        Fiyat bilgisi yok
+                      </span>
+                    )}
+                  </div>
+                </div>
               );
             })
           ) : (
@@ -224,6 +246,10 @@ PurchaseAndReviews.propTypes = {
   product: PropTypes.shape({
     _id: PropTypes.string,
     buyLink: PropTypes.arrayOf(PropTypes.string),
+    price: PropTypes.shape({
+      current: PropTypes.number,
+      discount: PropTypes.number,
+    }),
   }),
 };
 
