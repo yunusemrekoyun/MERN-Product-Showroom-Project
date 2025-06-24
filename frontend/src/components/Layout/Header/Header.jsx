@@ -7,7 +7,19 @@ import "./Header.css";
 const { confirm } = Modal;
 
 const Header = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  /* ---------- 1) USER STATE & STORAGE SYNC ---------- */
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user"))
+  );
+
+  /* localStorage değiştiğinde (diğer sekme vs.) */
+  useEffect(() => {
+    const sync = () => setUser(JSON.parse(localStorage.getItem("user")));
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, []);
+
+  /* ---------- 2) MOBİL EKRAN TAKİBİ ---------- */
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -17,32 +29,38 @@ const Header = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  /* ---------- 3) UI ---------- */
   return (
     <header>
       <div className="header-top">
         <div className="container header-wrapper">
+          {/* Logo */}
           <div className="header-left">
             <Link to="/" className="logo">
               <img src="/logo/logo.png" alt="Site Logo" className="site-logo" />
             </Link>
           </div>
 
+          {/* Masaüstü arama */}
           {!isMobile && (
             <div className="header-center">
               <Search />
             </div>
           )}
 
+          {/* Sağ kısım */}
           <div className="header-right">
+            {/* Mobil arama ikonu */}
             {isMobile && (
               <div
                 className="mobile-search-icon"
-                onClick={() => setShowMobileSearch((prev) => !prev)}
+                onClick={() => setShowMobileSearch((p) => !p)}
               >
                 <i className="bi bi-search"></i>
               </div>
             )}
 
+            {/* ------ Giriş yapmamış ------ */}
             {!user ? (
               <>
                 <Link to="/login" className="header-icon">
@@ -55,6 +73,7 @@ const Header = () => {
                 </Link>
               </>
             ) : (
+              /* ------ Giriş yapmış ------ */
               <>
                 <Link to="/account" className="header-icon user-info">
                   <i className="bi bi-person-circle"></i>
@@ -72,6 +91,8 @@ const Header = () => {
                       cancelText: "Hayır",
                       onOk() {
                         localStorage.removeItem("user");
+                        localStorage.removeItem("token");
+                        setUser(null); // aynı sekmede anında güncelle
                         window.location.href = "/";
                       },
                     });
@@ -85,7 +106,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobil arama kutusu: geçişli şekilde */}
+        {/* Mobil tam-genişlik arama kutusu */}
         {isMobile && (
           <div
             className={`mobile-search-area ${showMobileSearch ? "show" : ""}`}

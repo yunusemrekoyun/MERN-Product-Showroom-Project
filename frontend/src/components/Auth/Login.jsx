@@ -29,7 +29,10 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("user", JSON.stringify(data));
+        const { token, user } = data;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
 
         // E-posta onaylı değilse modal göster
         if (!data.emailVerified) {

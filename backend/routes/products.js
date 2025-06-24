@@ -3,12 +3,12 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const multer = require("multer");
-
+const { verifyToken, isAdmin } = require("../middleware/auth");
 // Multer memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ── SEARCH must come *before* the “/:id” route ───────────────
+/* ───────── SEARCH (önce gelmeli) ───────── */
 router.get("/search/:keyword", async (req, res) => {
   try {
     const keyword = req.params.keyword;
@@ -55,14 +55,19 @@ router.get("/", async (req, res) => {
 });
 // ── READ ONE ────────────────────────────────────────────────
 router.get("/:id", async (req, res) => {
+  // ← sadece tek GET /:id kaldı
   try {
     const product = await Product.findById(req.params.id)
       .select("-mainImages.data -childImages1.data -childImages2.data")
       .populate("category", "name")
       .lean();
-
     if (!product) return res.status(404).json({ error: "Ürün bulunamadı." });
-    res.json(product);
+
+    const favoritedByCount = await mongoose.model("User").countDocuments({
+      favorites: product._id,
+    });
+
+    res.json({ ...product, favoritedByCount });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Sunucu hatası." });
@@ -71,6 +76,8 @@ router.get("/:id", async (req, res) => {
 // CREATE
 router.post(
   "/",
+  verifyToken,
+  isAdmin,
   upload.fields([
     { name: "mainImages" },
     { name: "childImages1" },
@@ -127,6 +134,8 @@ router.post(
 // UPDATE
 router.put(
   "/:id",
+  verifyToken,
+  isAdmin,
   upload.fields([
     { name: "mainImages" },
     { name: "childImages1" },
