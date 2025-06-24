@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { message, Modal } from "antd"; // ⬅ antd Button eklendi
-import "./register.css";
+import "./Register.css";
 
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // min 8 char, harf + rakam
 
