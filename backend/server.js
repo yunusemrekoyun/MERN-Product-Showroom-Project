@@ -21,7 +21,15 @@ const port = 5000;
 app.set("trust proxy", 1);
 
 // CORS ve logging
-app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://mern-product-showroom-project-asdf.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
