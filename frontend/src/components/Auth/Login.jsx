@@ -29,37 +29,31 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const { token, user } = data;
+        const { token, user, emailVerified } = data;
 
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
 
-        // E-posta onaylı değilse modal göster
-        if (!data.emailVerified) {
+        const redirectUser = () => {
+          if (user.role === "admin") {
+            window.location.href = "/admin";
+          } else {
+            navigate("/");
+            window.location.reload();
+          }
+        };
+
+        if (!emailVerified) {
           Modal.warning({
             title: "E-posta Doğrulaması Gerekli",
             content:
               "E-posta adresiniz henüz doğrulanmamış. Lütfen e-postanızı kontrol edin.",
             okText: "Tamam",
-            onOk: () => {
-              if (data.role === "admin") {
-                window.location.href = "/admin";
-              } else {
-                navigate("/");
-                window.location.reload();
-              }
-            },
+            onOk: redirectUser,
           });
         } else {
-          // Doğrulanmışsa direkt giriş
-          message.success("Giriş başarılı.").then(() => {
-            if (data.role === "admin") {
-              window.location.href = "/admin";
-            } else {
-              navigate("/");
-              window.location.reload();
-            }
-          });
+          message.success("Giriş başarılı.");
+          redirectUser();
         }
       } else {
         message.error(
@@ -74,7 +68,6 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      {/* SOL TARAF → FORM */}
       <div className="login-left">
         <div className="login-box">
           <div className="text-center">
@@ -126,7 +119,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* SAĞ TARAF → GÖRSEL ALAN */}
       <div className="login-right login-visual">
         <div className="right-content">
           <h2>Sizi yeniden görmek harika!</h2>
